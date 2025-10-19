@@ -2,7 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
-require('dotenv').config();
+// require('dotenv').config();
+require('@dotenvx/dotenvx').config({ silent: true });
 app.use(cors());
 app.use(express.json());
 
@@ -18,10 +19,12 @@ app.get('/', (req, res) => {
  })
 
  const Gallery = require('./routes/GalleryServer');
- app.use('/gallery', Gallery);
  const Contact = require('./routes/ContactServer');
- app.use('/contact', Contact);
+ const AboutUs = require('./routes/AboutServer');
 
+ app.use('/gallery', Gallery);
+ app.use('/contact', Contact);
+app.use('/aboutus', AboutUs);
  
  app.listen(5000, () => {
     console.log('Server is running on port 5000');

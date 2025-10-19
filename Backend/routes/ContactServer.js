@@ -2,7 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { Parser } = require('json2csv');
 const router = express.Router();
-
 const contactSchema = new mongoose.Schema({
   name: String,
   email: String,

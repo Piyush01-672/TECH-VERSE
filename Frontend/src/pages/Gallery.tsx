@@ -11,7 +11,7 @@ useEffect(() => {
     .then(data => setGalleryItems(data))
     .catch(error => console.error('Error fetching gallery items:', error));
 }, []);
-const [showAllIImages, setShowAllImages] = useState(true);
+// const [showAllImages, setShowAllImages] = useState(true);
   return (
     <div className="min-h-screen pt-20">
       {/* Hero Section */}
