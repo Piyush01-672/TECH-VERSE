@@ -5,6 +5,8 @@ import "./index.css";
 import Loading from "./components/Loading";
 
 // Create a wrapper component to handle initial loading
+
+
 const Root: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
 

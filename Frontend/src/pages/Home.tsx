@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, MapPin, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -9,8 +10,19 @@ import TechverseLogo from "@/assets/techverse-logo.jpg";
 import { Leaf } from "lucide-react";
 import UniversityLogo from "@/assets/univeee-logo.png";
 import SoetLogo from "@/assets/soet-logo.png";
+import { EnquiryDialog } from "@/components/EnquiryDialog";
 
 const Home = () => {
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 10000); // 10 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const stats = [
     { label: "Participants", value: "500+", icon: Users },
     { label: "Projects", value: "100+", icon: Code },
@@ -263,6 +275,8 @@ const Home = () => {
           </div>
         </div>
       </section>
+       {/* Enquiry Dialog */}
+      <EnquiryDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
     </div>
   );
 };
