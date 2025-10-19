@@ -10,3 +10,22 @@
 *.njsproj
 *.sln
 *.sw?
+# Ignore environment files
+Backend/.env
+backend/.env
+Frontend/.env
+frontend/.env
+
+# Node modules
+**/node_modules/
+
+# Logs
+*.log
+
+# Build files
+dist/
+build/
+
+# System files
+.DS_Store
+Thumbs.db
