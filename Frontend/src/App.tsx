@@ -8,7 +8,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
-import Gallery from "./pages/Gallery";
+import Events from "./pages/Events";
 import AboutUs from "./pages/AboutUs";
 import Sponsors from "./pages/Sponsors";
 import Winners from "./pages/Winners";
@@ -53,7 +53,7 @@ const AppContent: React.FC = () => {
       <Loading show={loading} />
       <Routes location={location}>
         <Route path="/" element={<Home />} />
-        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/events" element={<Events />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/sponsors" element={<Sponsors />} />
         <Route path="/winners" element={<Winners />} />
