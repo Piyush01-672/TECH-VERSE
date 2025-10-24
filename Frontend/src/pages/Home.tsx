@@ -61,7 +61,7 @@ const Home = () => {
       {/* ✅ HERO SECTION */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
         <div
-          className="absolute inset-0 z-0 brightness-[0.8] contrast-[1.2]"
+          className="absolute inset-0 z-0 brightness-[2] contrast-[1.2]"
           style={{
             backgroundImage: `url(${heroImage})`,
             backgroundSize: "cover",

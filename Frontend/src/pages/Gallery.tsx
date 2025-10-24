@@ -1,17 +1,16 @@
-import GallerySlider from "@/components/Slider";
 import { useEffect, useState } from "react";
-import Category_Carousel from "@/components/Category_Carousel";
+import Category_navbar from "@/components/category_navbar";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import { Card } from "@/components/ui/card";
 const Gallery = () => {
-
-const [galleryItems, setGalleryItems] = useState([]);
-useEffect(() => {
-  fetch(`${BACKEND_URL}/gallery`)
-    .then(res => res.json())
-    .then(data => setGalleryItems(data))
-    .catch(error => console.error('Error fetching gallery items:', error));
-}, []);
-// const [showAllImages, setShowAllImages] = useState(true);
+  const [galleryItems, setGalleryItems] = useState([]);
+  useEffect(() => {
+    fetch(`${BACKEND_URL}/gallery`)
+      .then((res) => res.json())
+      .then((data) => setGalleryItems(data))
+      .catch((error) => console.error("Error fetching gallery items:", error));
+  }, []);
+  // const [showAllImages, setShowAllImages] = useState(true);
   return (
     <div className="min-h-screen pt-20">
       {/* Hero Section */}
@@ -44,44 +43,52 @@ useEffect(() => {
             <span className="font-semibold text-[#FFD54F]">
               excitement and innovation{" "}
             </span>
-             of our previous{" "}
-            <span className="font-semibold text-[#d746ffff]">
-              Events
-            </span>{" "}
-            through our highlights. &nbsp;
-          </p><br />
+            of our previous{" "}
+            <span className="font-semibold text-[#d746ffff]">Events</span>{" "}
+            through our highlights.
+          </p>
+          <br />
         </div>
       </section>
 
       {/* Video Section */}
-      <section className="py-20 bg-gradient-to-b from-blue-50 via-blue-100 to-gray-200">
-        
-
-          {/* <div className="max-w-4xl mx-auto">
-            <Card className="overflow-hidden border-primary/20">
+      {/*  <Card className="overflow-hidden border-primary/20">
               <div className="aspect-video bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                <div className="text-center p-8">
-                  <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                    <div className="w-0 h-0 border-l-[15px] border-l-primary-foreground border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent ml-1" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
-                    Video Coming Soon
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Event recap video will be available soon.
-                  </p>
-                </div>
+              <div className="text-center p-8">
+              <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-0 h-0 border-l-[15px] border-l-primary-foreground border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent ml-1" />
               </div>
-            </Card>
-          </div>*/}
-        
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+              Video Coming Soon
+              </h3>
+              <p className="text-muted-foreground">
+              Event recap video will be available soon.
+              </p>
+              </div>
+              </div>
+              </Card>
+              </div>*/}
 
       {/* Gallery Grid */}
-      {/* <GallerySlider galleryItems={galleryItems} /> */}
-      <Category_Carousel galleryItems={galleryItems} />
-      {/* </div> */}
-      </section> 
-
+      <section className="py-20 bg-gradient-to-b from-blue-50 via-blue-100 to-gray-200 justify-center items-center">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-snug mb-6 justify-center text-center mx-auto items-center">
+            Past Events
+          </h2>
+          <Category_navbar galleryItems={galleryItems} />
+        </div>
+        <div className="max-w-4xl mx-auto mt-20 ">
+        <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-snug mb-6 justify-center text-center mx-auto items-center">
+            Upcoming Events
+          </h2>
+          {/* <Upcoming_Events /> */}
+          <Card className="p-8 max-w-2xl border-primary/20 flex justify-center items-center content-center mx-auto">
+    <p className="text-gray-500 text-lg md:text-xl font-medium">
+      Events will be announced soon! 🚀
+    </p>
+  </Card>
+        </div>
+      </section>
     </div>
   );
 };

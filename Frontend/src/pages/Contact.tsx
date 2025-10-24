@@ -108,7 +108,7 @@ const Contact = () => {
                 </h2>
                 <p className="text-lg text-muted-foreground">
                   Whether you're interested in sponsoring, participating, or
-                  just want to learn more about Code Crafter, we're here to
+                  just want to learn more about TechVerse, we're here to
                   help. Reach out to us through any of the channels below.
                 </p>
               </div>
