@@ -18,7 +18,7 @@ const Home = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsDialogOpen(true);
-    }, 10000); // 10 seconds
+    }, 3000); 
 
     return () => clearTimeout(timer);
   }, []);
@@ -112,6 +112,7 @@ const Home = () => {
             {/* Buttons with hover glow */}
             <div className="flex flex-wrap gap-6 justify-center pt-8">
               <Button
+              onClick={() => setIsDialogOpen(true)}
                 size="lg"
                 className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-10 py-6 text-lg shadow-lg shadow-secondary/40 hover:shadow-[0_0_25px_rgba(59,130,246,0.7)] transition-all duration-300"
               >
