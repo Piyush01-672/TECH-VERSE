@@ -2,7 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 
-// Mongoose Schema for Enquiry
 const EnquirySchema = new mongoose.Schema({
   name: { type: String, required: true },
   regNumber: { type: String, required: true },
@@ -17,7 +16,6 @@ const EnquirySchema = new mongoose.Schema({
 
 const Enquiry = mongoose.model('Enquiry', EnquirySchema);
 
-// GET all enquiries (optional, for admin)
 router.get('/', async (req, res) => {
   try {
     const enquiries = await Enquiry.find();
@@ -26,13 +24,11 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-// POST a new enquiry
 router.post('/', async (req, res) => {
   try {
     const data = req.body;
 
-    // Basic validation
+    
     if (!data.name || !data.regNumber || !data.contact || !data.email || !data.department || !data.batch || !data.interests) {
       return res.status(400).json({ message: 'All required fields must be filled.' });
     }

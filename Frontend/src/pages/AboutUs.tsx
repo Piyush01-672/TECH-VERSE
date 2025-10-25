@@ -120,7 +120,7 @@ const AboutUs = () => {
           </div>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 -inset-10 place-items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 -inset-10 place-items-center">
             {aboutUs.map((member, index) => (
               <div
                 key={member._id || index}
@@ -129,7 +129,7 @@ const AboutUs = () => {
                 onMouseLeave={() => handleMouseLeave(index)}
               >
                 <div
-                  className={`relative w-full h-full transition-transform duration-[9000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
+                  className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
                     flippedIndex === index ? "[transform:rotateY(180deg)]" : ""
                   }`}
                 >
