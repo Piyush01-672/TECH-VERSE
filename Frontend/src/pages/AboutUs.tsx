@@ -1,75 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Linkedin, Mail, Github } from "lucide-react";
-import sumanpreet from "@/assets/sumanpreet.jpg";
-import lakshman from "@/assets/lakshman.jpg";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const AboutUs = () => {
-  const teamMembers = [
-    {
-      name: "Lakshman kumar das",
-      role: "President - Techverse Club",
-      image: lakshman,
-      description:
-        "A visionary leader guiding the Techverse Club with years of academic excellence and innovation leadership.",
-    },
-    {
-      name: "Sumanpreet kaur",
-      role: "Vice President - Techverse Club",
-      image: sumanpreet,
-      description:
-        "Leading the Techverse Club with a mission to empower students through cutting-edge projects and collaboration.",
-    },
-    {
-      name: "Coming Soon",
-      role: "Technical Head",
-      image: "",
-      description:
-        "A passionate developer driving innovation and handling all technical operations within the club.",
-    },
-    {
-      name: "Coming Soon",
-      role: "Operations Head",
-      image: "",
-      description:
-        "Ensuring every event and operation runs smoothly through excellent organization and coordination.",
-    },
-    // {
-    //   name: "Vikram Singh",
-    //   role: "Marketing Head",
-    //   image: "VS",
-    //   description:
-    //     "Promoting the club and its events with creative marketing strategies and outreach campaigns.",
-    // },
-    // {
-    //   name: "Ananya Gupta",
-    //   role: "Design Head",
-    //   image: "AG",
-    //   description:
-    //     "Crafting visually stunning designs and creative assets for all Techverse events and projects.",
-    // },
-    // {
-    //   name: "Rohit Mehta",
-    //   role: "Sponsorship Head",
-    //   image: "RM",
-    //   description:
-    //     "Building partnerships with sponsors and managing corporate relations for seamless collaboration.",
-    // },
-    {
-      name: "Coming Soon",
-      role: "Content Head",
-      image: "I",
-      description:
-        "Handling all communications, writing content, and managing the public image of Techverse Club.",
-    },
-  ];
-
+  const [aboutUs, setAboutUs] = useState<any[]>([]);
   const [flippedIndex, setFlippedIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch(`${BACKEND_URL}/AboutUs`)
+      .then((res) => res.json())
+      .then((data) => {
+        const formattedData = Array.isArray(data) ? data : [data];
+        setAboutUs(formattedData);
+      })
+      .catch((error) =>
+        console.error("Error fetching team members:", error)
+      );
+  }, []);
 
   return (
     <div className="min-h-screen pt-20 bg-white">
-      {/* Hero Section */}
+        {/* Hero Section */}
       <section className="relative py-32 bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-white overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-20 left-16 w-10 h-10 bg-[#4676E6]/70 rounded-full animate-bounce-slow blur-md"></div>
@@ -87,9 +40,7 @@ const AboutUs = () => {
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
             Meet our{" "}
-            <span className="font-semibold text-[#FFD54F]">
-              passionate team
-            </span>{" "}
+            <span className="font-semibold text-[#FFD54F]">passionate team</span>{" "}
             who make{" "}
             <span className="font-semibold text-[#d746ffff]">Techverse</span>{" "}
             thrive with innovation and creativity.
@@ -102,7 +53,7 @@ const AboutUs = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 px-4">
             <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-snug mb-4 relative inline-block">
-              Core Organizing Team
+              TechVerse Members
             </h2>
             <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed text-gray-500">
               Dedicated leaders working tirelessly to create an unforgettable
@@ -114,9 +65,9 @@ const AboutUs = () => {
 
           {/* Flip Card Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {teamMembers.map((member, index) => (
+            {aboutUs.map((member, index) => (
               <div
-                key={index}
+                key={member._id || index}
                 className="group [perspective:1000px] cursor-pointer hover:scale-105 transition-transform duration-300"
                 onClick={() =>
                   setFlippedIndex(flippedIndex === index ? null : index)
@@ -131,27 +82,36 @@ const AboutUs = () => {
                   <Card className="absolute inset-0 p-6 text-center border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-shadow duration-300 group-hover:shadow-blue-300/50">
                     <div className="w-28 h-28 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-lg group-hover:scale-110 transition-transform duration-300">
                       <img
-                        src={member.image} // imported image like sumanpreet.jpg
-                        alt={member.name}
+                        src={member.img_url || "/default-profile.jpg"}
+                        alt={member.Name}
                         className="w-full h-full object-cover"
                       />
                     </div>
 
                     <h3 className="text-xl font-bold text-gray-800 mb-1">
-                      {member.name}
+                      {member.Name}
                     </h3>
                     <p className="text-blue-600 font-semibold mb-4">
-                      {member.role}
+                      {member.Designation}
                     </p>
 
                     <div className="flex gap-2 justify-center">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="p-2 hover:bg-blue-600 hover:text-white"
+                      {/* LinkedIn */}
+                      <a
+                        href={member.linkedin || "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
-                        <Linkedin size={16} />
-                      </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="p-2 hover:bg-blue-600 hover:text-white"
+                        >
+                          <Linkedin size={16} />
+                        </Button>
+                      </a>
+
+                      {/* Mail (optional placeholder for future use) */}
                       <Button
                         size="sm"
                         variant="outline"
@@ -159,20 +119,28 @@ const AboutUs = () => {
                       >
                         <Mail size={16} />
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="p-2 hover:bg-blue-600 hover:text-white"
+
+                      {/* GitHub */}
+                      <a
+                        href={member.github || "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
-                        <Github size={16} />
-                      </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="p-2 hover:bg-blue-600 hover:text-white"
+                        >
+                          <Github size={16} />
+                        </Button>
+                      </a>
                     </div>
                   </Card>
 
                   {/* Back Side */}
                   <Card className="absolute inset-0 p-6 text-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center">
                     <p className="text-sm leading-relaxed px-2 mb-4">
-                      {member.description}
+                      {member.Description}
                     </p>
                     <span className="text-xs opacity-80">
                       Click again to flip back ↩️

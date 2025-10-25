@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -36,6 +37,7 @@ const formSchema = z.object({
   department: z.enum(["btech", "bca"], { required_error: "Please select a department" }),
   batch: z.string().min(1, { message: "Please select a batch" }),
   interests: z.array(z.string()).min(1, { message: "Select at least one area of interest" }),
+  otherInterest: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -46,17 +48,18 @@ interface EnquiryDialogProps {
 }
 
 const areasOfInterest = [
-  "Web Development",
-  "Mobile Development",
-  "AI/ML",
-  "Data Science",
-  "Cybersecurity",
-  "Cloud Computing",
-  "DevOps",
-  "Game Development",
+  "Coding & App/Web Development",
+  "AI/ML & Data Science",
+  "Event Managment & Leadership",
+  "Cybersecurity & Forensics",
+  "Designing (UI/UX, Posters, Branding)",
+  "Content Creation & Social Media",
+  "Other",
 ];
 
 export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
+  const [showOther, setShowOther] = useState(false);
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -65,42 +68,47 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
       contact: "",
       email: "",
       interests: [],
+      otherInterest: "",
     },
   });
 
   const department = form.watch("department");
+  const interests = form.watch("interests");
 
-  // Generate batch options based on department
   const getBatchOptions = () => {
-    if (department === "btech") {
-      return ["2021-2025", "2022-2026", "2023-2027", "2024-2028"];
-    } else if (department === "bca") {
-      return ["2022-2025", "2023-2026", "2024-2027"];
-    }
+    if (department === "btech") return ["2021-2025", "2022-2026", "2023-2027", "2024-2028"];
+    if (department === "bca") return ["2022-2025", "2023-2026", "2024-2027"];
     return [];
   };
 
   const onSubmit = (data: FormData) => {
+    if (interests.includes("Other") && data.otherInterest) {
+      data.interests = [...interests.filter(i => i !== "Other"), data.otherInterest];
+    }
     console.log("Form submitted:", data);
     toast.success("Enquiry submitted successfully! We'll get back to you soon.", {
       description: "Thank you for your interest in Techverse!",
     });
     onOpenChange(false);
+    setShowOther(false);
     form.reset();
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto card-glow">
-        <DialogHeader>
-          <DialogTitle className="text-2xl gradient-text">Join Techverse Club</DialogTitle>
-          <DialogDescription>
-            Fill out this form to express your interest. We'll reach out with more information!
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-6 bg-white rounded-2xl shadow-xl">
+        <DialogHeader className="text-center">
+          <DialogTitle className="text-2xl md:text-3xl font-extrabold text-gray-800 mb-2">
+            Join Techverse & Elevate Your Skills 🚀 
+          </DialogTitle>
+          <DialogDescription className="text-gray-600 text-sm md:text-base">
+            Fill out the form below to become part of our vibrant tech community. Discover, learn, and grow with us!
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-4">
+            {/* Name */}
             <FormField
               control={form.control}
               name="name"
@@ -115,6 +123,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
               )}
             />
 
+            {/* Registration Number */}
             <FormField
               control={form.control}
               name="regNumber"
@@ -129,6 +138,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
               )}
             />
 
+            {/* Contact & Email */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -137,13 +147,12 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                   <FormItem>
                     <FormLabel>Contact Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="9876543210" {...field} />
+                      <Input placeholder="+91 XXXXX XXXXX" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="email"
@@ -159,6 +168,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
               />
             </div>
 
+            {/* Department & Batch */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -181,7 +191,6 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="batch"
@@ -212,13 +221,16 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
               />
             </div>
 
+            {/* Interests */}
             <FormField
               control={form.control}
               name="interests"
               render={() => (
                 <FormItem>
-                  <div className="mb-4">
-                    <FormLabel className="text-base">Areas of Interest</FormLabel>
+                  <div className="mb-2">
+                    <FormLabel className="text-base font-semibold text-gray-800">
+                      Areas of Interest
+                    </FormLabel>
                     <FormMessage />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -227,38 +239,54 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                         key={interest}
                         control={form.control}
                         name="interests"
-                        render={({ field }) => {
-                          return (
-                            <FormItem
-                              key={interest}
-                              className="flex flex-row items-start space-x-3 space-y-0"
-                            >
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(interest)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([...field.value, interest])
-                                      : field.onChange(
-                                          field.value?.filter((value) => value !== interest)
-                                        );
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal text-sm cursor-pointer">
-                                {interest}
-                              </FormLabel>
-                            </FormItem>
-                          );
-                        }}
+                        render={({ field }) => (
+                          <FormItem className="flex items-center space-x-2">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(interest)}
+                                onCheckedChange={(checked) => {
+                                  if (interest === "Other") setShowOther(Boolean(checked));
+                                  return checked
+                                    ? field.onChange([...field.value, interest])
+                                    : field.onChange(
+                                        field.value?.filter((value) => value !== interest)
+                                      );
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className="font-normal text-sm cursor-pointer text-gray-700">
+                              {interest}
+                            </FormLabel>
+                          </FormItem>
+                        )}
                       />
                     ))}
                   </div>
+
+                  {showOther && (
+                    <FormField
+                      control={form.control}
+                      name="otherInterest"
+                      render={({ field }) => (
+                        <FormItem className="mt-3">
+                          <FormLabel>Specify Other Interest</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Your custom interest" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </FormItem>
               )}
             />
 
-            <Button type="submit" className="w-full" variant="default" size="lg">
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              className="w-full py-3 text-lg font-semibold bg-blue-500 hover:bg-blue-600 text-white rounded-xl shadow-md transition-all duration-300"
+            >
               Submit Enquiry
             </Button>
           </form>
