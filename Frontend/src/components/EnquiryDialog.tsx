@@ -81,18 +81,31 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
     return [];
   };
 
-  const onSubmit = (data: FormData) => {
-    if (interests.includes("Other") && data.otherInterest) {
-      data.interests = [...interests.filter(i => i !== "Other"), data.otherInterest];
-    }
-    console.log("Form submitted:", data);
-    toast.success("Enquiry submitted successfully! We'll get back to you soon.", {
-      description: "Thank you for your interest in Techverse!",
+  const onSubmit = async (data: FormData) => {
+  if (interests.includes("Other") && data.otherInterest) {
+    data.interests = [...interests.filter(i => i !== "Other"), data.otherInterest];
+  }
+
+  try {
+    const response = await fetch('http://localhost:5000/enquiry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
     });
-    onOpenChange(false);
-    setShowOther(false);
-    form.reset();
-  };
+
+    if (response.ok) {
+      toast.success("Enquiry submitted successfully!");
+      onOpenChange(false);
+      setShowOther(false);
+      form.reset();
+    } else {
+      toast.error("Failed to submit enquiry.");
+    }
+  } catch (err) {
+    toast.error("Server error: " + err.message);
+  }
+};
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

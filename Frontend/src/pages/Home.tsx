@@ -11,6 +11,96 @@ import { Leaf } from "lucide-react";
 import UniversityLogo from "@/assets/univeee-logo.png";
 import SoetLogo from "@/assets/soet-logo.png";
 import { EnquiryDialog } from "@/components/EnquiryDialog";
+import { FaInstagram, FaWhatsapp, FaLinkedin, FaXTwitter,FaPlus } from "react-icons/fa6";
+
+
+
+
+import { BsShareFill } from "react-icons/bs";
+
+
+const socialLinks = [
+  {
+    label: "Instagram",
+    icon: <FaInstagram size={20} />,
+    link: "https://instagram.com/yourpage",
+    color: "bg-pink-500",
+  },
+  {
+    label: "WhatsApp",
+    icon: <FaWhatsapp size={20} />,
+    link: "https://chat.whatsapp.com/your-community-link",
+    color: "bg-green-500",
+  },
+  {
+    label: "X (Twitter)",
+    icon: <FaXTwitter size={20} />,
+    link: "https://x.com/yourhandle",
+    color: "bg-gray-800",
+  },
+  {
+    label: "LinkedIn",
+    icon: <FaLinkedin size={20} />,
+    link: "https://linkedin.com/in/yourprofile",
+    color: "bg-blue-600",
+  },
+];
+
+export function FloatingSocials() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div
+      className="fixed bottom-6"
+      style={{
+        right: 24,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-end",
+        gap: "12px",
+        zIndex: 9999,
+      }}
+    >
+      {socialLinks.map((item, index) => (
+        <a
+          key={index}
+          href={item.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={item.label}
+          className={`flex items-center justify-center text-white shadow-lg rounded-full p-3 transition-all duration-300 transform
+            ${item.color}
+            ${open ? `opacity-100 translate-y-0` : `opacity-0 translate-y-4 pointer-events-none`}
+          `}
+          style={{
+            transitionDelay: `${index * 80}ms`,
+          }}
+          // Hover styles using tailwind classes added inline:
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "scale(1.15)";
+            e.currentTarget.style.boxShadow = "0 0 10px rgba(255,255,255,0.6)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "";
+            e.currentTarget.style.boxShadow = "";
+          }}
+        >
+          {item.icon}
+        </a>
+      ))}
+
+      <button
+  onClick={() => setOpen(!open)}
+  className="bg-blue-600 text-white p-4 rounded-2xl shadow-xl transition-all duration-300
+             hover:bg-blue-500 hover:scale-105 hover:shadow-[0_0_15px_rgba(59,130,246,0.7)]"
+>
+  <BsShareFill size={22} />
+</button>
+    </div>
+  );
+}
+
+
 
 const Home = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -278,8 +368,10 @@ const Home = () => {
       </section>
        {/* Enquiry Dialog */}
       <EnquiryDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
+      <FloatingSocials />
     </div>
   );
 };
 
 export default Home;
+
