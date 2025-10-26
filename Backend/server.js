@@ -23,6 +23,10 @@ app.get('/', (req, res) => {
  const AboutUs = require('./routes/AboutServer');
  const Enquiry = require('./routes/Enquiry');
  const Mentor = require('./routes/Mentor');
+ const Leader = require('./routes/Leaders');
+
+app.use('/leaders', Leader);
+
 
 
 

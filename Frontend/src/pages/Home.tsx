@@ -12,6 +12,7 @@ import UniversityLogo from "@/assets/univeee-logo.png";
 import SoetLogo from "@/assets/soet-logo.png";
 import { EnquiryDialog } from "@/components/EnquiryDialog";
 import { FaInstagram, FaWhatsapp, FaLinkedin, FaXTwitter,FaPlus } from "react-icons/fa6";
+import {  Code2, Cpu, Database, Globe,  Binary } from "lucide-react";
 
 
 
@@ -148,84 +149,139 @@ const Home = () => {
   ];
   return (
     <div className="min-h-screen">
-      {/* ✅ HERO SECTION */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
-        <div
-          className="absolute inset-0 z-0 brightness-[2] contrast-[1.2]"
-          style={{
-            backgroundImage: `url(${heroImage})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/70 to-black/90" />
-        </div>
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
+  {/* Animated Tech Background */}
+  <div className="absolute inset-0 overflow-hidden">
+    {/* Grid Pattern */}
+    <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f46e510_1px,transparent_1px),linear-gradient(to_bottom,#4f46e510_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center space-y-10 animate-fade-in-up">
-            {/* Edition Badge */}
-            <div className="inline-block px-6 py-2 bg-secondary/20 backdrop-blur-sm rounded-full border border-secondary/30">
-              <span className="text-secondary font-semibold">Since 2025</span>
-            </div>
+    {/* Glowing Circuit Lines */}
+    <div className="absolute top-20 left-10 w-72 h-72 border-2 border-cyan-400/30 rounded-lg animate-[spin_20s_linear_infinite] shadow-[0_0_50px_rgba(34,211,238,0.3)]">
+      <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
+      <div className="absolute top-0 left-1/2 w-0.5 h-full bg-gradient-to-b from-transparent via-cyan-400 to-transparent"></div>
+    </div>
+    <div className="absolute top-40 right-20 w-64 h-64 border-2 border-blue-400/30 rounded-full animate-[spin_15s_linear_infinite_reverse] shadow-[0_0_50px_rgba(59,130,246,0.3)]">
+      <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+    </div>
+    <div className="absolute bottom-20 left-1/4 w-80 h-80 border-2 border-purple-400/30 rounded-lg animate-[spin_25s_linear_infinite] shadow-[0_0_50px_rgba(168,85,247,0.3)]">
+      <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-purple-400 to-transparent"></div>
+      <div className="absolute top-0 left-1/2 w-0.5 h-full bg-gradient-to-b from-transparent via-purple-400 to-transparent"></div>
+    </div>
 
-            
-            <h1 className="text-6xl md:text-8xl font-bold font-space bg-gradient-to-r from-[#6EE7B7] via-[#3B82F6] to-[#9333EA] bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(147,51,234,0.6)]">
-              TechVerse
-            </h1>
+    {/* Floating Tech Icons with Glow */}
+    <div className="absolute top-32 right-1/4 animate-[bounce_3s_ease-in-out_infinite]">
+      <div className="p-4 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 backdrop-blur-sm rounded-xl border border-cyan-400/30 shadow-[0_0_30px_rgba(34,211,238,0.4)]">
+        <Code2 className="w-8 h-8 text-cyan-400" />
+      </div>
+    </div>
+    <div className="absolute bottom-40 right-1/3 animate-[bounce_4s_ease-in-out_infinite_1s]">
+      <div className="p-4 bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-full border border-purple-400/30 shadow-[0_0_30px_rgba(168,85,247,0.4)]">
+        <Cpu className="w-8 h-8 text-purple-400" />
+      </div>
+    </div>
+    <div className="absolute top-1/2 left-20 animate-[bounce_3.5s_ease-in-out_infinite_0.5s]">
+      <div className="p-4 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 backdrop-blur-sm rounded-xl border border-blue-400/30 shadow-[0_0_30px_rgba(59,130,246,0.4)]">
+        <Database className="w-8 h-8 text-blue-400" />
+      </div>
+    </div>
+    <div className="absolute top-1/4 right-1/2 animate-[bounce_3.8s_ease-in-out_infinite_0.3s]">
+      <div className="p-3 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 backdrop-blur-sm rounded-lg border border-emerald-400/30 shadow-[0_0_30px_rgba(16,185,129,0.4)]">
+        <Globe className="w-6 h-6 text-emerald-400" />
+      </div>
+    </div>
+    <div className="absolute bottom-1/4 left-1/3 animate-[bounce_4.2s_ease-in-out_infinite_0.8s]">
+      <div className="p-3 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur-sm rounded-full border border-yellow-400/30 shadow-[0_0_30px_rgba(234,179,8,0.4)]">
+        <Zap className="w-6 h-6 text-yellow-400" />
+      </div>
+    </div>
 
-            {/* Description */}
-            <p className="text-xl md:text-2xl max-w-3xl mx-auto bg-gradient-to-r from-[#93C5FD] via-[#E0F2FE] to-[#C7D2FE] bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(59,130,246,0.4)]">
-              The ultimate tech club
-              <Typewriter
-                words={[
-                  " that transform Ideas into Reality.",
-                  ". Join the Ultimate Community Experience.",
-                ]}
-                loop={true}
-                cursor
-                cursorStyle="|"
-                typeSpeed={90}
-                deleteSpeed={60}
-                delaySpeed={1500}
-              />
-            </p>
+    {/* Glowing Particles */}
+    {[...Array(20)].map((_, i) => (
+      <div
+        key={i}
+        className="absolute w-1 h-1 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,211,238,0.8)]"
+        style={{
+          top: `${Math.random() * 100}%`,
+          left: `${Math.random() * 100}%`,
+          animationDelay: `${Math.random() * 3}s`,
+          animationDuration: `${2 + Math.random() * 2}s`
+        }}
+      ></div>
+    ))}
 
-            {/* Date & Location */}
-            <div className="flex flex-wrap items-center justify-center gap-6 text-white/90 mt-6">
-              <div className="flex items-center gap-2"></div>
-              <div className="flex items-center gap-2 mr-10">
-                <MapPin size={20} />
-                <span className="font-medium">CT University, Punjab</span>
-              </div>
-            </div>
+    {/* Binary Rain Effect */}
+    <div className="absolute top-0 left-1/4 text-cyan-400/20 font-mono text-xs animate-[slideDown_10s_linear_infinite]">
+      <Binary className="w-4 h-4" />
+    </div>
+    <div className="absolute top-0 right-1/3 text-blue-400/20 font-mono text-xs animate-[slideDown_12s_linear_infinite]">
+      <Binary className="w-4 h-4" />
+    </div>
 
-            {/* Buttons with hover glow */}
-            <div className="flex flex-wrap gap-6 justify-center pt-8">
-              <Button
-              onClick={() => setIsDialogOpen(true)}
-                size="lg"
-                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-10 py-6 text-lg shadow-lg shadow-secondary/40 hover:shadow-[0_0_25px_rgba(59,130,246,0.7)] transition-all duration-300"
-              >
-                Join now
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="bg-white/10 hover:bg-white/20 text-white border-white/30 px-10 py-6 text-lg backdrop-blur-sm hover:shadow-[0_0_25px_rgba(255,255,255,0.6)] transition-all duration-300"
-              >
-                <Link to="/about">About us</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
+    {/* Large Glow Effects */}
+    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-[100px]"></div>
+    <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px]"></div>
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[120px]"></div>
+  </div>
 
-        {/* Floating Circles */}
-        <div className="absolute top-20 left-10 w-20 h-20 bg-secondary/20 rounded-full blur-xl animate-float" />
-        <div
-          className="absolute bottom-20 right-10 w-32 h-32 bg-accent/20 rounded-full blur-xl animate-float"
-          style={{ animationDelay: "2s" }}
-        />
-      </section>
+{/* ✅ CENTERED CONTENT */}
+<div className="relative z-10 flex flex-col items-center justify-center text-center px-6 space-y-10 pt-32 pb-20">
+  {/* Edition Badge */}
+  <div className="inline-block px-6 py-2 bg-secondary/20 backdrop-blur-sm rounded-full border border-secondary/30 shadow-md">
+    <span className="text-secondary font-semibold tracking-wide">Since 2025</span>
+  </div>
+
+  {/* Title */}
+  <h1 className="text-6xl md:text-8xl font-bold font-space bg-gradient-to-r from-[#6EE7B7] via-[#3B82F6] to-[#9333EA] bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(147,51,234,0.6)] leading-[1.15]">
+    TechVerse
+  </h1>
+
+  {/* Description */}
+  <p className="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed tracking-wide bg-gradient-to-r from-[#93C5FD] via-[#E0F2FE] to-[#C7D2FE] bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(59,130,246,0.4)]">
+    The ultimate tech club
+    <Typewriter
+      words={[
+        " that transforms Ideas into Reality.",
+        " where Innovation meets Community.",
+      ]}
+      loop={true}
+      cursor
+      cursorStyle="|"
+      typeSpeed={90}
+      deleteSpeed={60}
+      delaySpeed={1500}
+    />
+  </p>
+
+  {/* Location */}
+  <div className="flex flex-wrap items-center justify-center gap-4 text-white/90 mt-6">
+    <div className="flex items-center gap-2">
+      <MapPin size={22} />
+      <span className="font-medium tracking-wide">CT University, Punjab</span>
+    </div>
+  </div>
+
+  {/* Buttons */}
+  <div className="flex flex-wrap gap-6 justify-center mt-10">
+    <Button
+      onClick={() => setIsDialogOpen(true)}
+      size="lg"
+      className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-10 py-6 text-lg shadow-lg shadow-secondary/40 hover:shadow-[0_0_25px_rgba(59,130,246,0.7)] transition-all duration-300 rounded-xl"
+    >
+      Join now
+    </Button>
+    <Button
+      size="lg"
+      variant="outline"
+      className="bg-white/10 hover:bg-white/20 text-white border-white/30 px-10 py-6 text-lg backdrop-blur-sm hover:shadow-[0_0_25px_rgba(255,255,255,0.6)] transition-all duration-300 rounded-xl"
+    >
+      <Link to="/about">About us</Link>
+    </Button>
+  </div>
+</div>
+
+
+</section>
+
 
       {/* { MY TECHVERSE } */}
       <section className="relative py-10 bg-gradient-to-b from-blue-50 via-blue-100 to-gray-100 overflow-hidden">
