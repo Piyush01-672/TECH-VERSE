@@ -1,9 +1,10 @@
-import React, { useCallback,useEffect } from 'react'
+import React, { useCallback,useState } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import Autoplay from 'embla-carousel-autoplay'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
 import ClassNames from 'embla-carousel-class-names'
+import DOMPurify from 'dompurify'
 
 interface GalleryItem {
   _id: string;
@@ -28,6 +29,8 @@ export default function ImageCarousel({ galleryItems }: { galleryItems: GalleryI
     if (emblaApi) emblaApi.scrollNext()
   }, [emblaApi])
 
+  const Description = galleryItems.find((item) => item.description)?.description || ''
+  const [showFull, setShowFull] = useState(false);
   return (
     <div className="embla">
       <div className="embla__viewport w-[100vw] sm:w-[90vw]" ref={emblaRef}>
@@ -59,6 +62,20 @@ export default function ImageCarousel({ galleryItems }: { galleryItems: GalleryI
           <ChevronRight />
         </button>
       </div>
+    {Description && (
+      <div className="mt-3 text-justify text-black-200 text-sm md:text-base w-[65vw]">
+        <p
+          className={`${showFull ? 'line-clamp-none' : 'line-clamp-4'} whitespace-pre-line`}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(Description) }}
+        ></p>
+        <button
+          className="mt-1 text-blue-400 hover:text-blue-300 underline"
+          onClick={() => setShowFull((prev) => !prev)}
+        >
+          {showFull ? 'Show less' : 'Know more'}
+        </button>
+      </div>
+    )}
     </div>
   )
 }

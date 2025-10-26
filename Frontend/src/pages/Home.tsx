@@ -1,24 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, MapPin, Zap } from "lucide-react";
+import {MapPin, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
-import heroImage from "@/assets/hero-bg.jpg";
 import { Typewriter } from "react-simple-typewriter";
 import { Code, Trophy, Users, Sparkles } from "lucide-react";
 import TechverseLogo from "@/assets/techverse-logo.jpg";
-import { Leaf } from "lucide-react";
 import UniversityLogo from "@/assets/univeee-logo.png";
 import SoetLogo from "@/assets/soet-logo.png";
 import { EnquiryDialog } from "@/components/EnquiryDialog";
-import { FaInstagram, FaWhatsapp, FaLinkedin, FaXTwitter,FaPlus } from "react-icons/fa6";
+import { FaInstagram, FaWhatsapp, FaLinkedin, FaXTwitter} from "react-icons/fa6";
 import {  Code2, Cpu, Database, Globe,  Binary } from "lucide-react";
 
 
 
 
-import { BsShareFill } from "react-icons/bs";
 
+import { Send } from "lucide-react";
 
 const socialLinks = [
   {
@@ -95,7 +92,7 @@ export function FloatingSocials() {
   className="bg-blue-600 text-white p-4 rounded-2xl shadow-xl transition-all duration-300
              hover:bg-blue-500 hover:scale-105 hover:shadow-[0_0_15px_rgba(59,130,246,0.7)]"
 >
-  <BsShareFill size={22} />
+  <Send size={22} />
 </button>
     </div>
   );
@@ -279,9 +276,18 @@ const Home = () => {
     
   </div>
   {/* Moving Announcement Line */}
-<div className="relative w-full mt-1 overflow-hidden">
-  <div className="animate-marquee whitespace-nowrap text-blue-400 font-semibold text-lg tracking-wide mt-10">
-    🔔 TechVerse Updates: 🚀 Hackathon 2025 registrations are LIVE! — 🧠 AI & Web3 Workshop this week! — 🏆 Submit your ideas by Nov 10th! — 💡 Stay tuned for more updates!
+
+</div>
+
+
+<div className="absolute bottom-5 w-full mt-1 overflow-hidden flex ">
+  <div className="flex-shrink-0 mt-10 mr-4 bg-black z-10">
+    <p className="text-blue-400 font-semibold text-lg tracking-wide ">
+      🔔 TechVerse Updates:
+    </p>
+  </div>
+  <div className="animate-marquee whitespace-nowrap text-blue-400 font-semibold text-lg tracking-wide mt-10 z-1">
+  🚀 Hackathon 2025 registrations are LIVE! — 🧠 AI & Web3 Workshop this week! — 🏆 Submit your ideas by Nov 10th! — 💡 Stay tuned for more updates!
   </div>
 
   <style>{`
@@ -301,10 +307,6 @@ const Home = () => {
     }
   `}</style>
 </div>
-
-</div>
-
-
 
 </section>
 
