@@ -12,6 +12,7 @@ const AboutUsSchema = new mongoose.Schema({
 });
 const AboutUs = mongoose.model('AboutUs', AboutUsSchema);
 
+
 router.get('/', async (req, res) => {
     try {
       const data = await AboutUs.find();

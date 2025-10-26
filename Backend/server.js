@@ -22,12 +22,16 @@ app.get('/', (req, res) => {
  const Contact = require('./routes/ContactServer');
  const AboutUs = require('./routes/AboutServer');
  const Enquiry = require('./routes/Enquiry');
+ const Mentor = require('./routes/Mentor');
+
 
 
  app.use('/gallery', Gallery);
  app.use('/contact', Contact);
 app.use('/aboutus', AboutUs);
-app.use('/enquiry', Enquiry)
+app.use('/enquiry', Enquiry);
+app.use('/mentors', Mentor);
+
  
  app.listen(5000, () => {
     console.log('Server is running on port 5000');

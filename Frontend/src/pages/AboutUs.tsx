@@ -3,14 +3,15 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Linkedin, Mail, Github } from "lucide-react";
 import Logo from "@/assets/techverse-logo.jpg";
-
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const AboutUs = () => {
   const [aboutUs, setAboutUs] = useState<any[]>([]);
+  const [mentors, setMentors] = useState<any[]>([]); // ✅ moved inside component
   const [flippedIndex, setFlippedIndex] = useState<number | null>(null);
   const hoverTimers = new Map<number, ReturnType<typeof setTimeout>>();
 
+  // ✅ Fetch Team Members
   useEffect(() => {
     fetch(`${BACKEND_URL}/AboutUs`)
       .then((res) => res.json())
@@ -21,8 +22,18 @@ const AboutUs = () => {
       .catch((error) => console.error("Error fetching team members:", error));
   }, []);
 
+  // ✅ Fetch Mentors
+  useEffect(() => {
+    fetch(`${BACKEND_URL}/mentors`)
+      .then((res) => res.json())
+      .then((data) => {
+        const formattedData = Array.isArray(data) ? data : [data];
+        setMentors(formattedData);
+      })
+      .catch((err) => console.error("Error fetching mentors:", err));
+  }, []);
+
   const handleMouseEnter = (index: number) => {
-    // Wait 3 seconds before flipping
     const timer = setTimeout(() => {
       setFlippedIndex(index);
     }, 1800);
@@ -30,11 +41,9 @@ const AboutUs = () => {
   };
 
   const handleMouseLeave = (index: number) => {
-    // Clear timer if hover < 3s
     const timer = hoverTimers.get(index);
     if (timer) clearTimeout(timer);
     hoverTimers.delete(index);
-    // Flip back when leaving
     setFlippedIndex(null);
   };
 
@@ -119,82 +128,165 @@ const AboutUs = () => {
             </p>
           </div>
 
-          {/* Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 -inset-10 place-items-center">
-            {aboutUs.map((member, index) => (
-              <div
-                key={member._id || index}
-                className="relative w-72 h-72 [perspective:1000px]"
-                onMouseEnter={() => handleMouseEnter(index)}
-                onMouseLeave={() => handleMouseLeave(index)}
-              >
-                <div
-                  className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
-                    flippedIndex === index ? "[transform:rotateY(180deg)]" : ""
-                  }`}
-                >
-                  {/* Front Side */}
-                  <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
-                    <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
-                      <img
-                        src={member.img_url || "/default-profile.jpg"}
-                        alt={member.Name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-800 mb-1">
-                      {member.Name}
-                    </h3>
-                    <p className="text-blue-600 font-semibold mb-3 text-sm">
-                      {member.Designation}
-                    </p>
+         {/* Cards Grid */}
+<div className="flex flex-col items-center gap-14">
+  {/* Row 1 → first 3 cards */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-40 gap-y-12 justify-items-center">
+    {aboutUs.slice(0, 3).map((member, index) => (
+      <div
+        key={member._id || index}
+        className="relative w-64 h-64 [perspective:1000px]"
+        onMouseEnter={() => handleMouseEnter(index)}
+        onMouseLeave={() => handleMouseLeave(index)}
+      >
+        <div
+          className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
+            flippedIndex === index ? "[transform:rotateY(180deg)]" : ""
+          }`}
+        >
+          {/* Front Side */}
+          <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
+            <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
+              <img
+                src={member.img_url || "/default-profile.jpg"}
+                alt={member.Name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <h3 className="text-lg font-bold text-gray-800 mb-1 text-center leading-tight">
+              {member.Name}
+            </h3>
+            <p className="text-blue-600 font-semibold text-sm text-center mb-2">
+              {member.Designation}
+            </p>
+          </Card>
 
-                    <div className="flex gap-2 justify-center">
-                      <a href={member.linkedin || "#"} target="_blank" rel="noreferrer">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="p-2 hover:bg-blue-600 hover:text-white"
-                        >
-                          <Linkedin size={16} />
-                        </Button>
-                      </a>
+          {/* Back Side */}
+          <Card className="absolute inset-0 p-6 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
+            <p className="text-sm leading-relaxed px-2 mb-4 text-center">
+              {member.Description}
+            </p>
+            <span className="text-xs opacity-80">
+              Hover away to flip back ↩️
+            </span>
+          </Card>
+        </div>
+      </div>
+    ))}
+  </div>
 
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="p-2 hover:bg-blue-600 hover:text-white"
-                      >
-                        <Mail size={16} />
-                      </Button>
-
-                      <a href={member.github || "#"} target="_blank" rel="noreferrer">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="p-2 hover:bg-blue-600 hover:text-white"
-                        >
-                          <Github size={16} />
-                        </Button>
-                      </a>
-                    </div>
-                  </Card>
-
-                  {/* Back Side */}
-                  <Card className="absolute inset-0 p-6 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                    <p className="text-sm leading-relaxed px-2 mb-4 text-center">
-                      {member.Description}
-                    </p>
-                    <span className="text-xs opacity-80">
-                      Hover away to flip back ↩️
-                    </span>
-                  </Card>
-                </div>
+  {/* Row 2 → next 5 cards */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-16 gap-y-12 justify-items-center">
+    {aboutUs.slice(3).map((member, index) => {
+      const actualIndex = index + 3; // fix index for flipping
+      return (
+        <div
+          key={member._id || actualIndex}
+          className="relative w-64 h-64 [perspective:1000px]"
+          onMouseEnter={() => handleMouseEnter(actualIndex)}
+          onMouseLeave={() => handleMouseLeave(actualIndex)}
+        >
+          <div
+            className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
+              flippedIndex === actualIndex ? "[transform:rotateY(180deg)]" : ""
+            }`}
+          >
+            {/* Front Side */}
+            <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
+              <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
+                <img
+                  src={member.img_url || "/default-profile.jpg"}
+                  alt={member.Name}
+                  className="w-full h-full object-cover"
+                />
               </div>
-            ))}
+              <h3 className="text-lg font-bold text-gray-800 mb-1 text-center leading-tight">
+                {member.Name}
+              </h3>
+              <p className="text-blue-600 font-semibold text-sm text-center mb-1">
+                {member.Designation}
+              </p>
+            </Card>
+
+            {/* Back Side */}
+            <Card className="absolute inset-0 p-6 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
+              <p className="text-sm leading-relaxed px-2 mb-4 text-center">
+                {member.Description}
+              </p>
+              <span className="text-xs opacity-80">
+                Hover away to flip back ↩️
+              </span>
+            </Card>
           </div>
         </div>
+      );
+    })}
+  </div>
+</div>
+          </div>
+
       </section>
+
+
+   {/* Mentors Section */}
+<section className="py-20 bg-white">
+  <div className="container mx-auto px-4 text-center mb-16">
+    <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+      Mentors
+    </h2>
+    <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500">
+      Guiding us with their wisdom, expertise, and constant motivation.
+    </p>
+  </div>
+
+  {/* Mentor Cards */}
+  <div className="flex flex-col items-center gap-14">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-32 gap-y-12 justify-items-center">
+      {mentors.map((member, index) => (
+        <div
+          key={member._id || index}
+          className="relative w-64 h-64 [perspective:1000px]"
+          onMouseEnter={() => handleMouseEnter(index + 100)} // offset to avoid clash
+          onMouseLeave={() => handleMouseLeave(index + 100)}
+        >
+          <div
+            className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
+              flippedIndex === index + 100 ? "[transform:rotateY(180deg)]" : ""
+            }`}
+          >
+            {/* Front Side */}
+            <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
+              <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
+                <img
+                  src={member.img_url || "/default-profile.jpg"}
+                  alt={member.Name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h3 className="text-lg font-bold text-gray-800 mb-1 text-center leading-tight">
+                {member.Name}
+              </h3>
+              <p className="text-blue-600 font-semibold text-sm text-center mb-1">
+                {member.Designation}
+              </p>
+            </Card>
+
+            {/* Back Side */}
+            <Card className="absolute inset-0 p-6 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
+              <p className="text-sm leading-relaxed px-2 mb-4 text-center">
+                {member.Description}
+              </p>
+              <span className="text-xs opacity-80">
+                Hover away to flip back ↩️
+              </span>
+            </Card>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-br from-blue-500 to-cyan-400 relative overflow-hidden">
