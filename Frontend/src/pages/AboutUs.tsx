@@ -483,7 +483,7 @@ useEffect(() => {
     return (
       <div
         key={member._id || index}
-        className={`relative w-60 h-56 [perspective:1000px] transition-transform duration-700 ${lift}`}
+        className={`relative w-60 h-52 [perspective:1000px] transition-transform duration-700 ${lift}`}
         onMouseEnter={() => handleMouseEnter(index + 400)}
         onMouseLeave={() => handleMouseLeave(index + 400)}
       >
@@ -784,10 +784,10 @@ useEffect(() => {
 
 
 {/* Final Row — Leader connected to Worker (Horizontal Layout) */}
-{/* <div className="relative flex justify-center items-center mt-24">
- */}
+ <div className="relative flex justify-center items-center mt-24">
+ 
   {/* Leader Card (Left) */}
-  {/* {leaders.slice(22, 23).map((member, index) => (
+  {leaders.slice(22, 23).map((member, index) => (
     <div
       key={member._id || index}
       className="relative w-60 h-56 [perspective:1000px] transition-transform duration-700 mr-24 z-10"
@@ -798,9 +798,9 @@ useEffect(() => {
         className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
           flippedIndex === index + 1100 ? "[transform:rotateY(180deg)]" : ""
         }`}
-      > */}
+      > 
         {/* Front */}
-        {/* <Card className="absolute inset-0 flex flex-col justify-center items-center p-5 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
+         <Card className="absolute inset-0 flex flex-col justify-center items-center p-5 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
           <div className="w-20 h-20 mb-3 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
             <img
               src={member.img_url || "/default-profile.jpg"}
@@ -814,30 +814,30 @@ useEffect(() => {
           <p className="text-blue-600 font-semibold text-xs text-center mb-2">
             {member.Designation}
           </p>
-        </Card> */}
+        </Card> 
 
         {/* Back */}
-        {/* <Card className="absolute inset-0 p-4 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
+         <Card className="absolute inset-0 p-4 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
           <p className="text-xs leading-relaxed px-2 text-center">
             {member.description}
           </p>
         </Card>
       </div>
     </div>
-  ))} */}
+  ))} 
 
   {/* Connector Line */}
-  {/* <svg
+   <svg
     className="absolute left-1/2 -translate-x-1/2 w-[250px] h-[4px]"
     viewBox="0 0 250 4"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path d="M0 2 L250 2" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
-  </svg> */}
+  </svg> 
 
   {/* Worker Card (Right) */}
-  {/* {leaders.slice(23, 24).map((member, index) => (
+   {leaders.slice(23, 24).map((member, index) => (
     <div
       key={member._id || index}
       className="relative w-60 h-56 [perspective:1000px] transition-transform duration-700 ml-24 z-10"
@@ -848,9 +848,9 @@ useEffect(() => {
         className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
           flippedIndex === index + 1200 ? "[transform:rotateY(180deg)]" : ""
         }`}
-      > */}
+      > 
         {/* Front */}
-        {/* <Card className="absolute inset-0 flex flex-col justify-center items-center p-5 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
+         <Card className="absolute inset-0 flex flex-col justify-center items-center p-5 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
           <div className="w-20 h-20 mb-3 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
             <img
               src={member.img_url || "/default-profile.jpg"}
@@ -864,10 +864,10 @@ useEffect(() => {
           <p className="text-blue-600 font-semibold text-xs text-center mb-2">
             {member.Designation}
           </p>
-        </Card> */}
+        </Card> 
 
         {/* Back */}
-        {/* <Card className="absolute inset-0 p-4 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
+         <Card className="absolute inset-0 p-4 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
           <p className="text-xs leading-relaxed px-2 text-center">
             {member.description}
           </p>
@@ -878,7 +878,7 @@ useEffect(() => {
 </div>
 
     
-   */}
+   
    </div>
 </section>
 
