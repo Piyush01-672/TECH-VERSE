@@ -231,7 +231,7 @@ const Home = () => {
   </div>
 
   {/* Title */}
-  <h1 className="text-6xl md:text-8xl font-bold font-space bg-gradient-to-r from-[#6EE7B7] via-[#3B82F6] to-[#9333EA] bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(147,51,234,0.6)] leading-[1.15]">
+  <h1 className="text-6xl md:text-8xl font-bold font-space bg-gradient-to-r from-[#6EE7B7] via-[#3B82F6] to-[#9333EA] bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(147,51,234,0.6)] leading-[1.15] mt-8">
     TechVerse
   </h1>
 
@@ -253,7 +253,7 @@ const Home = () => {
   </p>
 
   {/* Location */}
-  <div className="flex flex-wrap items-center justify-center gap-4 text-white/90 mt-6">
+  <div className="flex flex-wrap items-center justify-center gap-4 text-white/90 mt-12">
     <div className="flex items-center gap-2">
       <MapPin size={22} />
       <span className="font-medium tracking-wide">CT University, Punjab</span>
@@ -261,7 +261,7 @@ const Home = () => {
   </div>
 
   {/* Buttons */}
-  <div className="flex flex-wrap gap-6 justify-center mt-10">
+  <div className="flex flex-wrap gap-6 justify-center mt-19">
     <Button
       onClick={() => setIsDialogOpen(true)}
       size="lg"
@@ -276,8 +276,34 @@ const Home = () => {
     >
       <Link to="/about">About us</Link>
     </Button>
+    
   </div>
+  {/* Moving Announcement Line */}
+<div className="relative w-full mt-1 overflow-hidden">
+  <div className="animate-marquee whitespace-nowrap text-blue-400 font-semibold text-lg tracking-wide mt-10">
+    🔔 TechVerse Updates: 🚀 Hackathon 2025 registrations are LIVE! — 🧠 AI & Web3 Workshop this week! — 🏆 Submit your ideas by Nov 10th! — 💡 Stay tuned for more updates!
+  </div>
+
+  <style>{`
+    @keyframes marquee {
+      0% {
+        transform: translateX(100%);
+      }
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+
+    .animate-marquee {
+      display: inline-block;
+      white-space: nowrap;
+      animation: marquee 15s linear infinite;
+    }
+  `}</style>
 </div>
+
+</div>
+
 
 
 </section>
