@@ -33,7 +33,7 @@ const socialLinks = [
   {
     label: "X (Twitter)",
     icon: <Mail size={20} />,
-    link: "mailto:techverse@ctuniversity.in?body=My custom mail body",
+    link: "mailto:techverse@ctuniversity.in",
     color: "bg-gray-800",
   },
   {

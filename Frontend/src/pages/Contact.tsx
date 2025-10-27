@@ -84,8 +84,10 @@ const Contact = () => {
             Contact Us
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto animate-fade-in leading-relaxed">
-            Have <span className="font-semibold text-[#FFD54F]">Questions</span> or
-            want to <span className="font-semibold text-[#d746ffff]">Collaborate</span>? We'd love to hear from you!
+            Have <span className="font-semibold text-[#FFD54F]">Questions</span>{" "}
+            or want to{" "}
+            <span className="font-semibold text-[#d746ffff]">Collaborate</span>?
+            We'd love to hear from you!
           </p>
         </div>
       </section>
@@ -93,25 +95,25 @@ const Contact = () => {
       {/* Contact Section */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
+        <div className="mb-12 max-w-5xl mx-auto">
+      <h2 className="text-3xl font-bold text-foreground text-center mb-4">
+        Let's Connect
+      </h2>
+      <p className="text-lg text-muted-foreground">
+        Whether you're interested in sponsoring, participating, or just want to learn more about TechVerse, we're here to help. Reach out to us through any of the channels below.
+      </p>
+    </div>
           <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
             {/* Contact Info */}
             <div className="space-y-8">
-              <div>
-                <h2 className="text-3xl font-bold text-foreground mb-4">Let's Connect</h2>
-                <p className="text-lg text-muted-foreground">
-                  Whether you're interested in sponsoring, participating, or
-                  just want to learn more about TechVerse, we're here to help.
-                  Reach out to us through any of the channels below.
-                </p>
-              </div>
 
               {/* Contact Cards */}
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
+              <div className="grid grid-rows-1 gap-4">
                 {[
                   {
                     icon: MapPin,
                     title: "Visit Us",
-                    desc: "School of Engineering and Technology\nCT University, Punjab, India - 144620",
+                    desc: "School of Engineering and Technology\nCT University, Punjab, India - 142023",
                   },
                   {
                     icon: Mail,
@@ -140,8 +142,12 @@ const Contact = () => {
                           <Icon className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-foreground mb-1">{c.title}</h3>
-                          <p className="text-muted-foreground whitespace-pre-line">{c.desc}</p>
+                          <h3 className="font-semibold text-foreground mb-1">
+                            {c.title}
+                          </h3>
+                          <p className="text-muted-foreground whitespace-pre-line ">
+                            {c.desc}
+                          </p>
                         </div>
                       </div>
                     </Card>
@@ -168,7 +174,9 @@ const Contact = () => {
 
             {/* Contact Form */}
             <Card className="p-8 border-primary/20">
-              <h2 className="text-2xl font-bold text-foreground mb-6">Send Us a Message</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-6">
+                Send Us a Message
+              </h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name *</Label>
@@ -241,6 +249,10 @@ const Contact = () => {
                   Send Message
                 </Button>
               </form>
+            <div className="mt-4 text-sm text-gray-500">
+              We'll respond within 1-2 business days. For urgent issues, call
+              our support line.
+            </div>
             </Card>
           </div>
         </div>
@@ -250,16 +262,32 @@ const Contact = () => {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-foreground mb-4">Frequently Asked Questions</h2>
-            <p className="text-lg text-muted-foreground">Quick answers to common questions</p>
+            <h2 className="text-4xl font-bold text-foreground mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Quick answers to common questions
+            </p>
           </div>
 
           <div className="max-w-3xl mx-auto space-y-2">
             {[
-              { q: "Who can join the club?", a: "Any student enrolled at CT University is welcome to apply and be part of the club." },
-              { q: "Is there a registration fee?", a: "Not at all—joining the club is completely free for all CT University students." },
-              { q: "Is there any requirements to join the club?", a: "There are no strict requirements to join the club—just a genuine interest in technology and a willingness to be involved." },
-              { q: "What activities does the club offer", a: "The club hosts a variety of tech-focused events, including workshops, hackathons, guest talks, and hands-on projects to help students grow and collaborate." },
+              {
+                q: "Who can join the club?",
+                a: "Any student enrolled at CT University is welcome to apply and be part of the club.",
+              },
+              {
+                q: "Is there a registration fee?",
+                a: "Not at all—joining the club is completely free for all CT University students.",
+              },
+              {
+                q: "Is there any requirements to join the club?",
+                a: "There are no strict requirements to join the club—just a genuine interest in technology and a willingness to be involved.",
+              },
+              {
+                q: "What activities does the club offer",
+                a: "The club hosts a variety of tech-focused events, including workshops, hackathons, guest talks, and hands-on projects to help students grow and collaborate.",
+              },
             ].map((faq, index) => {
               const isOpen = openFAQ === index;
               return (
@@ -269,10 +297,18 @@ const Contact = () => {
                   onClick={() => setOpenFAQ(isOpen ? null : index)}
                 >
                   <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold text-foreground">{faq.q}</h3>
-                    <span className="text-2xl font-bold text-foreground select-none">{isOpen ? "−" : "+"}</span>
+                    <h3 className="text-lg font-semibold text-foreground">
+                      {faq.q}
+                    </h3>
+                    <span className="text-2xl font-bold text-foreground select-none">
+                      {isOpen ? "−" : "+"}
+                    </span>
                   </div>
-                  {isOpen && <p className="mt-2 text-muted-foreground transition-all">{faq.a}</p>}
+                  {isOpen && (
+                    <p className="mt-2 text-muted-foreground transition-all">
+                      {faq.a}
+                    </p>
+                  )}
                 </Card>
               );
             })}
