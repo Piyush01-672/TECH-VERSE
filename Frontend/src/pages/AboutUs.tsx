@@ -61,33 +61,34 @@ const AboutUs = () => {
   return (
     <div className="min-h-screen pt-20 bg-white">
       {/* Hero Section */}
-      <section className="relative py-32 bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-white overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 left-16 w-10 h-10 bg-[#4676E6]/70 rounded-full animate-bounce-slow blur-md"></div>
-          <div className="absolute top-36 right-12 w-6 h-6 bg-[#FFD54F]/80 rounded-full animate-pulse blur-md"></div>
-          <div className="absolute top-1/2 right-40 w-16 h-8 bg-[#B16FFF]/70 rounded-3xl animate-bounce-x blur-md"></div>
-          <div className="absolute top-8 right-2 w-5 h-5 bg-[#F56060]/80 rounded-full animate-bounce"></div>
-          <div className="absolute bottom-8 left-8 w-5 h-5 bg-[#36C2A3]/70 rounded-full animate-bounce"></div>
-        </div>
+      
+  <section className="relative py-44 text-white overflow-hidden">
+  {/* Background Image */}
+  <div
+    className="absolute inset-0 bg-cover bg-center brightness-80 blur-[1px]"
+    style={{
+      backgroundImage:
+        "url('https://res.cloudinary.com/diijn4esl/image/upload/v1761583379/IMG_0345_grp_photo_mnt7uf.jpg')",
+    }}
+  ></div>
 
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <span className="inline-block px-4 py-2 bg-white/10 rounded-full text-sm font-medium backdrop-blur-md border border-white/20 shadow-sm mb-6 tracking-widest animate-fade-in">
-            Our Team
-          </span>
-          <h1 className="text-7xl font-extrabold pb-3 mb-8 bg-gradient-to-r from-[#FFD54F] via-white to-[#4676E6] bg-clip-text text-transparent drop-shadow-xl">
-            About Us
-          </h1>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-            Meet our{" "}
-            <span className="font-semibold text-[#FFD54F]">
-              passionate team
-            </span>{" "}
-            who make{" "}
-            <span className="font-semibold text-[#D746FF]">TechVerse</span>{" "}
-            thrive with innovation and creativity.
-          </p>
-        </div>
-      </section>
+  {/* Content */}
+  <div className="container mx-auto px-4 text-center relative z-10">
+  <h1 className="text-7xl font-extrabold pb-3 mb-8 -mt-8 bg-gradient-to-r from-[#FFD54F] via-white to-[#4676E6] bg-clip-text text-transparent drop-shadow-xl">
+    About Us
+  </h1>
+
+  <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+    Meet our{" "}
+    <span className="font-semibold text-[#FFD54F]">passionate team</span> who
+    make <span className="font-semibold text-[#D746FF]">TechVerse</span>{" "}
+    thrive with innovation and creativity.
+  </p>
+</div>
+
+</section>
+
+
 
       {/* TechVerse Club Section */}
       <section className="py-20 bg-white">
@@ -310,7 +311,7 @@ const AboutUs = () => {
       {/* Leaders */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 -mt-12">
             TechVerse Leaders
           </h2>
           <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500">
@@ -393,6 +394,13 @@ const AboutUs = () => {
               </div>
             ))}
           </div>
+
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight -mb-12 mt-10">
+            Event Coordinators
+          </h2>
+          <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500 -mb-14">
+            Guiding us with their wisdom, expertise, and constant motivation.
+          </p>
 
           {/* Row 3 — Single Centered Card */}
           <div className="flex justify-center mt-16">
@@ -571,6 +579,12 @@ const AboutUs = () => {
               );
             })}
           </div>
+           <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight -mb-12 mt-10">
+            Tech Coordinators
+          </h2>
+          <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500 -mb-24">
+            Guiding us with their wisdom, expertise, and constant motivation.
+          </p>
           {/* ===== ROW 5 + CONNECTOR + ROW 6 ===== */}
           <div className="relative flex flex-col items-center mt-24">
             {/* Row 5 — Single Centered Card */}
@@ -752,6 +766,13 @@ const AboutUs = () => {
               })}
             </div>
           </div>
+
+           <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight -mb-12 mt-10">
+            Media Coordinators
+          </h2>
+          <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500 -mb-24">
+            Guiding us with their wisdom, expertise, and constant motivation.
+          </p>
           {/* Row 7 — Single Centered Card */}
           <div className="flex justify-center mt-24 relative z-10">
             {leaders.slice(17, 18).map((member, index) => (
