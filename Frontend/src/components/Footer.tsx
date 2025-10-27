@@ -12,9 +12,33 @@ const Footer = () => {
           {/* About Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <img src={universityLogo} alt="University" className="h-12 w-12 rounded-full" />
-               <IoRocket className="text-[1.7rem] text-blue-500 drop-shadow-[0_0_8px_#00C6FF]" />
-              <img src={techverseLogo} alt="Techverse" className="h-12 w-12 rounded-full" />
+              <div className="flex items-center gap-4">
+  {/* University Logo - Clickable */}
+  <a
+    href="https://ctuniversity.in"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <img
+      src={universityLogo}
+      alt="University"
+      className="h-12 w-12 rounded-full transition-transform duration-300 hover:scale-110 cursor-pointer"
+    />
+  </a>
+
+  {/* Rocket Icon */}
+  <IoRocket
+    className="text-[1.7rem] text-blue-500 drop-shadow-[0_0_8px_#00C6FF] transition-transform duration-300 hover:scale-125 cursor-pointer"
+  />
+
+  {/* TechVerse Logo */}
+  <img
+    src={techverseLogo}
+    alt="Techverse"
+    className="h-12 w-12 rounded-full transition-transform duration-300 hover:scale-110 cursor-pointer"
+  />
+</div>
+
             </div>
             <h3 className="text-2xl font-bold text-foreground">Tech Verse</h3>
             <p className="text-sm text-muted-foreground">

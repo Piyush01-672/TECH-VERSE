@@ -111,7 +111,7 @@ const Contact = () => {
                   {
                     icon: MapPin,
                     title: "Visit Us",
-                    desc: "School of Engineering and Technology\nCT University, Punjab, India - 144620",
+                    desc: "School of Engineering and Technology\nCT University, Punjab, India - 142023",
                   },
                   {
                     icon: Mail,
