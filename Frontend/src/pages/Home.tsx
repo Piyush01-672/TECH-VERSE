@@ -11,10 +11,6 @@ import { EnquiryDialog } from "@/components/EnquiryDialog";
 import { FaInstagram, FaWhatsapp, FaLinkedin} from "react-icons/fa6";
 import {  Code2, Cpu, Database, Globe,  Binary } from "lucide-react";
 
-
-
-
-
 import { Send } from "lucide-react";
 
 const socialLinks = [

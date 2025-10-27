@@ -15,6 +15,7 @@ import Winners from "./pages/Winners";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Loading from "./components/Loading";
+import Register from "./components/Register"
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,7 @@ const AppContent: React.FC = () => {
         <Route path="/sponsors" element={<Sponsors />} />
         <Route path="/winners" element={<Winners />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/register" element={<Register />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

@@ -15,7 +15,6 @@ const Navbar = () => {
     { name: "Events", path: "/events" },
     { name: "About us", path: "/about" },
     { name: "Sponsors", path: "/sponsors" },
-    // { name: "Winners", path: "/winners" },
     { name: "Contact", path: "/contact" },
   ];
 
@@ -60,6 +59,7 @@ const Navbar = () => {
 
           {/* CTA Button */}
           <div className="hidden lg:block">
+<Link to="/register">
   <Button
     variant="default"
     className="bg-gradient-to-br from-[#252D6F] to-[#4676E6] shadow-lg 
@@ -69,6 +69,8 @@ const Navbar = () => {
   >
     Register Now
   </Button>
+</Link>
+
 </div>
 
 
@@ -99,9 +101,18 @@ const Navbar = () => {
               </Link>
             ))}
             <div className="pt-2">
-              <Button variant="default" className="w-full bg-gradient-to-r from-primary to-primary-glow">
-                Register Now
-              </Button>
+              
+  <Link to="/register" onClick={() => setIsOpen(false)}>
+  <Button
+    variant="default"
+    className="w-full bg-gradient-to-r from-[#252D6F] to-[#4676E6] 
+               hover:from-blue-500 hover:to-blue-700"
+  >
+    Register Now
+  </Button>
+</Link>
+
+
             </div>
           </div>
         )}

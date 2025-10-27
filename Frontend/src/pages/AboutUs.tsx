@@ -62,7 +62,7 @@ const AboutUs = () => {
     <div className="min-h-screen pt-20 bg-white">
       {/* Hero Section */}
       
-  <section className="relative py-44 text-white overflow-hidden">
+  <section className="relative py-64 text-white overflow-hidden">
   {/* Background Image */}
   <div
     className="absolute inset-0 bg-cover bg-center brightness-80 blur-[1px]"
@@ -73,18 +73,7 @@ const AboutUs = () => {
   ></div>
 
   {/* Content */}
-  <div className="container mx-auto px-4 text-center relative z-10">
-  <h1 className="text-7xl font-extrabold pb-3 mb-8 -mt-8 bg-gradient-to-r from-[#FFD54F] via-white to-[#4676E6] bg-clip-text text-transparent drop-shadow-xl">
-    About Us
-  </h1>
-
-  <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-    Meet our{" "}
-    <span className="font-semibold text-[#FFD54F]">passionate team</span> who
-    make <span className="font-semibold text-[#D746FF]">TechVerse</span>{" "}
-    thrive with innovation and creativity.
-  </p>
-</div>
+  
 
 </section>
 
