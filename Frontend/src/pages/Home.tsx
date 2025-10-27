@@ -29,7 +29,7 @@ const socialLinks = [
   {
     label: "X (Twitter)",
     icon: <Mail size={20} />,
-    link: "mailto:techverse@ctuniversity.in?body=My custom mail body",
+    link: "mailto:techverse@ctuniversity.in",
     color: "bg-gray-800",
   },
   {
@@ -282,17 +282,19 @@ const Home = () => {
       🔔 TechVerse Updates:
     </p>
   </div>
-  <div className="animate-marquee whitespace-nowrap text-blue-400 font-semibold text-lg tracking-wide mt-10 z-1">
-  💡 Stay tuned for more updates!
+  <div className="animate-marquee text-blue-400 font-semibold text-lg tracking-wide mt-10 z-1">
+    <span>🎮 TechVerse E-sports League  💡 Stay tuned for more updates!</span>
+    <span className="ml-20">🎮 TechVerse E-sports League  💡 Stay tuned for more updates!</span>
+    <span className="ml-20">🎮 TechVerse E-sports League  💡 Stay tuned for more updates!</span>
   </div>
 
   <style>{`
     @keyframes marquee {
       0% {
-        transform: translateX(100%);
+        transform: translateX(100vw);
       }
       100% {
-        transform: translateX(-100%);
+        transform: translateX(-100vw);
       }
     }
 

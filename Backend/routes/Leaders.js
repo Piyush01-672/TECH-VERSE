@@ -10,7 +10,7 @@ const LeaderSchema = new mongoose.Schema(
     description: String,
     Designation: String,
     linkedin: String,
-    github: String,
+    mail: String,
   },
   { collection: "leaders" } // ✅ important: use existing collection
 );

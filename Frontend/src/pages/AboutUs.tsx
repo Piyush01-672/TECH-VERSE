@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Linkedin, Github } from "lucide-react";
+import { Linkedin, Github, Mail } from "lucide-react";
 import Logo from "@/assets/techverse-logo.jpg";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -73,7 +73,18 @@ const AboutUs = () => {
   ></div>
 
   {/* Content */}
-  
+  <div className="container mx-auto px-4 text-center relative z-10">
+  <h1 className="text-7xl font-extrabold pb-3 mb-8 -mt-8 bg-gradient-to-r from-[#FFD54F] via-white to-[#4676E6] bg-clip-text text-transparent drop-shadow-xl">
+    About Us
+  </h1>
+
+  <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+    Meet our{" "}
+    <span className="font-semibold text-[#FFD54F]">passionate team</span> who
+    make <span className="font-semibold text-[#D746FF]">TechVerse</span>{" "}
+    thrive with innovation and creativity.
+  </p>
+</div>
 
 </section>
 
@@ -103,7 +114,7 @@ const AboutUs = () => {
 
           {/* Description */}
           <div className="md:w-2/3 text-center md:text-left -mt-4">
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="text-lg text-gray-600 leading-relaxed text-justify">
               TechVerse Club of CT University, under the School of Engineering
               and Technology, is a dynamic community of innovators, developers,
               and tech enthusiasts driven by a shared passion for technology and
@@ -128,10 +139,10 @@ const AboutUs = () => {
             <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
               Honorable Authorities
             </h2>
-            <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500">
+            {/* <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500">
               Dedicated leaders working tirelessly to create an unforgettable
               experience.
-            </p>
+            </p> */}
           </div>
 
           {/* Cards Grid */}
@@ -242,9 +253,9 @@ const AboutUs = () => {
           <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
             Mentors(SOET)
           </h2>
-          <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500">
+          {/* <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500">
             Guiding us with their wisdom, expertise, and constant motivation.
-          </p>
+          </p> */}
         </div>
 
         {/* Mentor Cards */}
@@ -303,10 +314,10 @@ const AboutUs = () => {
           <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 -mt-12">
             TechVerse Leaders
           </h2>
-          <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500">
+          {/* <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500">
             Meet the passionate leaders who drive TechVerse forward with
             innovation, teamwork, and vision.
-          </p>
+          </p> */}
         </div>
 
         {/* Leaders Cards */}
@@ -359,17 +370,18 @@ const AboutUs = () => {
                       </a>
 
                       <a
-                        href={member.github || "#"}
+                        href={`mailto:${member.mail || "#"}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`flex items-center justify-center w-8 h-8 rounded-md border ${
-                          member.github
+                          member.mail
                             ? "border-blue-500 text-blue-600 hover:bg-blue-100"
                             : "border-gray-300 text-gray-400 cursor-not-allowed"
                         } transition duration-200`}
                       >
-                        <Github size={18} />
+                        <Mail size={18} />
                       </a>
+
                     </div>
                   </Card>
 
@@ -385,11 +397,9 @@ const AboutUs = () => {
           </div>
 
           <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight -mb-12 mt-10">
-            Event Coordinators
+            Event Management Team
           </h2>
-          <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500 -mb-14">
-            Guiding us with their wisdom, expertise, and constant motivation.
-          </p>
+          
 
           {/* Row 3 — Single Centered Card */}
           <div className="flex justify-center mt-16">
@@ -569,11 +579,11 @@ const AboutUs = () => {
             })}
           </div>
            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight -mb-12 mt-10">
-            Tech Coordinators
+            Tech Team
           </h2>
-          <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500 -mb-24">
+          {/* <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500 -mb-24">
             Guiding us with their wisdom, expertise, and constant motivation.
-          </p>
+          </p> */}
           {/* ===== ROW 5 + CONNECTOR + ROW 6 ===== */}
           <div className="relative flex flex-col items-center mt-24">
             {/* Row 5 — Single Centered Card */}
@@ -757,11 +767,11 @@ const AboutUs = () => {
           </div>
 
            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight -mb-12 mt-10">
-            Media Coordinators
+            Media Team
           </h2>
-          <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500 -mb-24">
+          {/* <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500 -mb-24">
             Guiding us with their wisdom, expertise, and constant motivation.
-          </p>
+          </p> */}
           {/* Row 7 — Single Centered Card */}
           <div className="flex justify-center mt-24 relative z-10">
             {leaders.slice(17, 18).map((member, index) => (

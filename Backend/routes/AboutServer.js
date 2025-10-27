@@ -8,7 +8,7 @@ const AboutUsSchema = new mongoose.Schema({
   description: String,
   Designation: String,
   linkedin: String,
-  github: String
+  mail: String
 });
 const AboutUs = mongoose.model('AboutUs', AboutUsSchema);
 
