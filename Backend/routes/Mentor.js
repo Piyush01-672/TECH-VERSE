@@ -9,7 +9,7 @@ const MentorSchema = new mongoose.Schema({
   description: String,
   Designation: String,
   linkedin: String,
-  github: String
+  mail: String
 });
 
 const Mentor = mongoose.model('Mentor', MentorSchema);
