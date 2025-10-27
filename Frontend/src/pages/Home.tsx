@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import {MapPin, Zap } from "lucide-react";
+import {Mail,MapPin, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
 import { Code, Trophy, Users, Sparkles } from "lucide-react";
@@ -8,7 +8,7 @@ import TechverseLogo from "@/assets/techverse-logo.jpg";
 import UniversityLogo from "@/assets/univeee-logo.png";
 import SoetLogo from "@/assets/soet-logo.png";
 import { EnquiryDialog } from "@/components/EnquiryDialog";
-import { FaInstagram, FaWhatsapp, FaLinkedin, FaXTwitter} from "react-icons/fa6";
+import { FaInstagram, FaWhatsapp, FaLinkedin} from "react-icons/fa6";
 import {  Code2, Cpu, Database, Globe,  Binary } from "lucide-react";
 
 
@@ -21,25 +21,25 @@ const socialLinks = [
   {
     label: "Instagram",
     icon: <FaInstagram size={20} />,
-    link: "https://instagram.com/yourpage",
+    link: "https://www.instagram.com/tech.versectu/",
     color: "bg-pink-500",
   },
   {
     label: "WhatsApp",
     icon: <FaWhatsapp size={20} />,
-    link: "https://chat.whatsapp.com/your-community-link",
+    link: "https://chat.whatsapp.com/IiClyLPXlooJZWlJ66CnlN?mode=wwt",
     color: "bg-green-500",
   },
   {
     label: "X (Twitter)",
-    icon: <FaXTwitter size={20} />,
-    link: "https://x.com/yourhandle",
+    icon: <Mail size={20} />,
+    link: "mailto:techverse@ctuniversity.in?body=My custom mail body",
     color: "bg-gray-800",
   },
   {
     label: "LinkedIn",
     icon: <FaLinkedin size={20} />,
-    link: "https://linkedin.com/in/yourprofile",
+    link: "https://www.linkedin.com/company/techverse-club-ct-university/",
     color: "bg-blue-600",
   },
 ];
@@ -287,7 +287,7 @@ const Home = () => {
     </p>
   </div>
   <div className="animate-marquee whitespace-nowrap text-blue-400 font-semibold text-lg tracking-wide mt-10 z-1">
-  🚀 Hackathon 2025 registrations are LIVE! — 🧠 AI & Web3 Workshop this week! — 🏆 Submit your ideas by Nov 10th! — 💡 Stay tuned for more updates!
+  💡 Stay tuned for more updates!
   </div>
 
   <style>{`

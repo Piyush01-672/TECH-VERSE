@@ -166,7 +166,7 @@ const AboutUs = () => {
                     <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
                       <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
                         <img
-                          src={member.img_url || "/default-profile.jpg"}
+                          src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
                           alt={member.Name}
                           className="w-full h-full object-cover"
                         />
@@ -215,7 +215,7 @@ const AboutUs = () => {
                       <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
                         <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
                           <img
-                            src={member.img_url || "/default-profile.jpg"}
+                            src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
                             alt={member.Name}
                             className="w-full h-full object-cover"
                           />
@@ -278,7 +278,7 @@ const AboutUs = () => {
                   <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
                     <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
                       <img
-                        src={member.img_url || "/default-profile.jpg"}
+                        src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
                         alt={member.Name}
                         className="w-full h-full object-cover"
                       />
@@ -341,7 +341,7 @@ const AboutUs = () => {
                   <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
                     <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
                       <img
-                        src={member.img_url || "/default-profile.jpg"}
+                        src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
                         alt={member.Name}
                         className="w-full h-full object-cover"
                       />
@@ -414,7 +414,7 @@ const AboutUs = () => {
                   <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
                     <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
                       <img
-                        src={member.img_url || "/default-profile.jpg"}
+                        src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
                         alt={member.Name}
                         className="w-full h-full object-cover"
                       />
@@ -547,7 +547,7 @@ const AboutUs = () => {
                     <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
                       <div className="w-20 h-20 mb-3 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
                         <img
-                          src={member.img_url || "/default-profile.jpg"}
+                          src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
                           alt={member.Name}
                           className="w-full h-full object-cover"
                         />
@@ -593,7 +593,7 @@ const AboutUs = () => {
                     <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
                       <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
                         <img
-                          src={member.img_url || "/default-profile.jpg"}
+                          src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"} 
                           alt={member.Name}
                           className="w-full h-full object-cover"
                         />
@@ -727,7 +727,7 @@ const AboutUs = () => {
                       <Card className="absolute inset-0 flex flex-col justify-center items-center p-5 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
                         <div className="w-20 h-20 mb-3 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
                           <img
-                            src={member.img_url || "/default-profile.jpg"}
+                            src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
                             alt={member.Name}
                             className="w-full h-full object-cover"
                           />
@@ -772,7 +772,7 @@ const AboutUs = () => {
                   <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
                     <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
                       <img
-                        src={member.img_url || "/default-profile.jpg"}
+                        src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
                         alt={member.Name}
                         className="w-full h-full object-cover"
                       />
@@ -876,7 +876,7 @@ const AboutUs = () => {
                     <Card className="absolute inset-0 flex flex-col justify-center items-center p-5 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
                       <div className="w-20 h-20 mb-3 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
                         <img
-                          src={member.img_url || "/default-profile.jpg"}
+                          src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
                           alt={member.Name}
                           className="w-full h-full object-cover"
                         />
@@ -922,7 +922,7 @@ const AboutUs = () => {
                   <Card className="absolute inset-0 flex flex-col justify-center items-center p-5 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
                     <div className="w-20 h-20 mb-3 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
                       <img
-                        src={member.img_url || "/default-profile.jpg"}
+                        src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
                         alt={member.Name}
                         className="w-full h-full object-cover"
                       />

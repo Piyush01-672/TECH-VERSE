@@ -40,7 +40,7 @@ const Footer = () => {
 </div>
 
             </div>
-            <h3 className="text-2xl font-bold text-foreground">Tech Verse</h3>
+            <h3 className="text-2xl font-bold text-foreground">TechVerse</h3>
             <p className="text-sm text-muted-foreground">
              Official tech club of CT University, fostering innovation, coding, and collaboration among students through workshops, hackathons, and projects.
             </p>
