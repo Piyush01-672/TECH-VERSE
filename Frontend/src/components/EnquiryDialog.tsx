@@ -32,11 +32,17 @@ import { toast } from "sonner";
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   regNumber: z.string().min(1, { message: "Registration number is required" }),
-  contact: z.string().regex(/^\d{10}$/, { message: "Enter a valid 10-digit contact number" }),
+  contact: z
+    .string()
+    .regex(/^\d{10}$/, { message: "Enter a valid 10-digit contact number" }),
   email: z.string().email({ message: "Enter a valid email address" }),
-  department: z.enum(["btech", "bca"], { required_error: "Please select a department" }),
+  department: z.enum(["btech", "bca"], {
+    required_error: "Please select a department",
+  }),
   batch: z.string().min(1, { message: "Please select a batch" }),
-  interests: z.array(z.string()).min(1, { message: "Select at least one area of interest" }),
+  interests: z
+    .array(z.string())
+    .min(1, { message: "Select at least one area of interest" }),
   otherInterest: z.string().optional(),
 });
 
@@ -76,51 +82,58 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
   const interests = form.watch("interests");
 
   const getBatchOptions = () => {
-    if (department === "btech") return ["2021-2025", "2022-2026", "2023-2027", "2024-2028"];
+    if (department === "btech")
+      return ["2021-2025", "2022-2026", "2023-2027", "2024-2028"];
     if (department === "bca") return ["2022-2025", "2023-2026", "2024-2027"];
     return [];
   };
 
   const onSubmit = async (data: FormData) => {
-  if (interests.includes("Other") && data.otherInterest) {
-    data.interests = [...interests.filter(i => i !== "Other"), data.otherInterest];
-  }
-
-  try {
-    const response = await fetch('http://localhost:5000/enquiry', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-
-    if (response.ok) {
-      toast.success("Enquiry submitted successfully!");
-      onOpenChange(false);
-      setShowOther(false);
-      form.reset();
-    } else {
-      toast.error("Failed to submit enquiry.");
+    if (interests.includes("Other") && data.otherInterest) {
+      data.interests = [
+        ...interests.filter((i) => i !== "Other"),
+        data.otherInterest,
+      ];
     }
-  } catch (err) {
-    toast.error("Server error: " + err.message);
-  }
-};
 
+    try {
+      const response = await fetch("http://localhost:5000/enquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        toast.success("Enquiry submitted successfully!");
+        onOpenChange(false);
+        setShowOther(false);
+        form.reset();
+      } else {
+        toast.error("Failed to submit enquiry.");
+      }
+    } catch (err) {
+      toast.error("Server error: " + err.message);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-6 bg-white rounded-2xl shadow-xl">
+      <DialogContent className="w-4/5 max-w-2xl max-h-[70vh] overflow-y-auto p-6 bg-white rounded-2xl shadow-xl">
         <DialogHeader className="text-center">
           <DialogTitle className="text-2xl md:text-3xl font-extrabold text-gray-800 mb-2">
-            Join Techverse & Elevate Your Skills 🚀 
+            Join Techverse & Elevate Your Skills 🚀
           </DialogTitle>
           <DialogDescription className="text-gray-600 text-sm md:text-base">
-            Fill out the form below to become part of our vibrant tech community. Discover, learn, and grow with us!
+            Fill out the form below to become part of our vibrant tech
+            community. Discover, learn, and grow with us!
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6 mt-4"
+          >
             {/* Name */}
             <FormField
               control={form.control}
@@ -173,7 +186,11 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                   <FormItem>
                     <FormLabel>Email Address</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="john@example.com" {...field} />
+                      <Input
+                        type="email"
+                        placeholder="john@example.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -189,7 +206,10 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Department</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select department" />
@@ -258,11 +278,14 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                               <Checkbox
                                 checked={field.value?.includes(interest)}
                                 onCheckedChange={(checked) => {
-                                  if (interest === "Other") setShowOther(Boolean(checked));
+                                  if (interest === "Other")
+                                    setShowOther(Boolean(checked));
                                   return checked
                                     ? field.onChange([...field.value, interest])
                                     : field.onChange(
-                                        field.value?.filter((value) => value !== interest)
+                                        field.value?.filter(
+                                          (value) => value !== interest
+                                        )
                                       );
                                 }}
                               />
@@ -284,7 +307,10 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                         <FormItem className="mt-3">
                           <FormLabel>Specify Other Interest</FormLabel>
                           <FormControl>
-                            <Input placeholder="Your custom interest" {...field} />
+                            <Input
+                              placeholder="Your custom interest"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -300,7 +326,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
               type="submit"
               className="w-full py-3 text-lg font-semibold bg-blue-500 hover:bg-blue-600 text-white rounded-xl shadow-md transition-all duration-300"
             >
-              Submit Enquiry
+              Submit
             </Button>
           </form>
         </Form>

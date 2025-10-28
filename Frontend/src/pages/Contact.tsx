@@ -41,15 +41,18 @@ const Contact = () => {
       });
       return;
     }
-    await fetch(`${BACKEND_URL}/contact`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-    toast({
-      title: "Message Sent!",
-      description: "Thank you for reaching out. We'll get back to you soon.",
-    });
+      try {
+        const res = await fetch(`${BACKEND_URL}/contact`, { method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),});
+        if (!res.ok) throw new Error("Server error");
+        toast({
+          title: "Message Sent!",
+          description: "Thank you for reaching out. We'll get back to you soon.",
+        });
+      } catch (err) {
+        toast({ title: "Error", description: "Something went wrong 😢" });
+      }
     setFormData({ name: "", email: "", mobile: "", subject: "", message: "" });
   };
 
@@ -63,16 +66,16 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen pt-10">
       {/* Hero Section */}
-      <section className="relative py-32 bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-white overflow-hidden">
+      <section className="relative pt-[4.75rem] pb-4 md:py-32 bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-white overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           {/* Floating shapes */}
           <div className="absolute top-20 left-16 w-10 h-10 bg-[#4676E6]/70 rounded-full animate-bounce-slow blur-md"></div>
           <div className="absolute top-36 right-12 w-6 h-6 bg-[#FFD54F]/80 rounded-full animate-pulse blur-md"></div>
           <div className="absolute bottom-16 left-1/4 w-20 h-20 border-4 border-white/30 rounded-full animate-spin-slow"></div>
           <div className="absolute top-1/2 right-40 w-16 h-8 bg-[#B16FFF]/70 rounded-3xl animate-bounce-x blur-md"></div>
-          <div className="absolute top-8 right-2 w-5 h-5 bg-[#F56060]/80 rounded-full animate-bounce"></div>
+          <div className="absolute top-16 md:top-8 right-2 w-5 h-5 bg-[#F56060]/80 rounded-full animate-bounce"></div>
           <div className="absolute bottom-8 left-8 w-5 h-5 bg-[#36C2A3]/70 rounded-full animate-bounce"></div>
         </div>
 
@@ -80,7 +83,7 @@ const Contact = () => {
           <span className="inline-block px-4 py-2 bg-white/10 rounded-full text-sm font-medium backdrop-blur-md border border-white/20 shadow-sm mb-6 tracking-widest animate-fade-in">
             Get In Touch
           </span>
-          <h1 className="text-7xl md:auto font-extrabold pb-3 mb-8 animate-fade-in-up bg-gradient-to-r from-[#FFD54F] via-white to-[#4676E6] bg-clip-text text-transparent drop-shadow-xl">
+          <h1 className="text-6xl md:auto font-extrabold pb-3 mb-8 animate-fade-in-up bg-gradient-to-r from-[#FFD54F] via-white to-[#4676E6] bg-clip-text text-transparent drop-shadow-xl">
             Contact Us
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto animate-fade-in leading-relaxed">

@@ -12,9 +12,9 @@ const Events = () => {
   }, []);
   // const [showAllImages, setShowAllImages] = useState(true);
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen pt-10">
       {/* Hero Section */}
-      <section className="relative py-32 bg-gradient-to-br from-[#252D6F] to-[#4676E6]  text-white overflow-hidden">
+      <section className="relative pt-[4.75rem] pb-4 md:py-32 bg-gradient-to-br from-[#252D6F] to-[#4676E6]  text-white overflow-hidden">
         {/* Animated floating shapes (Tech vibes & Colorful) */}
         <div className="absolute inset-0 pointer-events-none">
           {/* Blue dot, floats up/down */}
@@ -26,16 +26,16 @@ const Events = () => {
           {/* Accent purple oval (up/down) */}
           <div className="absolute top-1/2 right-40 w-16 h-8 bg-[#B16FFF]/70 rounded-3xl animate-bounce-x blur-md"></div>
           {/* Small accent dots */}
-          <div className="absolute top-8 right-2 w-5 h-5 bg-[#F56060]/80 rounded-full animate-bounce"></div>
+          <div className="absolute top-16 md:top-8 right-2 w-5 h-5 bg-[#F56060]/80 rounded-full animate-bounce"></div>
           <div className="absolute bottom-8 left-8 w-5 h-5 bg-[#36C2A3]/70 rounded-full animate-bounce"></div>
         </div>
 
         {/* Centered content */}
         <div className="container mx-auto px-4 text-center relative z-10">
-          <span className="inline-block px-4 py-2 bg-white/10 rounded-full text-sm font-medium backdrop-blur-md border border-white/20 shadow-sm mb-6 tracking-widest animate-fade-in">
+          <span className="inline-block px-4 py-4 bg-white/10 rounded-full text-sm font-medium backdrop-blur-md border border-white/20 shadow-sm mb-6 tracking-widest animate-fade-in">
             Highlights
           </span>
-          <h1 className="text-7xl md:auto  font-extrabold pb-3 mb-8 animate-fade-in-up bg-gradient-to-r from-[#FFD54F] via-white to-[#4676E6] bg-clip-text text-transparent drop-shadow-xl">
+          <h1 className="text-6xl md:auto  font-extrabold pb-3 mb-8 animate-fade-in-up bg-gradient-to-r from-[#FFD54F] via-white to-[#4676E6] bg-clip-text text-transparent drop-shadow-xl">
             Event Gallery
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto animate-fade-in leading-relaxed">
@@ -82,8 +82,8 @@ const Events = () => {
             Upcoming Events
           </h2>
           {/* <Upcoming_Events /> */}
-          <Card className="p-8 max-w-2xl border-primary/20 flex justify-center items-center content-center mx-auto">
-    <p className="text-gray-500 text-lg md:text-xl font-medium">
+          <Card className="p-8 w-[80vw] max-w-2xl border-primary/20 flex justify-center items-center content-center mx-auto">
+    <p className="text-gray-500 text-md md:text-xl font-medium">
       Events will be announced soon! 🚀
     </p>
   </Card>

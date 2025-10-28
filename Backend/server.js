@@ -2,7 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
-// require('dotenv').config();
 require('@dotenvx/dotenvx').config({ silent: true });
 app.use(cors());
 app.use(express.json());
@@ -24,19 +23,16 @@ app.get('/', (req, res) => {
  const Enquiry = require('./routes/Enquiry');
  const Mentor = require('./routes/Mentor');
  const Leader = require('./routes/Leaders');
+const Register = require('./routes/RegistrationServer');
 
 app.use('/leaders', Leader);
-
-
-
-
- app.use('/gallery', Gallery);
- app.use('/contact', Contact);
+app.use('/gallery', Gallery);
+app.use('/contact', Contact);
 app.use('/aboutus', AboutUs);
 app.use('/enquiry', Enquiry);
 app.use('/mentors', Mentor);
-
+app.use('/register', Register);
  
- app.listen(5000, () => {
-    console.log('Server is running on port 5000');
+ app.listen(process.env.PORT || 5000, () => {
+    console.log(`Server is running on port ${process.env.PORT || 5000}`);
  })

@@ -33,11 +33,11 @@ export default function ImageCarousel({ galleryItems }: { galleryItems: GalleryI
   const [showFull, setShowFull] = useState(false);
   return (
     <div className="embla">
-      <div className="embla__viewport w-[100vw] sm:w-[90vw]" ref={emblaRef}>
-        <div className="embla__container" >
+      <div className="embla__viewport w-[90vw] sm:w-[90vw]" ref={emblaRef}>
+        <div className="embla__container px-1" >
           {galleryItems.map(item => (
             <div
-            className="embla__slide relative shrink-0 grow-0 basis-full md:basis-1/3 flex items-center justify-center mx-1"
+            className="embla__slide relative shrink-0 grow-0 basis-full md:basis-1/3 flex items-center justify-center "
             key={item._id}
           >
             <img
@@ -65,7 +65,7 @@ export default function ImageCarousel({ galleryItems }: { galleryItems: GalleryI
     {Description && (
       <div className="mt-3 text-justify text-black-200 text-sm md:text-base w-[65vw]">
         <p
-          className={`${showFull ? 'line-clamp-none' : 'line-clamp-4'} whitespace-pre-line`}
+          className={`${showFull ? 'line-clamp-none' : 'line-clamp-6 md:line-clamp-4'} whitespace-pre-line`}
           dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(Description) }}
         ></p>
         <button

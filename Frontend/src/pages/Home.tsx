@@ -149,30 +149,30 @@ const Home = () => {
     <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f46e510_1px,transparent_1px),linear-gradient(to_bottom,#4f46e510_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
 
     {/* Glowing Circuit Lines */}
-    <div className="absolute top-20 left-10 w-72 h-72 border-2 border-cyan-400/30 rounded-lg animate-[spin_20s_linear_infinite] shadow-[0_0_50px_rgba(34,211,238,0.3)]">
+    <div className="absolute top-20 left-10 w-36 h-36 md:w-72 md:h-72 border-2 border-cyan-400/30 rounded-lg animate-[spin_20s_linear_infinite] shadow-[0_0_50px_rgba(34,211,238,0.3)]">
       <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
       <div className="absolute top-0 left-1/2 w-0.5 h-full bg-gradient-to-b from-transparent via-cyan-400 to-transparent"></div>
     </div>
-    <div className="absolute top-40 right-20 w-64 h-64 border-2 border-blue-400/30 rounded-full animate-[spin_15s_linear_infinite_reverse] shadow-[0_0_50px_rgba(59,130,246,0.3)]">
+    <div className="absolute top-1/3 md:top-40 right-20 w-32 h-32 md:w-64 md:h-64 border-2 border-blue-400/30 rounded-full animate-[spin_15s_linear_infinite_reverse] shadow-[0_0_50px_rgba(59,130,246,0.3)]">
       <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
     </div>
-    <div className="absolute bottom-20 left-1/4 w-80 h-80 border-2 border-purple-400/30 rounded-lg animate-[spin_25s_linear_infinite] shadow-[0_0_50px_rgba(168,85,247,0.3)]">
+    <div className="absolute bottom-20 left-1/4 w-40 h-40 md:w-80 md:h-80 border-2 border-purple-400/30 rounded-lg animate-[spin_25s_linear_infinite] shadow-[0_0_50px_rgba(168,85,247,0.3)]">
       <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-purple-400 to-transparent"></div>
       <div className="absolute top-0 left-1/2 w-0.5 h-full bg-gradient-to-b from-transparent via-purple-400 to-transparent"></div>
     </div>
 
     {/* Floating Tech Icons with Glow */}
-    <div className="absolute top-32 right-1/4 animate-[bounce_3s_ease-in-out_infinite]">
+    <div className="absolute top-32 right-10 md:right-1/4 animate-[bounce_3s_ease-in-out_infinite]">
       <div className="p-4 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 backdrop-blur-sm rounded-xl border border-cyan-400/30 shadow-[0_0_30px_rgba(34,211,238,0.4)]">
         <Code2 className="w-8 h-8 text-cyan-400" />
       </div>
     </div>
-    <div className="absolute bottom-40 right-1/3 animate-[bounce_4s_ease-in-out_infinite_1s]">
+    <div className="absolute bottom-40 right-10 md:right-1/3 animate-[bounce_4s_ease-in-out_infinite_1s]">
       <div className="p-4 bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-full border border-purple-400/30 shadow-[0_0_30px_rgba(168,85,247,0.4)]">
         <Cpu className="w-8 h-8 text-purple-400" />
       </div>
     </div>
-    <div className="absolute top-1/2 left-20 animate-[bounce_3.5s_ease-in-out_infinite_0.5s]">
+    <div className="absolute top-1/2 left-10 md:left-20 animate-[bounce_3.5s_ease-in-out_infinite_0.5s]">
       <div className="p-4 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 backdrop-blur-sm rounded-xl border border-blue-400/30 shadow-[0_0_30px_rgba(59,130,246,0.4)]">
         <Database className="w-8 h-8 text-blue-400" />
       </div>
@@ -271,18 +271,18 @@ const Home = () => {
     </Button>
     
   </div>
-  {/* Moving Announcement Line */}
 
 </div>
+  {/* Moving Announcement Line */}
 
 
 <div className="absolute bottom-5 w-full mt-1 overflow-hidden flex ">
   <div className="flex-shrink-0 mt-10 mr-4 bg-black z-10">
-    <p className="text-blue-400 font-semibold text-lg tracking-wide ">
+    <p className="text-blue-400 font-semibold text-sm md:text-lg tracking-wide ">
       🔔 TechVerse Updates:
     </p>
   </div>
-  <div className="animate-marquee text-blue-400 font-semibold text-lg tracking-wide mt-10 z-1">
+  <div className="animate-marquee text-blue-400 font-semibold text-sm md:text-lg tracking-wide mt-10 z-1">
     <span>🎮 TechVerse E-sports League  💡 Stay tuned for more updates!</span>
     <span className="ml-20">🎮 TechVerse E-sports League  💡 Stay tuned for more updates!</span>
     <span className="ml-20">🎮 TechVerse E-sports League  💡 Stay tuned for more updates!</span>
@@ -382,7 +382,7 @@ const Home = () => {
 </div>
 
         {/* Description */}
-       <p className="text-justify max-w-3xl mx-auto text-base sm:text-lg md:text-xl lg:text-2xl text-blue-900 font-medium tracking-wide leading-relaxed md:leading-loose mt-12">
+       <p className="text-justify w-4/5 max-w-3xl mx-auto text-base sm:text-lg md:text-xl lg:text-2xl text-blue-900 font-medium tracking-wide leading-relaxed md:leading-loose mt-12">
   At <span className="font-extrabold text-blue-700">Tech Verse</span>, we believe in empowering innovation through collaboration. 
   Our platform brings together bright minds from around the world to share ideas, explore emerging technologies, 
   and transform creative visions into impactful realities. Join us as we build a vibrant community where{" "}
@@ -393,11 +393,11 @@ const Home = () => {
 
       {/* ✅ FEATURES SECTION */}
       <section className="container mx-auto px-4 py-20 ">
-        <h2 className="text-8xl md:text-6xl lg:text-7xl font-extrabold text-center mb-12 -mt-10 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-600 bg-clip-text text-transparent tracking-wider ">
+        <h2 className="text-center text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-12 mt-6 tracking-tight leading-tight drop-shadow-lg bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-600 bg-clip-text text-transparent">
           What We Offer
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-8 mt-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 gap-8 mt-6">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
@@ -408,10 +408,10 @@ const Home = () => {
                 <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
                   <Icon className="w-6 h-6 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">
+                <h3 className="text-md md:text-xl font-semibold text-foreground mb-2">
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground">{feature.description}</p>
+                <p className="text-sm md:text-base text-muted-foreground">{feature.description}</p>
               </div>
             );
           })}
@@ -436,6 +436,7 @@ const Home = () => {
                 size="lg"
                 variant="secondary"
                 className="gap-2 hover:scale-105 transition-transform"
+                onClick={() => setIsDialogOpen(true)}
               >
                 Get started today
               </Button>

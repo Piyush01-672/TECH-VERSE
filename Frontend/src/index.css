@@ -183,6 +183,8 @@ All colors MUST be HSL.
   opacity: 1;
   z-index: 20;
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  border: #3B82F6 4px solid;
+  border-radius: 1.6rem;
 }
 
 .embla__slide__img {   

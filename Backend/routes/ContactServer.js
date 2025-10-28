@@ -30,6 +30,7 @@ router.get('/csv', async (req, res) => {
       res.attachment('contact.csv');
       res.send(csv);
     } catch (err) {
+      console.error("Error generating CSV:", err);
       res.status(500).send(err.message);
     }
   });

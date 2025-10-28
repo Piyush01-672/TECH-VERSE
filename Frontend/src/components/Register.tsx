@@ -1,6 +1,11 @@
 import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast"; // adjust import path if needed
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL; // ✅ environment-safe backend URL
 
 const Register = () => {
+  const { toast } = useToast();
+
   const [teamName, setTeamName] = useState("");
   const [teamMembers, setTeamMembers] = useState(2);
   const [members, setMembers] = useState([
@@ -31,17 +36,43 @@ const Register = () => {
     setMembers(updated);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = { teamName, teamMembers, members };
-    console.log("Team Registration Data:", formData);
-    alert("Form Submitted! Check console for data.");
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) throw new Error("Failed to register team");
+
+      toast({
+        title: "🎉 Registration Successful!",
+        description: "Your team has been registered successfully.",
+      });
+
+      // reset form after success
+      setTeamName("");
+      setTeamMembers(2);
+      setMembers([
+        { name: "", regNo: "", contact: "", department: "", Email: "" },
+        { name: "", regNo: "", contact: "", department: "", Email: "" },
+      ]);
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: "❌ Registration Failed",
+        description: "Please check your connection or try again later.",
+      });
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-200 via-white to-blue-200 text-gray-800 px-4 py-24 overflow-x-hidden">
       <div className="backdrop-blur-xl bg-white/70 p-10 rounded-3xl shadow-2xl w-full max-w-3xl border border-cyan-300/50">
-        {/* ✅ Adjusted spacing so “G” isn’t cut */}
         <h1 className="text-4xl font-bold text-center mb-10 bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent drop-shadow-sm tracking-wide leading-[1.3]">
           Registration Form
         </h1>
@@ -49,7 +80,6 @@ const Register = () => {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Team Info */}
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Team Name */}
             <div>
               <label className="block text-sm font-semibold mb-2 text-gray-700">
                 Team Name
@@ -69,7 +99,6 @@ const Register = () => {
               <label className="block text-sm font-semibold mb-2 text-gray-700">
                 Number of Members
               </label>
-
               <div className="relative group">
                 <select
                   value={teamMembers}
@@ -81,17 +110,11 @@ const Register = () => {
                              shadow-md backdrop-blur-lg cursor-pointer text-gray-700 font-medium pr-12 hover:shadow-lg hover:border-cyan-500"
                 >
                   {[2, 3, 4].map((num) => (
-                    <option
-                      key={num}
-                      value={num}
-                      className="text-gray-700 bg-white hover:bg-cyan-100"
-                    >
+                    <option key={num} value={num}>
                       {num} Members
                     </option>
                   ))}
                 </select>
-
-                {/* Custom Dropdown Arrow */}
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-cyan-500 group-hover:text-cyan-600 transition-colors duration-300 pointer-events-none">
                   ▼
                 </div>
@@ -118,8 +141,8 @@ const Register = () => {
                     onChange={(e) =>
                       handleMemberInput(index, "name", e.target.value)
                     }
-                    className="p-3 rounded-xl border border-cyan-300 focus:border-cyan-500 outline-none focus:ring-4 focus:ring-cyan-100 transition bg-white/60 backdrop-blur-sm"
                     required
+                    className="p-3 rounded-xl border border-cyan-300 focus:border-cyan-500 outline-none focus:ring-4 focus:ring-cyan-100 transition bg-white/60 backdrop-blur-sm"
                   />
                   <input
                     type="text"
@@ -128,8 +151,8 @@ const Register = () => {
                     onChange={(e) =>
                       handleMemberInput(index, "regNo", e.target.value)
                     }
-                    className="p-3 rounded-xl border border-cyan-300 focus:border-cyan-500 outline-none focus:ring-4 focus:ring-cyan-100 transition bg-white/60 backdrop-blur-sm"
                     required
+                    className="p-3 rounded-xl border border-cyan-300 focus:border-cyan-500 outline-none focus:ring-4 focus:ring-cyan-100 transition bg-white/60 backdrop-blur-sm"
                   />
                   <input
                     type="tel"
@@ -142,9 +165,8 @@ const Register = () => {
                       }
                     }}
                     maxLength={10}
-                    pattern="\d{10}"
-                    className="p-3 rounded-xl border border-cyan-300 focus:border-cyan-500 outline-none focus:ring-4 focus:ring-cyan-100 transition bg-white/60 backdrop-blur-sm"
                     required
+                    className="p-3 rounded-xl border border-cyan-300 focus:border-cyan-500 outline-none focus:ring-4 focus:ring-cyan-100 transition bg-white/60 backdrop-blur-sm"
                   />
                   <input
                     type="text"
@@ -153,8 +175,8 @@ const Register = () => {
                     onChange={(e) =>
                       handleMemberInput(index, "department", e.target.value)
                     }
-                    className="p-3 rounded-xl border border-cyan-300 focus:border-cyan-500 outline-none focus:ring-4 focus:ring-cyan-100 transition bg-white/60 backdrop-blur-sm"
                     required
+                    className="p-3 rounded-xl border border-cyan-300 focus:border-cyan-500 outline-none focus:ring-4 focus:ring-cyan-100 transition bg-white/60 backdrop-blur-sm"
                   />
                   <input
                     type="email"
@@ -163,8 +185,8 @@ const Register = () => {
                     onChange={(e) =>
                       handleMemberInput(index, "Email", e.target.value)
                     }
-                    className="p-3 rounded-xl border border-cyan-300 focus:border-cyan-500 outline-none focus:ring-4 focus:ring-cyan-100 transition bg-white/60 backdrop-blur-sm md:col-span-2"
                     required
+                    className="p-3 rounded-xl border border-cyan-300 focus:border-cyan-500 outline-none focus:ring-4 focus:ring-cyan-100 transition bg-white/60 backdrop-blur-sm md:col-span-2"
                   />
                 </div>
               </div>
