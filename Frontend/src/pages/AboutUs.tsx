@@ -1,15 +1,95 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Linkedin, Github, Mail } from "lucide-react";
 import Logo from "@/assets/techverse-logo.jpg";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
+// ✅ Re-usable Card Component with responsive sizing
+const MemberCard = ({ member, index, isFlipped, socialIcons = false, handleMouseEnter, handleMouseLeave }: any) => {
+  // Height increased for better image display on mobile
+  const heightClass = socialIcons ? 'h-60 md:h-80' : 'h-48 md:h-72'; 
+
+  return (
+    <div
+      key={member._id || index}
+      className={`relative w-40 md:w-64 ${heightClass} [perspective:1000px]`}
+      onMouseEnter={() => handleMouseEnter(index)}
+      onMouseLeave={() => handleMouseLeave(index)}
+    >
+      <div
+        className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
+          isFlipped ? "[transform:rotateY(180deg)]" : ""
+        }`}
+      >
+        {/* Front Side */}
+        <Card className="absolute inset-0 flex flex-col justify-center items-center p-3 md:p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
+          
+          {/* ✅ aspect-square forces a 1:1 ratio, fixing image distortion */}
+          <div className="w-16 md:w-24 aspect-square mb-2 md:mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
+            <img
+              src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
+              alt={member.Name}
+              className="w-full h-full object-cover object-center"
+            />
+          </div>
+          <h3 className="text-sm md:text-lg font-bold text-gray-800 mb-1 text-center leading-tight">
+            {member.Name}
+          </h3>
+          <p className="text-blue-600 font-semibold text-xs md:text-sm text-center mb-2 md:mb-3">
+            {member.Designation}
+          </p>
+
+          {socialIcons && (
+            <div className="flex gap-3 mt-1 md:mt-2 gap-x-4 md:gap-x-8">
+              <a
+                href={member.linkedin || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded-md border ${
+                  member.linkedin
+                    ? "border-blue-500 text-blue-600 hover:bg-blue-100"
+                    : "border-gray-300 text-gray-400 cursor-not-allowed"
+                } transition duration-200`}
+              >
+                <Linkedin size={16} />
+              </a>
+              <a
+                href={`mailto:${member.mail || "#"}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded-md border ${
+                  member.mail
+                    ? "border-blue-500 text-blue-600 hover:bg-blue-100"
+                    : "border-gray-300 text-gray-400 cursor-not-allowed"
+                } transition duration-200`}
+              >
+                <Mail size={16} />
+              </a>
+            </div>
+          )}
+        </Card>
+
+        {/* Back Side */}
+        <Card className="absolute inset-0 p-3 md:p-6 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
+          <p className="text-xs md:text-sm leading-relaxed px-1 md:px-2 mb-2 md:mb-4 text-center">
+            {member.Description || member.description}
+          </p>
+          <span className="text-xs opacity-80">
+            Hover away to flip back ↩️
+          </span>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+
 const AboutUs = () => {
   const [aboutUs, setAboutUs] = useState<any[]>([]);
-  const [mentors, setMentors] = useState<any[]>([]); // ✅ moved inside component
+  const [mentors, setMentors] = useState<any[]>([]);
   const [flippedIndex, setFlippedIndex] = useState<number | null>(null);
-  const hoverTimers = new Map<number, ReturnType<typeof setTimeout>>();
+  const hoverTimers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
   const [leaders, setLeaders] = useState<any[]>([]);
 
   useEffect(() => {
@@ -22,7 +102,6 @@ const AboutUs = () => {
       .catch((err) => console.error("Error fetching leaders:", err));
   }, []);
 
-  // ✅ Fetch Team Members
   useEffect(() => {
     fetch(`${BACKEND_URL}/AboutUs`)
       .then((res) => res.json())
@@ -33,7 +112,6 @@ const AboutUs = () => {
       .catch((error) => console.error("Error fetching team members:", error));
   }, []);
 
-  // ✅ Fetch Mentors
   useEffect(() => {
     fetch(`${BACKEND_URL}/mentors`)
       .then((res) => res.json())
@@ -48,59 +126,46 @@ const AboutUs = () => {
     const timer = setTimeout(() => {
       setFlippedIndex(index);
     }, 1800);
-    hoverTimers.set(index, timer);
+    hoverTimers.current.set(index, timer);
   };
 
   const handleMouseLeave = (index: number) => {
-    const timer = hoverTimers.get(index);
+    const timer = hoverTimers.current.get(index);
     if (timer) clearTimeout(timer);
-    hoverTimers.delete(index);
+    hoverTimers.current.delete(index);
     setFlippedIndex(null);
   };
 
   return (
-    <div className="min-h-screen pt-20 bg-white">
+    <div className="min-h-screen pt-20 bg-white overflow-x-hidden">
       {/* Hero Section */}
-      
-  <section className="relative py-72 text-white overflow-hidden">
-  {/* Background Image */}
-  <div
-    className="absolute inset-0 bg-cover bg-center brightness-80 blur-[0px]"
-    style={{
-      backgroundImage:
-        "url('https://res.cloudinary.com/diijn4esl/image/upload/v1761583379/IMG_0345_grp_photo_mnt7uf.jpg')",
-    }}
-  ></div>
-
-  
-
-</section>
-
-
+      <section className="relative py-48 md:py-72 text-white overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center brightness-80 blur-[0px]"
+          style={{
+            backgroundImage:
+              "url('https://res.cloudinary.com/diijn4esl/image/upload/v1761720223/grp_photo_fvzjjq.jpg')",
+          }}
+        ></div>
+      </section>
 
       {/* TechVerse Club Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 text-center mb-12">
-          <h2 className="text-6xl font-extrabold text-gray-800">
+          <h2 className="text-4xl md:text-6xl font-extrabold text-gray-800">
             About TechVerse Club
           </h2>
         </div>
 
-        <div className="container mx-auto px-7 flex flex-col md:flex-row items-center justify-center gap-16">
-          {/* Logo Section */}
-          <div className="relative w-64 h-64 flex-shrink-0 flex items-center justify-center">
-            {/* Thin blue outline behind logo */}
+        <div className="container mx-auto px-4 md:px-7 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
+          <div className="relative w-48 h-48 md:w-64 md:h-64 flex-shrink-0 flex items-center justify-center">
             <div className="absolute inset-0 rounded-full border-[1.5px] border-blue-500/70 shadow-[0_6px_20px_rgba(0,0,0,0.15)]"></div>
-
-            {/* Logo */}
             <img
               src={Logo}
               alt="TechVerse Club Logo"
               className="w-full h-full object-cover rounded-full relative z-10 border border-blue-400 shadow-lg"
             />
           </div>
-
-          {/* Description */}
           <div className="md:w-2/3 text-center md:text-left -mt-4">
             <p className="text-lg text-gray-600 leading-relaxed text-justify">
               TechVerse Club of CT University, under the School of Engineering
@@ -120,113 +185,50 @@ const AboutUs = () => {
         </div>
       </section>
 
-      {/* Team Section */}
+      {/* Honorable Authorities Section */}
       <section className="py-10 -mt-12">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
               Honorable Authorities
             </h2>
-            {/* <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500">
-              Dedicated leaders working tirelessly to create an unforgettable
-              experience.
-            </p> */}
           </div>
 
-          {/* Cards Grid */}
           <div className="flex flex-col items-center gap-14">
-            {/* Row 1 → first 3 cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-40 gap-y-12 justify-items-center">
+            {/* ✅ FIX: grid-cols-2 for mobile, lg:grid-cols-3 for desktop */}
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 md:gap-12 lg:gap-x-40 justify-items-center">
               {aboutUs.slice(0, 3).map((member, index) => (
-                <div
-                  key={member._id || index}
-                  className="relative w-64 h-64 [perspective:1000px]"
-                  onMouseEnter={() => handleMouseEnter(index)}
-                  onMouseLeave={() => handleMouseLeave(index)}
-                >
-                  <div
-                    className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
-                      flippedIndex === index
-                        ? "[transform:rotateY(180deg)]"
-                        : ""
-                    }`}
-                  >
-                    {/* Front Side */}
-                    <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
-                      <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
-                        <img
-                          src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
-                          alt={member.Name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <h3 className="text-lg font-bold text-gray-800 mb-1 text-center leading-tight">
-                        {member.Name}
-                      </h3>
-                      <p className="text-blue-600 font-semibold text-sm text-center mb-2">
-                        {member.Designation}
-                      </p>
-                    </Card>
-
-                    {/* Back Side */}
-                    <Card className="absolute inset-0 p-6 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                      <p className="text-sm leading-relaxed px-2 mb-4 text-center">
-                        {member.Description}
-                      </p>
-                      <span className="text-xs opacity-80">
-                        Hover away to flip back ↩️
-                      </span>
-                    </Card>
+                  // ✅ FIX: Logic to center the 3rd card on mobile (lg:col-span-1 resets it for desktop)
+                  <div key={member._id || index} className={index === 2 ? 'col-span-2 lg:col-span-1 flex justify-center' : 'flex justify-center'}>
+                    <MemberCard
+                      member={member}
+                      index={index}
+                      isFlipped={flippedIndex === index}
+                      handleMouseEnter={handleMouseEnter}
+                      handleMouseLeave={handleMouseLeave}
+                    />
                   </div>
-                </div>
               ))}
             </div>
 
-            {/* Row 2 → next 5 cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-16 gap-y-12 justify-items-center">
+            {/* ✅ FIX: grid-cols-2 for mobile, lg:grid-cols-5 for desktop */}
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5 md:gap-12 lg:gap-x-16 justify-items-center">
               {aboutUs.slice(3).map((member, index) => {
-                const actualIndex = index + 3; // fix index for flipping
+                const actualIndex = index + 3;
+                const sliceLength = aboutUs.slice(3).length;
+                // Check if this is the last item AND if the total number of items in this slice is odd
+                const isLastItemAndOdd = (index === sliceLength - 1) && (sliceLength % 2 !== 0);
+                
                 return (
-                  <div
-                    key={member._id || actualIndex}
-                    className="relative w-64 h-64 [perspective:1000px]"
-                    onMouseEnter={() => handleMouseEnter(actualIndex)}
-                    onMouseLeave={() => handleMouseLeave(actualIndex)}
-                  >
-                    <div
-                      className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
-                        flippedIndex === actualIndex
-                          ? "[transform:rotateY(180deg)]"
-                          : ""
-                      }`}
-                    >
-                      {/* Front Side */}
-                      <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
-                        <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
-                          <img
-                            src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
-                            alt={member.Name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <h3 className="text-lg font-bold text-gray-800 mb-1 text-center leading-tight">
-                          {member.Name}
-                        </h3>
-                        <p className="text-blue-600 font-semibold text-sm text-center mb-1">
-                          {member.Designation}
-                        </p>
-                      </Card>
-
-                      {/* Back Side */}
-                      <Card className="absolute inset-0 p-6 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                        <p className="text-sm leading-relaxed px-2 mb-4 text-center">
-                          {member.Description}
-                        </p>
-                        <span className="text-xs opacity-80">
-                          Hover away to flip back ↩️
-                        </span>
-                      </Card>
-                    </div>
+                  // ✅ FIX: Logic to center the last card on mobile if count is odd (md: and lg: reset it for desktop)
+                  <div key={member._id || actualIndex} className={isLastItemAndOdd ? 'col-span-2 md:col-span-1 lg:col-span-1 flex justify-center' : 'flex justify-center'}>
+                    <MemberCard
+                      member={member}
+                      index={actualIndex}
+                      isFlipped={flippedIndex === actualIndex}
+                      handleMouseEnter={handleMouseEnter}
+                      handleMouseLeave={handleMouseLeave}
+                    />
                   </div>
                 );
               })}
@@ -241,773 +243,318 @@ const AboutUs = () => {
           <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
             Mentors(SOET)
           </h2>
-          {/* <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500">
-            Guiding us with their wisdom, expertise, and constant motivation.
-          </p> */}
         </div>
-
-        {/* Mentor Cards */}
         <div className="flex flex-col items-center gap-14">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-28 gap-y-12 justify-items-center">
-            {mentors.map((member, index) => (
-              <div
-                key={member._id || index}
-                className="relative w-64 h-64 [perspective:1000px]"
-                onMouseEnter={() => handleMouseEnter(index + 100)} // offset to avoid clash
-                onMouseLeave={() => handleMouseLeave(index + 100)}
-              >
-                <div
-                  className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
-                    flippedIndex === index + 100
-                      ? "[transform:rotateY(180deg)]"
-                      : ""
-                  }`}
-                >
-                  {/* Front Side */}
-                  <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
-                    <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
-                      <img
-                        src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
-                        alt={member.Name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-800 mb-1 text-center leading-tight">
-                      {member.Name}
-                    </h3>
-                    <p className="text-blue-600 font-semibold text-sm text-center mb-1">
-                      {member.Designation}
-                    </p>
-                  </Card>
-
-                  {/* Back Side */}
-                  <Card className="absolute inset-0 p-6 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                    <p className="text-sm leading-relaxed px-2 mb-4 text-center">
-                      {member.Description}
-                    </p>
-                    <span className="text-xs opacity-80">
-                      Hover away to flip back ↩️
-                    </span>
-                  </Card>
+          {/* ✅ FIX: grid-cols-2 for mobile, lg:grid-cols-3 for desktop */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 md:gap-12 lg:gap-x-28 justify-items-center">
+            {mentors.map((member, index) => {
+              const sliceLength = mentors.length;
+              const isLastItemAndOdd = (index === sliceLength - 1) && (sliceLength % 2 !== 0);
+              
+              return (
+                // ✅ FIX: Logic to center the last card on mobile if count is odd
+                <div key={member._id || index} className={isLastItemAndOdd ? 'col-span-2 md:col-span-1 lg:col-span-1 flex justify-center' : 'flex justify-center'}>
+                  <MemberCard
+                    member={member}
+                    index={index + 100}
+                    isFlipped={flippedIndex === index + 100}
+                    handleMouseEnter={handleMouseEnter}
+                    handleMouseLeave={handleMouseLeave}
+                  />
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Leaders */}
+      {/* Leaders Section (remains grid-cols-2) */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 -mt-12">
             TechVerse Leaders
           </h2>
-          {/* <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500">
-            Meet the passionate leaders who drive TechVerse forward with
-            innovation, teamwork, and vision.
-          </p> */}
         </div>
 
-        {/* Leaders Cards */}
         <div className="flex flex-col items-center gap-14">
-          {/* First 6 Leaders (3 + 3 grid) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-28 gap-y-12 justify-items-center">
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 md:gap-12 lg:gap-x-28 justify-items-center">
             {leaders.slice(0, 6).map((member, index) => (
-              <div
+              <MemberCard
                 key={member._id || index}
-                className="relative w-64 h-72 [perspective:1000px]"
-                onMouseEnter={() => handleMouseEnter(index + 200)}
-                onMouseLeave={() => handleMouseLeave(index + 200)}
-              >
-                <div
-                  className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
-                    flippedIndex === index + 200
-                      ? "[transform:rotateY(180deg)]"
-                      : ""
-                  }`}
-                >
-                  {/* Front Side */}
-                  <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
-                    <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
-                      <img
-                        src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
-                        alt={member.Name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-800 mb-1 text-center leading-tight">
-                      {member.Name}
-                    </h3>
-                    <p className="text-blue-600 font-semibold text-sm text-center mb-3">
-                      {member.Designation}
-                    </p>
-
-                    {/* Social Icons */}
-                    <div className="flex gap-3 mt-2 gap-x-8">
-                      <a
-                        href={member.linkedin || "#"}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`flex items-center justify-center w-8 h-8 rounded-md border ${
-                          member.linkedin
-                            ? "border-blue-500 text-blue-600 hover:bg-blue-100"
-                            : "border-gray-300 text-gray-400 cursor-not-allowed"
-                        } transition duration-200`}
-                      >
-                        <Linkedin size={18} />
-                      </a>
-
-                      <a
-                        href={`mailto:${member.mail || "#"}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`flex items-center justify-center w-8 h-8 rounded-md border ${
-                          member.mail
-                            ? "border-blue-500 text-blue-600 hover:bg-blue-100"
-                            : "border-gray-300 text-gray-400 cursor-not-allowed"
-                        } transition duration-200`}
-                      >
-                        <Mail size={18} />
-                      </a>
-
-                    </div>
-                  </Card>
-
-                  {/* Back Side */}
-                  <Card className="absolute inset-0 p-6 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                    <p className="text-sm leading-relaxed px-2 mb-4 text-center">
-                      {member.description}
-                    </p>
-                  </Card>
-                </div>
-              </div>
+                member={member}
+                index={index + 200}
+                isFlipped={flippedIndex === index + 200}
+                socialIcons={true}
+                handleMouseEnter={handleMouseEnter}
+                handleMouseLeave={handleMouseLeave}
+              />
             ))}
           </div>
 
           <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight -mb-12 mt-10">
             Event Management Team
           </h2>
-          
 
-          {/* Row 3 — Single Centered Card */}
           <div className="flex justify-center mt-16">
             {leaders.slice(6, 7).map((member, index) => (
-              <div
+              <MemberCard
                 key={member._id || index}
-                className="relative w-64 h-64 [perspective:1000px]"
-                onMouseEnter={() => handleMouseEnter(index + 300)}
-                onMouseLeave={() => handleMouseLeave(index + 300)}
-              >
-                <div
-                  className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
-                    flippedIndex === index + 300
-                      ? "[transform:rotateY(180deg)]"
-                      : ""
-                  }`}
-                >
-                  {/* Front Side */}
-                  <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
-                    <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
-                      <img
-                        src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
-                        alt={member.Name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-800 mb-1 text-center leading-tight">
-                      {member.Name}
-                    </h3>
-                    <p className="text-blue-600 font-semibold text-sm text-center mb-3">
-                      {member.Designation}
-                    </p>
-                  </Card>
-
-                  {/* Back Side */}
-                  <Card className="absolute inset-0 p-6 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                    <p className="text-sm leading-relaxed px-2 mb-4 text-center">
-                      {member.description}
-                    </p>
-                  </Card>
-                </div>
-              </div>
+                member={member}
+                index={index + 300}
+                isFlipped={flippedIndex === index + 300}
+                handleMouseEnter={handleMouseEnter}
+                handleMouseLeave={handleMouseLeave}
+              />
             ))}
           </div>
-          {/* CONNECTOR SECTION (between leader and 4 members) */}
+
+          {/* CONNECTOR SECTION */}
           <div className="relative w-full flex justify-center items-center -mt-10">
-            {/* Soft glowing background */}
             <div
               className="absolute top-[40%] left-1/2 -translate-x-1/2 
-                  w-[70%] h-[160px] 
-                  bg-gradient-to-b from-blue-200/50 to-transparent 
-                  rounded-full blur-3xl"
+                w-full max-w-sm md:max-w-[70%] h-[160px] 
+                bg-gradient-to-b from-blue-200/50 to-transparent 
+                rounded-full blur-3xl"
             ></div>
-
-            {/* Hierarchy connection lines */}
             <svg
-              className="absolute top-0 left-1/2 -translate-x-1/2 w-[70%] h-[160px] pointer-events-none"
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[160px] pointer-events-none"
               viewBox="0 0 800 200"
+              preserveAspectRatio="xMidYMin meet"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              {/* vertical line from leader down */}
               <path
                 d="M400 0 L400 80"
                 stroke="#3B82F6"
                 strokeWidth="3"
                 strokeLinecap="round"
               />
-              {/* horizontal connector */}
               <path
                 d="M50 80 L750 80"
-                stroke="#3B82F6"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              {/* small verticals to each member */}
-              <path
-                d="M150 80 L150 100"
+                className="hidden md:block"
                 stroke="#3B82F6"
                 strokeWidth="3"
                 strokeLinecap="round"
               />
               <path
-                d="M316 80 L316 100"
+                d="M200 80 L600 80"
+                className="block md:hidden"
                 stroke="#3B82F6"
                 strokeWidth="3"
                 strokeLinecap="round"
               />
-              <path
-                d="M484 80 L484 100"
-                stroke="#3B82F6"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              <path
-                d="M650 80 L650 100"
-                stroke="#3B82F6"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-
-              {/* subtle glow overlay on main line */}
-              <path
-                stroke="url(#glowGradient)"
-                strokeWidth="6"
-                strokeLinecap="round"
-                opacity="0.4"
-              />
-              <defs>
-                <linearGradient
-                  id="glowGradient"
-                  x1="150"
-                  y1="80"
-                  x2="650"
-                  y2="80"
-                  gradientUnits="userSpaceOnUse"
-                >
-                  <stop stopColor="#60A5FA" />
-                  <stop offset="0.5" stopColor="#3B82F6" />
-                  <stop offset="1" stopColor="#60A5FA" />
-                </linearGradient>
-              </defs>
+              <path d="M150 80 L150 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M316 80 L316 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M484 80 L484 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M650 80 L650 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M200 80 L200 100" className="block md:hidden" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M600 80 L600 100" className="block md:hidden" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
             </svg>
           </div>
 
-          {/* Row 4 — Four Cards in Semi-Circle Layout */}
-          <div className="relative flex justify-center gap-x-12 mt-12 flex-wrap md:flex-nowrap">
-            {leaders.slice(7, 11).map((member, index) => {
-              // lift the first and last cards slightly for the curve effect
-              const lift =
-                index === 0 || index === 3
-                  ? "-translate-y-32"
-                  : index === 1 || index === 2
-                  ? "-translate-y-4"
-                  : "";
+          <div className="container mx-auto px-4 mt-8 md:mt-12">
+            <div className="grid grid-cols-2 gap-4 md:flex md:justify-center md:gap-12 lg:gap-x-12 justify-items-center md:flex-nowrap">
+              {leaders.slice(7, 11).map((member, index) => {
+                const lift =
+                  index === 0 || index === 3
+                    ? "md:-translate-y-32"
+                    : index === 1 || index === 2
+                    ? "md:-translate-y-4"
+                    : "";
 
-              return (
-                <div
-                  key={member._id || index}
-                  className={`relative w-60 h-52 [perspective:1000px] transition-transform duration-700 ${lift}`}
-                  onMouseEnter={() => handleMouseEnter(index + 400)}
-                  onMouseLeave={() => handleMouseLeave(index + 400)}
-                >
-                  <div
-                    className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
-                      flippedIndex === index + 400
-                        ? "[transform:rotateY(180deg)]"
-                        : ""
-                    }`}
-                  >
-                    {/* Front Side */}
-                    <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
-                      <div className="w-20 h-20 mb-3 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
-                        <img
-                          src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
-                          alt={member.Name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <h3 className="text-md font-bold text-gray-800 mb-1 text-center leading-tight">
-                        {member.Name}
-                      </h3>
-                      <p className="text-blue-600 font-semibold text-xs text-center mb-3">
-                        {member.Designation}
-                      </p>
-                    </Card>
-
-                    {/* Back Side */}
-                    <Card className="absolute inset-0 p-4 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                      <p className="text-xs leading-relaxed px-2 text-center">
-                        {member.description}
-                      </p>
-                    </Card>
+                return (
+                  <div key={member._id || index} className={`transition-transform duration-700 ${lift}`}>
+                    <MemberCard
+                      member={member}
+                      index={index + 400}
+                      isFlipped={flippedIndex === index + 400}
+                      cardHeight="h-40 md:h-52"
+                      handleMouseEnter={handleMouseEnter}
+                      handleMouseLeave={handleMouseLeave}
+                    />
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-           <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight -mb-12 mt-10">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight -mb-12 mt-10">
             Tech Team
           </h2>
-          {/* <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500 -mb-24">
-            Guiding us with their wisdom, expertise, and constant motivation.
-          </p> */}
           {/* ===== ROW 5 + CONNECTOR + ROW 6 ===== */}
           <div className="relative flex flex-col items-center mt-24">
             {/* Row 5 — Single Centered Card */}
-            <div className="flex justify-center relative z-10">
+            <div className="flex justify-center relative z-10 -translate-y-8">
               {leaders.slice(11, 12).map((member, index) => (
-                <div
+                <MemberCard
                   key={member._id || index}
-                  className="relative w-64 h-64 [perspective:1000px]"
-                  onMouseEnter={() => handleMouseEnter(index + 500)}
-                  onMouseLeave={() => handleMouseLeave(index + 500)}
-                >
-                  <div
-                    className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
-                      flippedIndex === index + 500
-                        ? "[transform:rotateY(180deg)]"
-                        : ""
-                    }`}
-                  >
-                    {/* Front Side */}
-                    <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
-                      <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
-                        <img
-                          src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"} 
-                          alt={member.Name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <h3 className="text-lg font-bold text-gray-800 mb-1 text-center leading-tight">
-                        {member.Name}
-                      </h3>
-                      <p className="text-blue-600 font-semibold text-sm text-center mb-3">
-                        {member.Designation}
-                      </p>
-                    </Card>
-
-                    {/* Back Side */}
-                    <Card className="absolute inset-0 p-6 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                      <p className="text-sm leading-relaxed px-2 mb-4 text-center">
-                        {member.description}
-                      </p>
-                    </Card>
-                  </div>
-                </div>
+                  member={member}
+                  index={index + 500}
+                  isFlipped={flippedIndex === index + 500}
+                  handleMouseEnter={handleMouseEnter}
+                  handleMouseLeave={handleMouseLeave}
+                />
               ))}
             </div>
 
-            {/* CONNECTOR SECTION (between leader and 4 members) */}
-            <div className="relative w-full flex justify-center items-center -mt-10">
-              {/* Soft glowing background */}
+            {/* CONNECTOR SECTION */}
+            <div className="relative w-full flex justify-center items-center">
               <div
                 className="absolute top-[40%] left-1/2 -translate-x-1/2 
-                  w-[70%] h-[160px] 
-                  bg-gradient-to-b from-blue-200/50 to-transparent 
-                  rounded-full blur-3xl"
+                w-full max-w-sm md:max-w-[70%] h-[160px] 
+                bg-gradient-to-b from-blue-200/50 to-transparent 
+                rounded-full blur-3xl"
               ></div>
-
-              {/* Hierarchy connection lines */}
               <svg
-                className="absolute top-0 left-1/2 -translate-x-1/2 w-[70%] h-[160px] pointer-events-none"
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[200px] pointer-events-none"
                 viewBox="0 0 800 200"
+                preserveAspectRatio="xMidYMin meet"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                {/* vertical line from leader down */}
-                <path
-                  d="M400 0 L400 80"
-                  stroke="#3B82F6"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-                {/* horizontal connector */}
-                <path
-                  d="M-100 80 L900 80"
-                  stroke="#3B82F6"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-                {/* small verticals to each member */}
-                <path
-                  d="M150 80 L150 100"
-                  stroke="#3B82F6"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M316 80 L316 100"
-                  stroke="#3B82F6"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M484 80 L484 100"
-                  stroke="#3B82F6"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M650 80 L650 100"
-                  stroke="#3B82F6"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-
-                {/* subtle glow overlay on main line */}
-                <path
-                  stroke="url(#glowGradient)"
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                  opacity="0.4"
-                />
-                <defs>
-                  <linearGradient
-                    id="glowGradient"
-                    x1="150"
-                    y1="80"
-                    x2="650"
-                    y2="80"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stopColor="#60A5FA" />
-                    <stop offset="0.5" stopColor="#3B82F6" />
-                    <stop offset="1" stopColor="#60A5FA" />
-                  </linearGradient>
-                </defs>
+                <path d="M400 0 L400 120" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+                <path d="M0 80 L800 80" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+                <path d="M200 80 L600 80" className="block md:hidden" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+                <path d="M100 80 L100 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+                <path d="M250 80 L250 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+                <path d="M400 80 L400 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+                <path d="M550 80 L550 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+                <path d="M700 80 L700 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+                <path d="M200 80 L200 100" className="block md:hidden" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+                <path d="M600 80 L600 100" className="block md:hidden" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
               </svg>
             </div>
 
-            {/* Row 6 — Semicircle Layout */}
-            <div className="relative flex justify-center gap-x-10 mt-32 flex-wrap md:flex-nowrap z-10">
-              {leaders.slice(12, 17).map((member, index) => {
-                const lift =
-                  index === 0 || index === 4
-                    ? "-translate-y-40"
-                    : index === 1 || index === 3
-                    ? "-translate-y-10"
-                    : index === 2
-                    ? "-translate-y-6"
-                    : "";
-                return (
-                  <div
-                    key={member._id || index}
-                    className={`relative w-56 h-52 [perspective:1000px] transition-transform duration-700 ${lift}`}
-                    onMouseEnter={() => handleMouseEnter(index + 600)}
-                    onMouseLeave={() => handleMouseLeave(index + 600)}
-                  >
-                    <div
-                      className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
-                        flippedIndex === index + 600
-                          ? "[transform:rotateY(180deg)]"
-                          : ""
-                      }`}
-                    >
-                      {/* Front Side */}
-                      <Card className="absolute inset-0 flex flex-col justify-center items-center p-5 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
-                        <div className="w-20 h-20 mb-3 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
-                          <img
-                            src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
-                            alt={member.Name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <h3 className="text-md font-bold text-gray-800 mb-1 text-center leading-tight">
-                          {member.Name}
-                        </h3>
-                        <p className="text-blue-600 font-semibold text-xs text-center mb-2">
-                          {member.Designation}
-                        </p>
-                      </Card>
-
-                      {/* Back Side */}
-                      <Card className="absolute inset-0 p-4 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                        <p className="text-xs leading-relaxed px-2 text-center">
-                          {member.description}
-                        </p>
-                      </Card>
+            <div className="container mx-auto px-4 mt-16 md:mt-32">
+              <div className="grid grid-cols-2 gap-4 md:flex md:justify-center md:gap-10 justify-items-center md:flex-nowrap z-10">
+                {leaders.slice(12, 17).map((member, index) => {
+                  const lift =
+                    index === 0 || index === 4
+                      ? "md:-translate-y-40"
+                      : index === 1 || index === 3
+                      ? "md:-translate-y-10"
+                      : index === 2
+                      ? "md:-translate-y-6"
+                      : "";
+                  return (
+                    <div key={member._id || index} className={`transition-transform duration-700 ${lift}`}>
+                      <MemberCard
+                        member={member}
+                        index={index + 600}
+                        isFlipped={flippedIndex === index + 600}
+                        cardHeight="h-40 md:h-52"
+                        handleMouseEnter={handleMouseEnter}
+                        handleMouseLeave={handleMouseLeave}
+                      />
                     </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight -mb-12 mt-10">
+            Media Team
+          </h2>
+          {/* Row 7 — Single Centered Card */}
+          <div className="flex justify-center mt-24 relative z-10">
+            {leaders.slice(17, 18).map((member, index) => (
+              <MemberCard
+                key={member._id || index}
+                member={member}
+                index={index + 700}
+                isFlipped={flippedIndex === index + 700}
+                handleMouseEnter={handleMouseEnter}
+                handleMouseLeave={handleMouseLeave}
+              />
+            ))}
+          </div>
+
+          {/* Connector between center and 4 below */}
+          <div className="relative w-full flex justify-center items-center -mt-4">
+            <svg
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[160px] pointer-events-none"
+              viewBox="0 0 800 200"
+              preserveAspectRatio="xMidYMin meet"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M400 0 L400 80" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M50 80 L750 80" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M200 80 L600 80" className="block md:hidden" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M150 80 L150 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M316 80 L316 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M484 80 L484 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M650 80 L650 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M200 80 L200 100" className="block md:hidden" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M600 80 L600 100" className="block md:hidden" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+            </svg>
+          </div>
+
+          {/* Row 8 — Four Cards */}
+          <div className="container mx-auto px-4 mt-8 md:mt-12">
+            <div className="grid grid-cols-2 gap-4 md:flex md:justify-center md:gap-12 justify-items-center md:flex-nowrap">
+              {leaders.slice(18, 22).map((member, index) => {
+                const lift =
+                  index === 0 || index === 3
+                    ? "md:-translate-y-32"
+                    : index === 1 || index === 2
+                    ? "md:-translate-y-4"
+                    : "";
+
+                return (
+                  <div key={member._id || index} className={`transition-transform duration-700 ${lift}`}>
+                    <MemberCard
+                      member={member}
+                      index={index + 800}
+                      isFlipped={flippedIndex === index + 800}
+                      cardHeight="h-40 md:h-52"
+                      handleMouseEnter={handleMouseEnter}
+                      handleMouseLeave={handleMouseLeave}
+                    />
                   </div>
                 );
               })}
             </div>
           </div>
 
-           <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight -mb-12 mt-10">
-            Media Team
-          </h2>
-          {/* <p className="text-lg md:text-xl max-w-2xl mx-auto text-gray-500 -mb-24">
-            Guiding us with their wisdom, expertise, and constant motivation.
-          </p> */}
-          {/* Row 7 — Single Centered Card */}
-          <div className="flex justify-center mt-24 relative z-10">
-            {leaders.slice(17, 18).map((member, index) => (
-              <div
-                key={member._id || index}
-                className="relative w-64 h-64 [perspective:1000px]"
-                onMouseEnter={() => handleMouseEnter(index + 700)}
-                onMouseLeave={() => handleMouseLeave(index + 700)}
-              >
-                <div
-                  className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
-                    flippedIndex === index + 700
-                      ? "[transform:rotateY(180deg)]"
-                      : ""
-                  }`}
-                >
-                  {/* Front Side */}
-                  <Card className="absolute inset-0 flex flex-col justify-center items-center p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
-                    <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
-                      <img
-                        src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
-                        alt={member.Name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-800 mb-1 text-center leading-tight">
-                      {member.Name}
-                    </h3>
-                    <p className="text-blue-600 font-semibold text-sm text-center mb-3">
-                      {member.Designation}
-                    </p>
-                  </Card>
-
-                  {/* Back Side */}
-                  <Card className="absolute inset-0 p-6 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                    <p className="text-sm leading-relaxed px-2 mb-4 text-center">
-                      {member.description}
-                    </p>
-                  </Card>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Connector between center and 4 below */}
-          <div className="relative w-full flex justify-center items-center -mt-14">
-            <svg
-              className="absolute top-0 left-1/2 -translate-x-1/2 w-[75%] h-[160px] pointer-events-none"
-              viewBox="0 0 900 200"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              {/* vertical from leader */}
-              <path
-                d="M450 0 L450 80"
-                stroke="#3B82F6"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              {/* horizontal line */}
-              <path
-                d="M80 80 L820 80"
-                stroke="#3B82F6"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              {/* small vertical connectors */}
-              <path
-                d="M200 80 L200 100"
-                stroke="#3B82F6"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              <path
-                d="M390 80 L390 100"
-                stroke="#3B82F6"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              <path
-                d="M510 80 L510 100"
-                stroke="#3B82F6"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              <path
-                d="M700 80 L700 100"
-                stroke="#3B82F6"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
-
-          {/* Row 8 — Four Cards in Row */}
-          {/* Row 8 — Four Cards in Semi-Circle Layout */}
-          <div className="relative flex justify-center gap-x-12 mt-12 flex-wrap md:flex-nowrap">
-            {leaders.slice(18, 22).map((member, index) => {
-              // lift the first and last cards for the curve effect
-              const lift =
-                index === 0 || index === 3
-                  ? "-translate-y-32"
-                  : index === 1 || index === 2
-                  ? "-translate-y-4"
-                  : "";
-
-              return (
-                <div
-                  key={member._id || index}
-                  className={`relative w-60 h-52 [perspective:1000px] transition-transform duration-700 ${lift}`}
-                  onMouseEnter={() => handleMouseEnter(index + 800)}
-                  onMouseLeave={() => handleMouseLeave(index + 800)}
-                >
-                  <div
-                    className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
-                      flippedIndex === index + 800
-                        ? "[transform:rotateY(180deg)]"
-                        : ""
-                    }`}
-                  >
-                    {/* Front */}
-                    <Card className="absolute inset-0 flex flex-col justify-center items-center p-5 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
-                      <div className="w-20 h-20 mb-3 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
-                        <img
-                          src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
-                          alt={member.Name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <h3 className="text-md font-bold text-gray-800 mb-1 text-center leading-tight">
-                        {member.Name}
-                      </h3>
-                      <p className="text-blue-600 font-semibold text-xs text-center mb-2">
-                        {member.Designation}
-                      </p>
-                    </Card>
-
-                    {/* Back */}
-                    <Card className="absolute inset-0 p-4 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                      <p className="text-xs leading-relaxed px-2 text-center">
-                        {member.description}
-                      </p>
-                    </Card>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Final Row — Leader connected to Worker (Horizontal Layout) */}
-          <div className="relative flex justify-center items-center mt-24">
-            {/* Leader Card (Left) */}
+          {/* Final Row — Leader connected to Worker */}
+          <div className="relative flex flex-col justify-center items-center mt-24 gap-4">
             {leaders.slice(22, 23).map((member, index) => (
-              <div
+              <MemberCard
                 key={member._id || index}
-                className="relative w-60 h-56 [perspective:1000px] transition-transform duration-700 mr-24 z-10"
-                onMouseEnter={() => handleMouseEnter(index + 1100)}
-                onMouseLeave={() => handleMouseLeave(index + 1100)}
-              >
-                <div
-                  className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
-                    flippedIndex === index + 1100
-                      ? "[transform:rotateY(180deg)]"
-                      : ""
-                  }`}
-                >
-                  {/* Front */}
-                  <Card className="absolute inset-0 flex flex-col justify-center items-center p-5 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
-                    <div className="w-20 h-20 mb-3 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
-                      <img
-                        src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
-                        alt={member.Name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <h3 className="text-md font-bold text-gray-800 mb-1 text-center leading-tight">
-                      {member.Name}
-                    </h3>
-                    <p className="text-blue-600 font-semibold text-xs text-center mb-2">
-                      {member.Designation}
-                    </p>
-                  </Card>
-
-                  {/* Back */}
-                  <Card className="absolute inset-0 p-4 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                    <p className="text-xs leading-relaxed px-2 text-center">
-                      {member.description}
-                    </p>
-                  </Card>
-                </div>
-              </div>
+                member={member}
+                index={index + 1100}
+                isFlipped={flippedIndex === index + 1100}
+                cardHeight="h-44 md:h-56"
+                handleMouseEnter={handleMouseEnter}
+                handleMouseLeave={handleMouseLeave}
+              />
             ))}
 
-            {/* Connector Line */}
             <svg
-              className="absolute left-1/2 -translate-x-1/2 w-[250px] h-[4px]"
-              viewBox="0 0 250 4"
+              className="block w-1 h-12"
+              viewBox="0 0 4 48"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M0 2 L250 2"
+                d="M2 0 L2 48"
                 stroke="#3B82F6"
                 strokeWidth="3"
                 strokeLinecap="round"
               />
             </svg>
 
-            {/* Worker Card (Right) */}
             {leaders.slice(23, 24).map((member, index) => (
-              <div
+              <MemberCard
                 key={member._id || index}
-                className="relative w-60 h-56 [perspective:1000px] transition-transform duration-700 ml-24 z-10"
-                onMouseEnter={() => handleMouseEnter(index + 1200)}
-                onMouseLeave={() => handleMouseLeave(index + 1200)}
-              >
-                <div
-                  className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
-                    flippedIndex === index + 1200
-                      ? "[transform:rotateY(180deg)]"
-                      : ""
-                  }`}
-                >
-                  {/* Front */}
-                  <Card className="absolute inset-0 flex flex-col justify-center items-center p-5 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
-                    <div className="w-20 h-20 mb-3 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
-                      <img
-                        src={member.img_url || "/default-profile.jpg"}
-                        alt={member.Name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <h3 className="text-md font-bold text-gray-800 mb-1 text-center leading-tight">
-                      {member.Name}
-                    </h3>
-                    <p className="text-blue-600 font-semibold text-xs text-center mb-2">
-                      {member.Designation}
-                    </p>
-                  </Card>
-
-                  {/* Back */}
-                  <Card className="absolute inset-0 p-4 flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-500 text-white border-none rounded-xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                    <p className="text-xs leading-relaxed px-2 text-center">
-                      {member.description}
-                    </p>
-                  </Card>
-                </div>
-              </div>
+                member={member}
+                index={index + 1200}
+                isFlipped={flippedIndex === index + 1200}
+                cardHeight="h-44 md:h-56"
+                handleMouseEnter={handleMouseEnter}
+                handleMouseLeave={handleMouseLeave}
+              />
             ))}
           </div>
         </div>
@@ -1016,10 +563,10 @@ const AboutUs = () => {
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-br from-blue-500 to-cyan-400 relative overflow-hidden">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-6xl font-bold text-white mb-6">
+          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
             Want to Join Our Team?
           </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
             We're always looking for passionate individuals to help organize
             future events.
           </p>
