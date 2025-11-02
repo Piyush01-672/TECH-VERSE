@@ -167,13 +167,14 @@ All colors MUST be HSL.
 .embla__container {
   display: flex;
   align-items: center;
+  gap: 1rem;
 }
 
 .embla__slide {
   display: flex;
   min-width: 0; 
   transition: transform 0.6s ease, opacity 0.6s ease;
-  transform: scale(0.83);
+  transform: scale(0.8);
   opacity: 0.9;
   border-radius: 1.4rem;
 }
@@ -195,11 +196,5 @@ All colors MUST be HSL.
   z-index: 10;
 }
 
-.nav-btns {
-  margin-top: 1.6rem;
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-}
 
 

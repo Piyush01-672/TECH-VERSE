@@ -327,7 +327,7 @@ const Home = () => {
       {[...Array(11)].map((_, i) => (
         <svg
           key={i}
-          className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 animate-sway"
+          className="w-4 h-4  xl:w-6 xl:h-6 text-green-500 animate-sway"
           style={{ transform: `rotate(${15 + i * 2}deg)` }}
           fill="currentColor"
           viewBox="0 0 24 24"
@@ -338,7 +338,7 @@ const Home = () => {
     </div>
 
     {/* Left Logo */}
-    <div className="w-20 h-20 sm:w-34 sm:h-34 md:w-40 md:h-40 rounded-full overflow-hidden flex justify-center items-center bg-transparent drop-shadow-md mx-2 sm:mx-4">
+    <div className="w-20 h-20 sm:w-32 sm:h-32 xl:w-40 xl:h-40 rounded-full overflow-hidden flex justify-center items-center bg-transparent drop-shadow-md mx-2 sm:mx-4">
       <img
         src={UniversityLogo}
         alt="Left Logo"
@@ -347,7 +347,7 @@ const Home = () => {
     </div>
 
     {/* Center Techverse logo */}
-    <div className="w-28 h-28 sm:w-40 sm:h-40 md:w-64 md:h-64 rounded-full overflow-hidden flex justify-center items-center bg-transparent drop-shadow-xl mx-2 sm:mx-4">
+    <div className="w-28 h-28 sm:w-48 sm:h-48 xl:w-64 xl:h-64 rounded-full overflow-hidden flex justify-center items-center bg-transparent drop-shadow-xl mx-2 sm:mx-4">
       <img
         src={TechverseLogo}
         alt="Techverse Logo"
@@ -356,7 +356,7 @@ const Home = () => {
     </div>
 
     {/* Right Logo */}
-    <div className="w-20 h-20 sm:w-44 sm:h-44 md:w-48 md:h-48 rounded-full overflow-hidden flex justify-center items-center bg-transparent drop-shadow-md mx-2 sm:mx-1">
+    <div className="w-20 h-20 sm:w-40 sm:h-40 xl:w-48 xl:h-48 rounded-full overflow-hidden flex justify-center items-center bg-transparent drop-shadow-md mx-2 sm:mx-1">
       <img
         src={SoetLogo}
         alt="Right Logo"
@@ -369,7 +369,7 @@ const Home = () => {
       {[...Array(11)].map((_, i) => (
         <svg
           key={i}
-          className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 animate-sway"
+          className="w-4 h-4 xl:w-6 xl:h-6 text-green-500 animate-sway"
           style={{ transform: `rotate(${-15 - i * 2}deg)` }}
           fill="currentColor"
           viewBox="0 0 24 24"

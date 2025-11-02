@@ -17,7 +17,7 @@ interface GalleryItem {
 
 export default function ImageCarousel({ galleryItems }: { galleryItems: GalleryItem[] }) {
   const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop:false },
+    { loop:false ,slidesToScroll: 1},
     [Autoplay({ delay: 5000 }), WheelGesturesPlugin(), ClassNames({ snapped: 'is-snapped' })]
   )
 
@@ -28,13 +28,13 @@ export default function ImageCarousel({ galleryItems }: { galleryItems: GalleryI
   const scrollNext = useCallback(() => {
     if (emblaApi) emblaApi.scrollNext()
   }, [emblaApi])
-
+  
   const Description = galleryItems.find((item) => item.description)?.description || ''
   const [showFull, setShowFull] = useState(false);
   return (
     <div className="embla">
       <div className="embla__viewport w-[90vw] sm:w-[90vw]" ref={emblaRef}>
-        <div className="embla__container px-1" >
+        <div className="embla__container" >
           {galleryItems.map(item => (
             <div
             className="embla__slide relative shrink-0 grow-0 basis-full md:basis-1/3 flex items-center justify-center "
@@ -50,7 +50,7 @@ export default function ImageCarousel({ galleryItems }: { galleryItems: GalleryI
           ))}
         </div>
       </div>
-      <div className="nav-btns">
+      <div className="flex justify-center gap-6 mt-4 ">
         <button
           className="embla__prev border rounded-full bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-white w-10 h-10 flex items-center justify-center"
           onClick={scrollPrev}>
