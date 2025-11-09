@@ -135,9 +135,9 @@ const Home = () => {
     },
     {
       icon: Sparkles,
-      title: "Innovation Projects",
+      title: "Mentorship",
       description:
-        "Work on real-world projects and bring your innovative ideas to life.",
+        "Gain hands-on guidance from industry experts and transform your ideas into impactful projects.",
     },
   ];
   return (
@@ -383,7 +383,7 @@ const Home = () => {
 
         {/* Description */}
        <p className="text-justify w-4/5 max-w-3xl mx-auto text-base sm:text-lg md:text-xl lg:text-2xl text-blue-900 font-medium tracking-wide leading-relaxed md:leading-loose mt-12">
-  At <span className="font-extrabold text-blue-700">Tech Verse</span>, we believe in empowering innovation through collaboration. 
+  At <span className="font-extrabold text-blue-700">Tech Verse</span>, we believe in empowering men collaboration. 
   Our platform brings together bright minds from around the world to share ideas, explore emerging technologies, 
   and transform creative visions into impactful realities. Join us as we build a vibrant community where{" "}
   <span className="font-semibold text-blue-600">technology meets imagination</span>.
