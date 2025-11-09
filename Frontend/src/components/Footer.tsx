@@ -102,7 +102,7 @@ const Footer = () => {
                 <Linkedin size={20} />
               </a>
               <a
-                href="#"
+                href="https://github.com/TechVesrse-CT-University"
                 className="p-2 bg-muted hover:bg-primary hover:text-primary-foreground rounded-lg transition-all"
                 aria-label="GitHub"
               >
