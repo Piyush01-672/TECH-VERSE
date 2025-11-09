@@ -431,9 +431,9 @@ const AboutUs = () => {
                     index === 0 || index === 4
                       ? "md:-translate-y-40"
                       : index === 1 || index === 3
-                      ? "md:-translate-y-10"
+                      ? "md:-translate-y-7"
                       : index === 2
-                      ? "md:-translate-y-6"
+                      ? "md:-translate-y-5"
                       : "";
                   return (
                     <div key={member._id || index} className={`transition-transform duration-700 ${lift}`}>
