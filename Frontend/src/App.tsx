@@ -55,7 +55,7 @@ const AppContent: React.FC = () => {
       <Routes location={location}>
         <Route path="/" element={<Home />} />
         <Route path="/events" element={<Events />} />
-        <Route path="/about" element={<AboutUs />} />
+        <Route path="/about" element={<AboutUs onLoadComplete={() => setLoading(false)} />} />
         <Route path="/sponsors" element={<Sponsors />} />
         <Route path="/winners" element={<Winners />} />
         <Route path="/contact" element={<Contact />} />

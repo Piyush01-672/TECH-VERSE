@@ -10,6 +10,14 @@ const Events = () => {
       .then((data) => setGalleryItems(data))
       .catch((error) => console.error("Error fetching gallery items:", error));
   }, []);
+
+  useEffect(() => {
+    galleryItems.slice(0, 4).forEach(item => {
+      const img = new Image();
+      img.src = item.img_url;
+    });
+  }, [galleryItems]);
+  
   // const [showAllImages, setShowAllImages] = useState(true);
   return (
     <div className="min-h-screen pt-10">

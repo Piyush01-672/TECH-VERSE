@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Linkedin, Github, Mail } from "lucide-react";
 import Logo from "@/assets/techverse-logo.jpg";
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 // ✅ Re-usable Card Component with responsive sizing
@@ -19,7 +20,7 @@ const MemberCard = ({ member, index, isFlipped, socialIcons = false, handleMouse
     >
       <div
         className={`relative w-full h-full transition-transform duration-[8000ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] [transform-style:preserve-3d] ${
-          isFlipped ? "[transform:rotateY(180deg)]" : ""
+          isFlipped ? "[transform:rotateY(0deg)]" : ""
         }`}
       >
         {/* Front Side */}
@@ -27,7 +28,7 @@ const MemberCard = ({ member, index, isFlipped, socialIcons = false, handleMouse
           
           {/* ✅ aspect-square forces a 1:1 ratio, fixing image distortion */}
           <div className="w-16 md:w-24 aspect-square mb-2 md:mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
-            <img
+            <LazyLoadImage
               src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
               alt={member.Name}
               className="w-full h-full object-cover object-center"
@@ -85,42 +86,37 @@ const MemberCard = ({ member, index, isFlipped, socialIcons = false, handleMouse
 };
 
 
-const AboutUs = () => {
+const AboutUs = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
   const [aboutUs, setAboutUs] = useState<any[]>([]);
   const [mentors, setMentors] = useState<any[]>([]);
   const [flippedIndex, setFlippedIndex] = useState<number | null>(null);
   const hoverTimers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
   const [leaders, setLeaders] = useState<any[]>([]);
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [heroLoaded, setHeroLoaded] = useState(false);
 
-  useEffect(() => {
-    fetch(`${BACKEND_URL}/leaders`)
-      .then((res) => res.json())
-      .then((data) => {
-        const formattedData = Array.isArray(data) ? data : [data];
-        setLeaders(formattedData);
-      })
-      .catch((err) => console.error("Error fetching leaders:", err));
-  }, []);
+useEffect(() => {
+  Promise.all([
+    fetch(`${BACKEND_URL}/leaders`).then((res) => res.json()),
+    fetch(`${BACKEND_URL}/AboutUs`).then((res) => res.json()),
+    fetch(`${BACKEND_URL}/mentors`).then((res) => res.json()),
+  ])
+    .then(([leadersData, aboutUsData, mentorsData]) => {
+      setLeaders(Array.isArray(leadersData) ? leadersData : [leadersData]);
+      setAboutUs(Array.isArray(aboutUsData) ? aboutUsData : [aboutUsData]);
+      setMentors(Array.isArray(mentorsData) ? mentorsData : [mentorsData]);
+      setDataLoaded(true);
+    })
+    .catch((err) => console.error("Error fetching data:", err));
+}, []);
 
-  useEffect(() => {
-    fetch(`${BACKEND_URL}/AboutUs`)
-      .then((res) => res.json())
-      .then((data) => {
-        const formattedData = Array.isArray(data) ? data : [data];
-        setAboutUs(formattedData);
-      })
-      .catch((error) => console.error("Error fetching team members:", error));
-  }, []);
 
-  useEffect(() => {
-    fetch(`${BACKEND_URL}/mentors`)
-      .then((res) => res.json())
-      .then((data) => {
-        const formattedData = Array.isArray(data) ? data : [data];
-        setMentors(formattedData);
-      })
-      .catch((err) => console.error("Error fetching mentors:", err));
-  }, []);
+useEffect(() => {
+  if (dataLoaded && heroLoaded) {
+    onLoadComplete();
+  }
+}, [dataLoaded, heroLoaded]);
+
 
   const handleMouseEnter = (index: number) => {
     const timer = setTimeout(() => {
@@ -160,7 +156,7 @@ const AboutUs = () => {
         <div className="container mx-auto px-4 md:px-7 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
           <div className="relative w-48 h-48 md:w-64 md:h-64 flex-shrink-0 flex items-center justify-center">
             <div className="absolute inset-0 rounded-full border-[1.5px] border-blue-500/70 shadow-[0_6px_20px_rgba(0,0,0,0.15)]"></div>
-            <img
+            <LazyLoadImage
               src={Logo}
               alt="TechVerse Club Logo"
               className="w-full h-full object-cover rounded-full relative z-10 border border-blue-400 shadow-lg"
@@ -291,7 +287,7 @@ const AboutUs = () => {
             ))}
           </div>
 
-          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight -mb-12 mt-10">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight -mb-12 mt-10 text-center">
             Event Management Team
           </h2>
 
