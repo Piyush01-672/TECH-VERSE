@@ -27,7 +27,7 @@ const socialLinks = [
     color: "bg-green-500",
   },
   {
-    label: "X (Twitter)",
+    label: "Mail Us",
     icon: <Mail size={20} />,
     link: "mailto:techverse@ctuniversity.in",
     color: "bg-gray-800",
