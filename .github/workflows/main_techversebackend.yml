@@ -60,7 +60,7 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-        client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_D0BF916C71A84162A06C57A2A4388EB3 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_D0BF916C71A84162A06C57A2A4388EB3 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A217EF8D98554D22AFF3877A942CBCDC }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C54FFA5327F74E3E856A51F5ADA85D1E }}
 
@@ -69,4 +69,5 @@ jobs:
         with:
           app-name: 'techversebackend'
           package: backend.zip
+
 
