@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
 require('@dotenvx/dotenvx').config({ silent: true });
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true
+}));
 app.use(express.json());
 
 mongoose.connect(process.env.MongoDB_url, {
