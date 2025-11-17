@@ -94,7 +94,7 @@ const AboutUs = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
   const [leaders, setLeaders] = useState<any[]>([]);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [heroLoaded, setHeroLoaded] = useState(false);
-
+const HeroUrl="https://res.cloudinary.com/diijn4esl/image/upload/v1761720223/grp_photo_fvzjjq.jpg";
 useEffect(() => {
   Promise.all([
     fetch(`${BACKEND_URL}/leaders`).then((res) => res.json()),
@@ -108,6 +108,12 @@ useEffect(() => {
       setDataLoaded(true);
     })
     .catch((err) => console.error("Error fetching data:", err));
+}, []);
+
+useEffect(() => {
+  const img = new Image();
+  img.src = HeroUrl;
+  img.onload = () => setHeroLoaded(true);
 }, []);
 
 
@@ -140,9 +146,8 @@ useEffect(() => {
           className="absolute inset-0 bg-cover bg-center brightness-80 blur-[0px]"
           style={{
             backgroundImage:
-              "url('https://res.cloudinary.com/diijn4esl/image/upload/v1761720223/grp_photo_fvzjjq.jpg')",
-          }}
-        ></div>
+              `url(${HeroUrl})`,
+          }}></div>
       </section>
 
       {/* TechVerse Club Section */}
