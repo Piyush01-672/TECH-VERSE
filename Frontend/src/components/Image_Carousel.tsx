@@ -42,6 +42,19 @@ export default function ImageCarousel({
     }
   }, [emblaApi]);
 
+  const getOptimizedCloudinaryUrl = (
+    url: string,
+    width = 800
+  ) => {
+    if (!url.includes("/upload/")) return url;
+  
+    return url.replace(
+      "/upload/",
+      `/upload/f_auto,q_auto,w_${width}/`
+    );
+  };
+  
+
   useEffect(() => {
     if (!emblaApi) return;
 
@@ -84,12 +97,21 @@ export default function ImageCarousel({
               className="embla__slide relative shrink-0 grow-0 basis-full md:basis-1/3 flex items-center justify-center "
               key={item._id}
             >
+              <div className="aspect-[3/2] w-full bg-gray-200 rounded-xl overflow-hidden">
               <LazyLoadImage
                 className="embla__slide__img w-[100%] h-auto object-cover rounded-xl overflow-hidden"
-                src={item.img_url}
+                src={getOptimizedCloudinaryUrl(item.img_url)}
+                srcSet={`
+                  ${getOptimizedCloudinaryUrl(item.img_url, 400)} 400w,
+                  ${getOptimizedCloudinaryUrl(item.img_url, 800)} 800w,
+                  ${getOptimizedCloudinaryUrl(item.img_url, 1200)} 1200w
+                `}
+                placeholderSrc={getOptimizedCloudinaryUrl(item.img_url, 20)}
+                sizes="(max-width: 768px) 100vw, 33vw"
                 alt={item.name}
                 effect="blur"
               />
+            </div>
             </div>
           ))}
         </div>

@@ -4,8 +4,8 @@ const cors = require('cors');
 const app = express();
 require('@dotenvx/dotenvx').config({ silent: true });
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true
+  // origin: process.env.FRONTEND_URL,
+  // credentials: true
 }));
 app.use(express.json());
 

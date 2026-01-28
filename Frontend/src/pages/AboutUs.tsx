@@ -5,6 +5,8 @@ import { Linkedin, Github, Mail } from "lucide-react";
 import Logo from "@/assets/techverse-logo.jpg";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import { cloudinary } from "@/hooks/cloudinary";
+
 
 // ✅ Re-usable Card Component with responsive sizing
 const MemberCard = ({ member, index, isFlipped, socialIcons = false, handleMouseEnter, handleMouseLeave }: any) => {
@@ -27,11 +29,20 @@ const MemberCard = ({ member, index, isFlipped, socialIcons = false, handleMouse
         <Card className="absolute inset-0 flex flex-col justify-center items-center p-3 md:p-6 border border-blue-200 shadow-lg rounded-xl bg-white [backface-visibility:hidden] transition-transform duration-500 hover:scale-105 hover:shadow-blue-200/70">
           
           {/* ✅ aspect-square forces a 1:1 ratio, fixing image distortion */}
-          <div className="w-16 md:w-24 aspect-square mb-2 md:mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
+          <div className="relative w-16 md:w-24 aspect-square mb-2 md:mb-4 rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
             <LazyLoadImage
-              src={member.img_url || "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
-              alt={member.Name}
-              className="w-full h-full object-cover object-center"
+             src={cloudinary(member.img_url ,200)||"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
+            srcSet={`
+              ${cloudinary(member.img_url, 100)} 100w,
+               ${cloudinary(member.img_url, 200)} 200w,
+              ${cloudinary(member.img_url, 300)} 300w
+            `}
+            sizes="(max-width: 768px) 100px, 150px"
+            placeholderSrc={cloudinary(member.img_url, 20)||"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png"}
+            effect="blur"
+            wrapperClassName="absolute inset-0"
+            alt={member.Name}
+            className="w-full h-full object-cover object-center"
             />
           </div>
           <h3 className="text-sm md:text-lg font-bold text-gray-800 mb-1 text-center leading-tight">
@@ -94,7 +105,11 @@ const AboutUs = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
   const [leaders, setLeaders] = useState<any[]>([]);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [heroLoaded, setHeroLoaded] = useState(false);
-const HeroUrl="https://res.cloudinary.com/diijn4esl/image/upload/v1761720223/grp_photo_fvzjjq.jpg";
+const HeroUrl=cloudinary(
+  "https://res.cloudinary.com/diijn4esl/image/upload/v1761720223/grp_photo_fvzjjq.jpg",1600);
+const HeroUrlMobile = cloudinary(
+    "https://res.cloudinary.com/diijn4esl/image/upload/v1761720223/grp_photo_fvzjjq.jpg",800);
+  
 useEffect(() => {
   Promise.all([
     fetch(`${BACKEND_URL}/leaders`).then((res) => res.json()),
@@ -110,11 +125,16 @@ useEffect(() => {
     .catch((err) => console.error("Error fetching data:", err));
 }, []);
 
-useEffect(() => {
-  const img = new Image();
-  img.src = HeroUrl;
-  img.onload = () => setHeroLoaded(true);
-}, []);
+// useEffect(() => {
+//   const img = new Image();
+//   img.src = HeroUrl;
+//   img.onload = () => setHeroLoaded(true);
+// }, []);
+<link
+  rel="preload"
+  as="image"
+  href={HeroUrl}
+/>
 
 
 useEffect(() => {
@@ -142,12 +162,15 @@ useEffect(() => {
     <div className="min-h-screen pt-20 bg-white overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative py-48 md:py-72 text-white overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center brightness-80 blur-[0px]"
-          style={{
-            backgroundImage:
-              `url(${HeroUrl})`,
-          }}></div>
+      <div
+  className="absolute inset-0 bg-cover bg-center brightness-80"
+  style={{
+    backgroundImage: `url(${
+      window.innerWidth < 768 ? HeroUrlMobile : HeroUrl
+    })`,
+  }}
+></div>
+
       </section>
 
       {/* TechVerse Club Section */}
