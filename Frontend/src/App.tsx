@@ -16,6 +16,7 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Loading from "./components/Loading";
 import Register from "./components/Register"
+import CodeCrafter from "./pages/CodeCrafter";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const AppContent: React.FC = () => {
         <Route path="/winners" element={<Winners />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/codecrafter" element={<CodeCrafter />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
