@@ -38,7 +38,7 @@ All colors MUST be HSL.
     --ring: 220 70% 25%;
 
     --radius: 0.75rem;
-    
+
     --gradient-primary: linear-gradient(135deg, hsl(220 70% 25%), hsl(220 60% 40%));
     --gradient-accent: linear-gradient(135deg, hsl(35 90% 55%), hsl(45 95% 60%));
     --gradient-hero: linear-gradient(180deg, hsl(220 70% 15%), hsl(220 60% 25%));
@@ -91,7 +91,7 @@ All colors MUST be HSL.
     --border: 220 40% 20%;
     --input: 220 40% 20%;
     --ring: 220 60% 45%;
-    
+
     --gradient-primary: linear-gradient(135deg, hsl(220 60% 25%), hsl(220 70% 40%));
     --gradient-accent: linear-gradient(135deg, hsl(35 90% 55%), hsl(45 95% 60%));
     --gradient-hero: linear-gradient(180deg, hsl(220 70% 10%), hsl(220 60% 18%));
@@ -117,27 +117,35 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
 @keyframes typingLoop {
   0% {
     width: 0;
   }
+
   40% {
     width: 100%;
   }
+
   60% {
     width: 100%;
   }
+
   100% {
     width: 0;
   }
 }
 
 @keyframes blink {
-  0%, 100% {
+
+  0%,
+  100% {
     border-color: transparent;
   }
+
   50% {
-    border-color: #3B82F6; /* matches your primary color */
+    border-color: #3B82F6;
+    /* matches your primary color */
   }
 }
 
@@ -148,8 +156,10 @@ All colors MUST be HSL.
   border-right-width: 4px;
   animation: typingLoop 6s steps(10, end) infinite, blink 0.8s step-end infinite;
 }
+
 .Typewriter__cursor {
-  color: #9333ea; /* purple accent to match your gradient */
+  color: #9333ea;
+  /* purple accent to match your gradient */
   text-shadow: 0 0 8px rgba(147, 51, 234, 0.8);
 }
 
@@ -161,7 +171,7 @@ All colors MUST be HSL.
 }
 
 .embla__viewport {
-  overflow: hidden;        
+  overflow: hidden;
 }
 
 .embla__container {
@@ -172,7 +182,7 @@ All colors MUST be HSL.
 
 .embla__slide {
   display: flex;
-  min-width: 0; 
+  min-width: 0;
   transition: transform 0.6s ease, opacity 0.6s ease;
   transform: scale(0.8);
   opacity: 0.9;
@@ -180,21 +190,18 @@ All colors MUST be HSL.
 }
 
 .embla__slide.is-snapped {
-  transform: scale(1); 
+  transform: scale(1);
   opacity: 1;
   z-index: 20;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   border: #3B82F6 4px solid;
   border-radius: 1.6rem;
 }
 
-.embla__slide__img {   
-  aspect-ratio: 3/2;   
+.embla__slide__img {
+  aspect-ratio: 3/2;
   border-radius: 1.4rem;
   box-shadow: 0px 18px 55px rgba(0, 0, 0, 0.25);
   transition: transform 0.3s ease, z-index 0.3s ease;
   z-index: 10;
 }
-
-
-

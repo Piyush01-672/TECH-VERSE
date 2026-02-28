@@ -1,7 +1,57 @@
 import { useState, useEffect } from "react";
+import { BookOpen, CalendarHeart, Info, UserPlus } from "lucide-react";
 // import { registerTeam } from "../Services/api";
 
+const CountdownTimer = ({ targetDate }: { targetDate: Date }) => {
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = targetDate.getTime() - now;
+
+      if (distance < 0) {
+        clearInterval(interval);
+        return;
+      }
+
+      setTimeLeft({
+        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((distance % (1000 * 60)) / 1000)
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [targetDate]);
+
+  return (
+    <div className="flex justify-between gap-2 mt-4">
+      {[
+        { label: 'Days', value: timeLeft.days },
+        { label: 'Hours', value: timeLeft.hours },
+        { label: 'Minutes', value: timeLeft.minutes },
+        { label: 'Seconds', value: timeLeft.seconds }
+      ].map((item, idx) => (
+        <div key={idx} className="flex flex-col items-center flex-1">
+          <div className="bg-[#465c92] text-white text-3xl font-bold rounded-lg w-full py-4 flex items-center justify-center">
+            {item.value}
+          </div>
+          <span className="text-white/80 text-xs mt-2 uppercase font-semibold">{item.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const TeamRegistrationForm = () => {
+  const [activeTab, setActiveTab] = useState("register");
   const [formData, setFormData] = useState({
     teamName: "",
     hackathonExperience: "",
@@ -13,10 +63,10 @@ const TeamRegistrationForm = () => {
       girlsCount: 0,
     },
     participants: [
-      { name: "", email: "", gender: "" , college: "", program: ""},
-      { name: "", email: "", gender: "" , college: "", program: ""},
-      { name: "", email: "", gender: "" , college: "", program: ""},
-      { name: "", email: "", gender: "" , college: "", program: ""},
+      { name: "", email: "", gender: "", college: "", program: "" },
+      { name: "", email: "", gender: "", college: "", program: "" },
+      { name: "", email: "", gender: "", college: "", program: "" },
+      { name: "", email: "", gender: "", college: "", program: "" },
     ],
   });
 
@@ -27,7 +77,7 @@ const TeamRegistrationForm = () => {
   useEffect(() => {
     if (error) window.scrollTo({ top: 0, behavior: "smooth" });
   }, [error]);
-  
+
   // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,16 +89,16 @@ const TeamRegistrationForm = () => {
       return;
     }
     if (name === "accommodationRequired") {
-        setFormData(prev => ({
-          ...prev,
-          accommodationRequired: value,
-          accommodationDetails:
-            value === "No"
-              ? { boysCount: 0, girlsCount: 0 }
-              : prev.accommodationDetails,
-        }));
-        return;
-      }
+      setFormData(prev => ({
+        ...prev,
+        accommodationRequired: value,
+        accommodationDetails:
+          value === "No"
+            ? { boysCount: 0, girlsCount: 0 }
+            : prev.accommodationDetails,
+      }));
+      return;
+    }
     // Update the form data state
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -61,12 +111,12 @@ const TeamRegistrationForm = () => {
     const otherValue = formData.accommodationDetails[otherField];
     if (validValue + otherValue > formData.teamSize) return;
     setFormData(prev => ({
-        ...prev,
-        accommodationDetails: {
-          ...prev.accommodationDetails,
-          [field]: validValue,
-        },
-      }));
+      ...prev,
+      accommodationDetails: {
+        ...prev.accommodationDetails,
+        [field]: validValue,
+      },
+    }));
   };
 
   // Handle participant field changes
@@ -77,9 +127,9 @@ const TeamRegistrationForm = () => {
       [field]: value,
     };
     setFormData(prev => ({
-        ...prev,
-        participants: updatedParticipants,
-      }));
+      ...prev,
+      participants: updatedParticipants,
+    }));
   };
 
   // Handle form submission
@@ -130,10 +180,10 @@ const TeamRegistrationForm = () => {
         girlsCount: 0,
       },
       participants: [
-        { name: "", email: "", gender: "" , college: "", program: ""},
-        { name: "", email: "", gender: "" , college: "", program: ""},
-        { name: "", email: "", gender: "" , college: "", program: ""},
-        { name: "", email: "", gender: "" , college: "", program: ""},
+        { name: "", email: "", gender: "", college: "", program: "" },
+        { name: "", email: "", gender: "", college: "", program: "" },
+        { name: "", email: "", gender: "", college: "", program: "" },
+        { name: "", email: "", gender: "", college: "", program: "" },
       ],
     });
     setSubmitted(false);
@@ -220,27 +270,27 @@ const TeamRegistrationForm = () => {
             </select>
           </div>
           <div className="space-y-2">
-    <label className="text-sm font-medium text-foreground">College *</label>
-    <input
-      type="text"
-      name="college"
-      value={formData.participants[i].college}
-      onChange={(e) => handleParticipantChange(i, "college", e.target.value)}
-      required
-      className="w-full p-3 rounded-xl border border-primary/20 bg-background/60 backdrop-blur-md focus:ring-2 focus:ring-[#4676E6]/50 focus:border-[#4676E6] focus:outline-none transition-all duration-200"
-    />
-  </div>
-  <div className="space-y-2">
-    <label className="text-sm font-medium text-foreground">Program *</label>
-    <input
-      type="text"
-      name="program"
-      value={formData.participants[i].program}
-      onChange={(e) => handleParticipantChange(i, "program", e.target.value)}
-      required
-      className="w-full p-3 rounded-xl border border-primary/20 bg-background/60 backdrop-blur-md focus:ring-2 focus:ring-[#4676E6]/50 focus:border-[#4676E6] focus:outline-none transition-all duration-200"
-    />
-  </div>
+            <label className="text-sm font-medium text-foreground">College *</label>
+            <input
+              type="text"
+              name="college"
+              value={formData.participants[i].college}
+              onChange={(e) => handleParticipantChange(i, "college", e.target.value)}
+              required
+              className="w-full p-3 rounded-xl border border-primary/20 bg-background/60 backdrop-blur-md focus:ring-2 focus:ring-[#4676E6]/50 focus:border-[#4676E6] focus:outline-none transition-all duration-200"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">Program *</label>
+            <input
+              type="text"
+              name="program"
+              value={formData.participants[i].program}
+              onChange={(e) => handleParticipantChange(i, "program", e.target.value)}
+              required
+              className="w-full p-3 rounded-xl border border-primary/20 bg-background/60 backdrop-blur-md focus:ring-2 focus:ring-[#4676E6]/50 focus:border-[#4676E6] focus:outline-none transition-all duration-200"
+            />
+          </div>
         </div>,
       );
     }
@@ -251,230 +301,429 @@ const TeamRegistrationForm = () => {
   return (
     <div className="min-h-screen pt-10 bg-gradient-to-br from-[#252D6F]/10 to-[#4676E6]/10 overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative pt-16 pb-8 md:py-32 bg-gradient-to-br from-[#252D6F] to-[#4676E6]  text-white overflow-hidden">
+      <section className="relative pt-24 pb-16 md:py-32 bg-[#2a4585] text-white overflow-hidden">
+        {/* Unique Abstract Background Elements (Matching the specific blue and circle aesthetics) */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 left-16 w-10 h-10 bg-[#4676E6]/70 rounded-full animate-bounce-slow blur-md"></div>
-          <div className="absolute top-36 right-12 w-6 h-6 bg-[#FFD54F]/80 rounded-full animate-pulse blur-md"></div>
-          <div className="absolute bottom-16 left-1/4 w-20 h-20 border-4 border-white/30 rounded-full animate-spin-slow"></div>
-          <div className="absolute top-1/2 right-40 w-16 h-8 bg-[#B16FFF]/70 rounded-3xl animate-bounce-x blur-md"></div>
-          <div className="absolute top-16 md:top-8 right-2 w-5 h-5 bg-[#F56060]/80 rounded-full animate-bounce"></div>
-          <div className="absolute bottom-8 left-8 w-5 h-5 bg-[#36C2A3]/70 rounded-full animate-bounce"></div>
+          <div className="absolute top-10 left-[10%] w-32 h-32 bg-[#4873d1] blur-3xl opacity-60 rounded-full mix-blend-screen"></div>
+          <div className="absolute bottom-[20%] right-[5%] w-[400px] h-[400px] border-[1px] border-[#6b94eb] opacity-20 rounded-full transform translate-x-1/4 translate-y-1/4"></div>
+          <div className="absolute bottom-[25%] right-[8%] w-[340px] h-[340px] border-[2px] border-[#6b94eb] opacity-10 rounded-full transform translate-x-1/4 translate-y-1/4"></div>
+          <div className="absolute bottom-10 left-10 w-6 h-6 bg-[#32be9e] rounded-full blur-[1px]"></div>
+          <div className="absolute top-0 right-0 w-[50%] h-[70%] bg-gradient-to-bl from-[#223971] to-transparent opacity-100 rounded-bl-[150px] mix-blend-multiply"></div>
         </div>
 
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <span className="inline-block px-4 py-4 bg-white/10 rounded-full text-sm font-medium backdrop-blur-md border border-white/20 shadow-sm mb-6 tracking-widest animate-fade-in">
-            Hackathon
-          </span>
-          <h1 className="text-3xl sm:text-5xl md:text-6xl  font-extrabold pb-3 mb-8 animate-fade-in-up bg-gradient-to-r from-[#FFD54F] via-white to-[#4676E6] bg-clip-text text-transparent drop-shadow-xl">
-            Code Crafter 3.0
-          </h1>
-          <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-3xl mx-auto animate-fade-in leading-relaxed">
-            Relive the{" "}
-            <span className="font-semibold text-[#FFD54F]">
-              excitement and innovation{" "}
-            </span>
-            of our
-            <span className="font-semibold text-[#d746ffff]">
-              {" "}
-              Hackathon
-            </span>{" "}
-          </p>
-          <br />
+        <div className="container mx-auto px-6 md:px-12 relative z-10 max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-start">
+            <div>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[72px] font-[900] mb-4 leading-[1.1] tracking-tight text-white drop-shadow-md">
+                CODECRAFTER <br className="hidden md:block" /> 3.0
+              </h1>
+              <p className="text-lg md:text-xl text-[#d0e1ff] max-w-xl font-medium leading-relaxed mb-12 drop-shadow-sm">
+                Unleash your coding potential and build something extraordinary for the Tech-Verse flagship hackathon.
+              </p>
+
+              {/* Unique Interactive Timer Card */}
+              <div className="bg-gradient-to-br from-[#1e3061] to-[#253970] rounded-2xl p-6 sm:p-8 max-w-md shadow-[0_15px_40px_rgba(0,0,0,0.25)] border border-[#486eb7]/40 backdrop-blur-sm group hover:border-[#6392ec]/60 transition-all duration-300">
+                <h3 className="text-2xl font-bold text-[#e1ecff] mb-6 flex items-center gap-2">
+                  <span className="w-2 h-6 bg-[#FFD54F] rounded-full inline-block"></span>
+                  Registration Closes In:
+                </h3>
+                <CountdownTimer targetDate={new Date("2026-04-23T00:00:00")} />
+                <button
+                  onClick={() => setActiveTab('register')}
+                  className="w-full mt-8 bg-gradient-to-r from-[#4d81e7] to-[#3a6bc6] hover:from-[#5b8eed] hover:to-[#4076d1] text-white font-bold py-3.5 rounded-xl shadow-[0_4px_14px_rgba(77,129,231,0.4)] transition-all transform hover:-translate-y-0.5 uppercase tracking-wider text-sm"
+                >
+                  Register Now
+                </button>
+              </div>
+            </div>
+
+            {/* Premium Event Highlights Card */}
+            <div className="lg:mt-0 mt-8 flex lg:justify-end">
+              <div className="bg-[#1c2c59] rounded-2xl p-8 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-[#3e5b9e]/30 max-w-md w-full relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#4676E6] blur-[80px] opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
+
+                <h3 className="text-3xl font-bold text-white mb-8 text-center relative z-10">
+                  Event Highlights
+                </h3>
+                <ul className="space-y-5 relative z-10">
+                  {[
+                    "24-hour intense coding challenge",
+                    "100k+ INR in prizes",
+                    "Networking with industry experts",
+                    "Workshops and mentorship",
+                    "Opportunity to showcase your skills"
+                  ].map((highlight, idx) => (
+                    <li key={idx} className="flex items-center text-[#d0e1ff] font-medium text-[15.5px]">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#6495ed] shadow-[0_0_8px_rgba(100,149,237,0.8)] mr-4 flex-shrink-0 relative">
+                        <span className="absolute inset-0 rounded-full bg-[#6495ed] animate-ping opacity-20"></span>
+                      </span>
+                      {highlight}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Form Section */}
-      <section className="py-24 relative">
+      <section className="py-12 md:py-20 relative">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-32 left-1/4 w-72 h-72 bg-[#4676E6]/10 blur-3xl rounded-full"></div>
           <div className="absolute bottom-32 right-1/4 w-72 h-72 bg-[#252D6F]/10 blur-3xl rounded-full"></div>
         </div>
         <div className="container mx-auto px-4 max-w-5xl">
-          <div className="relative bg-card/80 backdrop-blur-xl border border-primary/20 rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl overflow-hidden">
+          {/* Internal Navbar / Tabs */}
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-16 max-w-5xl mx-auto relative z-10 w-full px-4">
+            {[
+              { id: 'rules', label: 'RULES', icon: BookOpen },
+              { id: 'schedules', label: 'SCHEDULES', icon: CalendarHeart },
+              { id: 'about', label: 'ABOUT', icon: Info },
+              { id: 'register', label: 'REGISTER', icon: UserPlus }
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 md:px-10 py-4 rounded-2xl font-bold tracking-widest transition-all duration-500 shadow-md transform 
+                  ${isActive
+                      ? 'bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-white scale-110 -translate-y-2 shadow-xl shadow-[#4676E6]/40 ring-2 ring-white/50 z-20'
+                      : 'bg-white/80 backdrop-blur-md text-[#252D6F] hover:bg-white hover:scale-105 hover:-translate-y-1 hover:shadow-lg border border-[#4676E6]/20'
+                    }`}
+                >
+                  <Icon size={isActive ? 22 : 18} className={`transition-all duration-300 ${isActive ? 'text-[#FFD54F]' : 'text-[#4676E6]'}`} />
+                  <span>{tab.label}</span>
+                  {isActive && (
+                    <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-1 bg-[#FFD54F] rounded-full animate-fade-in-up"></span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="relative bg-card/90 backdrop-blur-2xl border border-primary/20 rounded-3xl p-6 sm:p-8 md:p-12 shadow-2xl overflow-hidden min-h-[400px]">
             {/* subtle glow accent */}
             <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#4676E6]/10 blur-3xl rounded-full pointer-events-none"></div>
             <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-[#252D6F]/10 blur-3xl rounded-full pointer-events-none"></div>
 
-            {submitted ? (
-              <div className="text-center py-12">
-                <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#252D6F] to-[#4676E6] flex items-center justify-center text-white text-3xl mb-6 shadow-lg">
-                  ✓
+            {activeTab === 'rules' && (
+              <div className="animate-fade-in-up">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl font-extrabold text-[#252D6F] uppercase tracking-wide">
+                    HACKATHON RULES
+                  </h2>
+                  <div className="h-[3px] w-16 bg-[#4676E6] mx-auto mt-4 mb-6"></div>
+                  <p className="text-muted-foreground font-medium">
+                    Please read the following rules carefully before registering for the event.
+                  </p>
                 </div>
 
-                <h3 className="text-2xl font-bold text-foreground mb-3">
-                  Registration Successful!
-                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                  {/* General Rules */}
+                  <div className="bg-background/50 rounded-xl shadow-sm border border-primary/10 p-8 hover:shadow-md transition-shadow">
+                    <h3 className="text-xl font-bold text-[#252D6F] mb-6">
+                      General Rules
+                    </h3>
+                    <ul className="space-y-4 text-muted-foreground font-medium list-disc list-inside">
+                      <li>Teams must consist of 2-4 members.</li>
+                      <li>All team members should be enrolled in an accredited educational institution.</li>
+                      <li>Projects must be started from scratch during the hackathon.</li>
+                      <li>Use of open-source libraries and frameworks is allowed.</li>
+                      <li>Submissions must include source code and documentation.</li>
+                    </ul>
+                  </div>
 
-                <p className="text-muted-foreground mb-6">
-                  Your team has been registered. We’ll reach out soon.
-                </p>
+                  {/* Judging Criteria */}
+                  <div className="bg-background/50 rounded-xl shadow-sm border border-primary/10 p-8 hover:shadow-md transition-shadow">
+                    <h3 className="text-xl font-bold text-[#252D6F] mb-6">
+                      Judging Criteria
+                    </h3>
+                    <ul className="space-y-4 text-muted-foreground font-medium list-none">
+                      <li><span className="font-bold text-[#4676E6]">30%</span> Innovation and Creativity</li>
+                      <li><span className="font-bold text-[#4676E6]">25%</span> Technical Complexity</li>
+                      <li><span className="font-bold text-[#4676E6]">20%</span> Practicality and Impact</li>
+                      <li><span className="font-bold text-[#4676E6]">15%</span> Presentation Quality</li>
+                      <li><span className="font-bold text-[#4676E6]">10%</span> User Experience</li>
+                    </ul>
+                  </div>
+                </div>
 
-                <button
-                  onClick={handleReset}
-                  className="px-8 py-3 rounded-lg bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-white font-semibold hover:opacity-90 transition"
-                >
-                  Register Another Team
-                </button>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity shadow-md">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    Download Rule Book
+                  </button>
+                  <button className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity shadow-md">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    Download Problem Statements
+                  </button>
+                </div>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-8 md:space-y-10">
-                {error && (
-                  <div className="p-4 rounded-lg border border-red-500/30 bg-red-500/10 text-red-500 text-sm">
-                    {error}
-                  </div>
-                )}
+            )}
 
-                {/* Section Block */}
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-foreground flex items-center gap-3 pb-4">
-                    <span className="w-2 h-8 bg-gradient-to-b from-[#252D6F] to-[#4676E6] rounded-full"></span>
-                    Team Information
+            {activeTab === 'schedules' && (
+              <div className="animate-fade-in-up">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl font-extrabold text-[#252D6F] uppercase tracking-wide">
+                    EVENT SCHEDULE
                   </h2>
+                  <div className="h-[3px] w-16 bg-[#4676E6] mx-auto mt-4 mb-6"></div>
+                  <p className="text-muted-foreground font-medium">
+                    Stay updated with the hackathon timeline.
+                  </p>
+                </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">
-                      Team Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="teamName"
-                      value={formData.teamName}
-                      onChange={handleChange}
-                      required
-                      className="w-full p-3 rounded-xl border border-primary/20 bg-background/60 backdrop-blur-md focus:ring-2 focus:ring-[#4676E6]/50 focus:border-[#4676E6] focus:outline-none transition-all duration-200"
-                    />
+                <div className="max-w-3xl mx-auto space-y-4">
+                  <div className="flex gap-4 items-start p-5 rounded-xl bg-background/50 border border-primary/10 hover:shadow-lg transition-all hover:-translate-y-1 hover:border-[#4676E6]/30">
+                    <div className="flex-shrink-0 w-24 font-bold text-[#4676E6] text-lg">09:00 AM</div>
+                    <div>
+                      <h4 className="font-bold text-foreground text-lg">Registration & Check-in</h4>
+                      <p className="text-muted-foreground mt-1">Arrive at the venue and get your team badges.</p>
+                    </div>
                   </div>
+                  <div className="flex gap-4 items-start p-5 rounded-xl bg-background/50 border border-primary/10 hover:shadow-lg transition-all hover:-translate-y-1 hover:border-[#4676E6]/30">
+                    <div className="flex-shrink-0 w-24 font-bold text-[#4676E6] text-lg">10:30 AM</div>
+                    <div>
+                      <h4 className="font-bold text-foreground text-lg">Opening Ceremony</h4>
+                      <p className="text-muted-foreground mt-1">Welcome speech, rules briefing, and theme announcement.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 items-start p-5 rounded-xl bg-background/50 border border-primary/10 hover:shadow-lg transition-all hover:-translate-y-1 hover:border-[#4676E6]/30">
+                    <div className="flex-shrink-0 w-24 font-bold text-[#4676E6] text-lg">11:30 AM</div>
+                    <div>
+                      <h4 className="font-bold text-foreground text-lg">Hacking Begins</h4>
+                      <p className="text-muted-foreground mt-1">Start working on your amazing projects!</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 items-start p-5 rounded-xl bg-background/50 border border-primary/10 hover:shadow-lg transition-all hover:-translate-y-1 hover:border-[#4676E6]/30">
+                    <div className="flex-shrink-0 w-24 font-bold text-[#4676E6] text-lg">01:00 PM</div>
+                    <div>
+                      <h4 className="font-bold text-foreground text-lg">Lunch Break</h4>
+                      <p className="text-muted-foreground mt-1">Refuel and network with other participants.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 items-start p-5 rounded-xl bg-background/50 border border-primary/10 hover:shadow-lg transition-all hover:-translate-y-1 hover:border-[#4676E6]/30">
+                    <div className="flex-shrink-0 w-24 font-bold text-[#4676E6] text-lg">... ongoing</div>
+                    <div>
+                      <h4 className="font-bold text-foreground text-lg">24-Hour Hacking</h4>
+                      <p className="text-muted-foreground mt-1">Mentorship sessions and mini-games will run concurrently.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">
-                        Team Size *
-                      </label>
+            {activeTab === 'about' && (
+              <div className="animate-fade-in-up">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl font-extrabold text-[#252D6F] uppercase tracking-wide">
+                    ABOUT CODE CRAFTER
+                  </h2>
+                  <div className="h-[3px] w-16 bg-[#4676E6] mx-auto mt-4 mb-6"></div>
+                </div>
+
+                <div className="prose prose-lg mx-auto text-muted-foreground text-center max-w-3xl leading-relaxed">
+                  <p className="mb-6">
+                    <strong className="text-foreground">Code Crafter 3.0</strong> is a premier 24-hour hackathon designed to bring together the brightest minds in technology, design, and business. Our goal is to foster innovation, encourage collaboration, and provide a platform for students to build real-world solutions.
+                  </p>
+                  <p className="mb-6">
+                    Whether you are a seasoned developer, a creative designer, or an aspiring entrepreneur, Code Crafter offers an unparalleled opportunity to learn, network, and showcase your skills.
+                  </p>
+                  <p>
+                    Join us for an unforgettable experience filled with workshops, mentorship, fun activities, and incredible prizes!
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'register' && (
+              <div className="animate-fade-in-up">
+                {submitted ? (
+                  <div className="text-center py-12">
+                    <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#252D6F] to-[#4676E6] flex items-center justify-center text-white text-3xl mb-6 shadow-lg">
+                      ✓
+                    </div>
+
+                    <h3 className="text-2xl font-bold text-foreground mb-3">
+                      Registration Successful!
+                    </h3>
+
+                    <p className="text-muted-foreground mb-6">
+                      Your team has been registered. We’ll reach out soon.
+                    </p>
+
+                    <button
+                      onClick={handleReset}
+                      className="px-8 py-3 rounded-lg bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-white font-semibold hover:opacity-90 transition"
+                    >
+                      Register Another Team
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-8 md:space-y-10">
+                    {error && (
+                      <div className="p-4 rounded-lg border border-red-500/30 bg-red-500/10 text-red-500 text-sm">
+                        {error}
+                      </div>
+                    )}
+
+                    {/* Section Block */}
+                    <div className="space-y-6">
+                      <h2 className="text-2xl font-bold text-foreground flex items-center gap-3 pb-4">
+                        <span className="w-2 h-8 bg-gradient-to-b from-[#252D6F] to-[#4676E6] rounded-full"></span>
+                        Team Information
+                      </h2>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground">
+                          Team Name *
+                        </label>
+                        <input
+                          type="text"
+                          name="teamName"
+                          value={formData.teamName}
+                          onChange={handleChange}
+                          required
+                          className="w-full p-3 rounded-xl border border-primary/20 bg-background/60 backdrop-blur-md focus:ring-2 focus:ring-[#4676E6]/50 focus:border-[#4676E6] focus:outline-none transition-all duration-200"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-foreground">
+                            Team Size *
+                          </label>
+                          <select
+                            name="teamSize"
+                            value={formData.teamSize}
+                            onChange={handleChange}
+                            className="w-full p-3 rounded-lg border border-primary/20 bg-background focus:ring-2 focus:ring-primary/40"
+                          >
+                            <option value="2">2 Members</option>
+                            <option value="3">3 Members</option>
+                            <option value="4">4 Members</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-foreground">
+                            Contact Number *
+                          </label>
+                          <input
+                            type="tel"
+                            pattern="[0-9]{10}"
+                            inputMode="numeric"
+                            name="contactNumber"
+                            value={formData.contactNumber}
+                            onChange={handleChange}
+                            required
+                            maxLength={10}
+                            title="Please enter a 10-digit phone number"
+                            className="w-full p-3 rounded-xl border border-primary/20 bg-background/60 backdrop-blur-md focus:ring-2 focus:ring-[#4676E6]/50 focus:border-[#4676E6] focus:outline-none transition-all duration-200"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Participants */}
+                    <div className="space-y-6">
+                      <h2 className="text-2xl font-bold text-foreground flex items-center gap-3 pb-4">
+                        <span className="w-2 h-8 bg-gradient-to-b from-[#252D6F] to-[#4676E6] rounded-full"></span>
+                        Team Members ({formData.teamSize})
+                      </h2>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                        {renderParticipantFields().map((field, index) => (
+                          <div
+                            key={index}
+                            className="relative p-4 sm:p-6 rounded-2xl border border-primary/20 bg-background/70 backdrop-blur-md shadow-md hover:shadow-xl hover:-translate-y-1 hover:border-[#4676E6]/40 transition-all duration-300"
+                          >
+                            {field}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Accommodation */}
+                    <div className="space-y-6">
+                      <h2 className="text-2xl font-bold text-foreground flex items-center gap-3 pb-4">
+                        <span className="w-2 h-8 bg-gradient-to-b from-[#252D6F] to-[#4676E6] rounded-full"></span>
+                        Accommodation
+                      </h2>
+
                       <select
-                        name="teamSize"
-                        value={formData.teamSize}
+                        name="accommodationRequired"
+                        value={formData.accommodationRequired}
                         onChange={handleChange}
                         className="w-full p-3 rounded-lg border border-primary/20 bg-background focus:ring-2 focus:ring-primary/40"
                       >
-                        <option value="2">2 Members</option>
-                        <option value="3">3 Members</option>
-                        <option value="4">4 Members</option>
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
                       </select>
+
+                      {formData.accommodationRequired === "Yes" && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-muted-foreground">
+                              Boys Requiring Accommodation
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              max={formData.teamSize}
+                              value={formData.accommodationDetails.boysCount}
+                              onChange={(e) =>
+                                handleAccommodationChange(
+                                  "boysCount",
+                                  e.target.value,
+                                )
+                              }
+                              disabled={formData.accommodationRequired !== "Yes"}
+                              placeholder="Boys"
+                              className="w-full p-3 rounded-xl border border-primary/20 bg-background/60 backdrop-blur-md focus:ring-2 focus:ring-[#4676E6]/50 focus:border-[#4676E6] focus:outline-none transition-all duration-200"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-muted-foreground">
+                              Girls Requiring Accommodation
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              max={formData.teamSize}
+                              value={formData.accommodationDetails.girlsCount}
+                              onChange={(e) =>
+                                handleAccommodationChange(
+                                  "girlsCount",
+                                  e.target.value,
+                                )
+                              }
+                              disabled={formData.accommodationRequired !== "Yes"}
+                              placeholder="Girls"
+                              className="w-full p-3 rounded-xl border border-primary/20 bg-background/60 backdrop-blur-md focus:ring-2 focus:ring-[#4676E6]/50 focus:border-[#4676E6] focus:outline-none transition-all duration-200"
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">
-                        Contact Number *
-                      </label>
-                      <input
-                        type="tel"
-                        pattern="[0-9]{10}"
-                        inputMode="numeric"
-                        name="contactNumber"
-                        value={formData.contactNumber}
-                        onChange={handleChange}
-                        required
-                        maxLength={10}
-  title="Please enter a 10-digit phone number"
-                        className="w-full p-3 rounded-xl border border-primary/20 bg-background/60 backdrop-blur-md focus:ring-2 focus:ring-[#4676E6]/50 focus:border-[#4676E6] focus:outline-none transition-all duration-200"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Participants */}
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-foreground flex items-center gap-3 pb-4">
-                    <span className="w-2 h-8 bg-gradient-to-b from-[#252D6F] to-[#4676E6] rounded-full"></span>
-                    Team Members ({formData.teamSize})
-                  </h2>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                    {renderParticipantFields().map((field, index) => (
-                      <div
-                        key={index}
-                        className="relative p-4 sm:p-6 rounded-2xl border border-primary/20 bg-background/70 backdrop-blur-md shadow-md hover:shadow-xl hover:-translate-y-1 hover:border-[#4676E6]/40 transition-all duration-300"
+                    {/* Submit */}
+                    <div className="pt-6">
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#252D6F] to-[#4676E6] text-white font-semibold text-lg shadow-lg hover:shadow-2xl hover:scale-[1.02] active:scale-100 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {field}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Accommodation */}
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-foreground flex items-center gap-3 pb-4">
-                    <span className="w-2 h-8 bg-gradient-to-b from-[#252D6F] to-[#4676E6] rounded-full"></span>
-                    Accommodation
-                  </h2>
-
-                  <select
-                    name="accommodationRequired"
-                    value={formData.accommodationRequired}
-                    onChange={handleChange}
-                    className="w-full p-3 rounded-lg border border-primary/20 bg-background focus:ring-2 focus:ring-primary/40"
-                  >
-                    <option value="No">No</option>
-                    <option value="Yes">Yes</option>
-                  </select>
-
-                  {formData.accommodationRequired === "Yes" && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-muted-foreground">
-                          Boys Requiring Accommodation
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          max={formData.teamSize}
-                          value={formData.accommodationDetails.boysCount}
-                          onChange={(e) =>
-                            handleAccommodationChange(
-                              "boysCount",
-                              e.target.value,
-                            )
-                          }
-                          disabled={formData.accommodationRequired !== "Yes"}
-                          placeholder="Boys"
-                          className="w-full p-3 rounded-xl border border-primary/20 bg-background/60 backdrop-blur-md focus:ring-2 focus:ring-[#4676E6]/50 focus:border-[#4676E6] focus:outline-none transition-all duration-200"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-muted-foreground">
-                          Girls Requiring Accommodation
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          max={formData.teamSize}
-                          value={formData.accommodationDetails.girlsCount}
-                          onChange={(e) =>
-                            handleAccommodationChange(
-                              "girlsCount",
-                              e.target.value,
-                            )
-                          }
-                          disabled={formData.accommodationRequired !== "Yes"}
-                          placeholder="Girls"
-                          className="w-full p-3 rounded-xl border border-primary/20 bg-background/60 backdrop-blur-md focus:ring-2 focus:ring-[#4676E6]/50 focus:border-[#4676E6] focus:outline-none transition-all duration-200"
-                        />
-                      </div>
+                        {loading ? "Submitting..." : "Register Team"}
+                      </button>
                     </div>
-                  )}
-                </div>
-
-                {/* Submit */}
-                <div className="pt-6">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#252D6F] to-[#4676E6] text-white font-semibold text-lg shadow-lg hover:shadow-2xl hover:scale-[1.02] active:scale-100 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loading ? "Submitting..." : "Register Team"}
-                  </button>
-                </div>
-              </form>
+                  </form>
+                )}
+              </div>
             )}
           </div>
         </div>
