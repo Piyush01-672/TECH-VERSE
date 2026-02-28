@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,useRef } from "react";
 import { BookOpen, CalendarHeart, Info, UserPlus } from "lucide-react";
 // import { registerTeam } from "../Services/api";
 
@@ -10,16 +10,17 @@ const CountdownTimer = ({ targetDate }: { targetDate: Date }) => {
     seconds: 0
   });
 
+  
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date().getTime();
       const distance = targetDate.getTime() - now;
-
+      
       if (distance < 0) {
         clearInterval(interval);
         return;
       }
-
+      
       setTimeLeft({
         days: Math.floor(distance / (1000 * 60 * 60 * 24)),
         hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
@@ -27,10 +28,10 @@ const CountdownTimer = ({ targetDate }: { targetDate: Date }) => {
         seconds: Math.floor((distance % (1000 * 60)) / 1000)
       });
     }, 1000);
-
+    
     return () => clearInterval(interval);
   }, [targetDate]);
-
+  
   return (
     <div className="flex justify-between gap-2 mt-4">
       {[
@@ -40,7 +41,7 @@ const CountdownTimer = ({ targetDate }: { targetDate: Date }) => {
         { label: 'Seconds', value: timeLeft.seconds }
       ].map((item, idx) => (
         <div key={idx} className="flex flex-col items-center flex-1">
-          <div className="bg-[#465c92] text-white text-3xl font-bold rounded-lg w-full py-4 flex items-center justify-center">
+          <div className="bg-white/15 backdrop-blur-md border border-white/20 text-white text-3xl font-bold rounded-xl w-full py-4 flex items-center justify-center shadow-lg hover:scale-105 transition-all duration-300">
             {item.value}
           </div>
           <span className="text-white/80 text-xs mt-2 uppercase font-semibold">{item.label}</span>
@@ -51,7 +52,7 @@ const CountdownTimer = ({ targetDate }: { targetDate: Date }) => {
 };
 
 const TeamRegistrationForm = () => {
-  const [activeTab, setActiveTab] = useState("register");
+  const [activeTab, setActiveTab] = useState("about");
   const [formData, setFormData] = useState({
     teamName: "",
     hackathonExperience: "",
@@ -69,10 +70,11 @@ const TeamRegistrationForm = () => {
       { name: "", email: "", gender: "", college: "", program: "" },
     ],
   });
-
+  
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const formSectionRef = useRef(null);
 
   useEffect(() => {
     if (error) window.scrollTo({ top: 0, behavior: "smooth" });
@@ -299,77 +301,98 @@ const TeamRegistrationForm = () => {
   };
 
   return (
-    <div className="min-h-screen pt-10 bg-gradient-to-br from-[#252D6F]/10 to-[#4676E6]/10 overflow-x-hidden">
+    <div className="min-h-screen pt-10 bg-gradient-to-br from-[#252D6F]/10 to-[#4676E6]/10 overflow-hidden">
       {/* Hero Section */}
-      <section className="relative pt-24 pb-16 md:py-32 bg-[#2a4585] text-white overflow-hidden">
-        {/* Unique Abstract Background Elements (Matching the specific blue and circle aesthetics) */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-10 left-[10%] w-32 h-32 bg-[#4873d1] blur-3xl opacity-60 rounded-full mix-blend-screen"></div>
-          <div className="absolute bottom-[20%] right-[5%] w-[400px] h-[400px] border-[1px] border-[#6b94eb] opacity-20 rounded-full transform translate-x-1/4 translate-y-1/4"></div>
-          <div className="absolute bottom-[25%] right-[8%] w-[340px] h-[340px] border-[2px] border-[#6b94eb] opacity-10 rounded-full transform translate-x-1/4 translate-y-1/4"></div>
-          <div className="absolute bottom-10 left-10 w-6 h-6 bg-[#32be9e] rounded-full blur-[1px]"></div>
-          <div className="absolute top-0 right-0 w-[50%] h-[70%] bg-gradient-to-bl from-[#223971] to-transparent opacity-100 rounded-bl-[150px] mix-blend-multiply"></div>
+<section className="relative pt-[4.75rem] pb-8 md:py-20 bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-white overflow-hidden">
+
+  {/* Floating Abstract Shapes */}
+  <div className="absolute inset-0 pointer-events-none">
+    <div className="absolute top-20 left-16 w-10 h-10 bg-[#4676E6]/70 rounded-full animate-bounce-slow blur-md"></div>
+    <div className="absolute top-36 right-12 w-6 h-6 bg-[#FFD54F]/80 rounded-full animate-pulse blur-md"></div>
+    <div className="absolute bottom-16 left-1/4 w-20 h-20 border-4 border-white/30 rounded-full animate-spin-slow"></div>
+    <div className="absolute top-1/2 right-40 w-16 h-8 bg-[#B16FFF]/70 rounded-3xl animate-bounce-x blur-md"></div>
+    <div className="absolute top-16 md:top-14 right-2 w-5 h-5 bg-[#F56060]/80 rounded-full animate-bounce"></div>
+    <div className="absolute bottom-8 left-8 w-5 h-5 bg-[#36C2A3]/70 rounded-full animate-bounce"></div>
+  </div>
+
+  <div className="container mx-auto px-6 md:px-12 relative z-10 max-w-7xl">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+      {/* Left Content */}
+      <div>
+        <h1 className="text-5xl sm:text-6xl lg:text-[72px] font-extrabold leading-[1.1] tracking-tight mb-4 bg-gradient-to-r from-[#FFD54F] via-white to-[#4676E6] bg-clip-text text-transparent drop-shadow-xl animate-fade-in-up">
+          CODECRAFTER 3.0
+        </h1>
+        {/* <div className="absolute -top-10 -left-10 w-64 h-64 bg-[#FFD54F]/20 blur-3xl rounded-full pointer-events-none"></div> */}
+
+        <p className="text-lg md:text-xl text-white/90 max-w-xl font-medium leading-relaxed mb-8 animate-fade-in">
+          Unleash your coding potential and build something extraordinary.
+          24 hours. Infinite creativity. One epic build.
+        </p>
+
+        {/* Timer Card */}
+        <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 sm:p-8 max-w-md border border-white/20 shadow-2xl hover:scale-[1.02] transition-all duration-300">
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <span className="w-2 h-6 bg-[#FFD54F] rounded-full inline-block"></span>
+            Registration Closes In:
+          </h3>
+
+          <CountdownTimer targetDate={new Date("2026-04-23T00:00:00")} />
+
+          <button
+            onClick={() => {
+              setActiveTab("register");
+              if (formSectionRef.current) {
+                const navbarHeight = 120; 
+                const elementTop =
+                  formSectionRef.current.getBoundingClientRect().top + window.pageYOffset;
+                window.scrollTo({
+                  top: elementTop + navbarHeight,
+                  behavior: "smooth",
+                });
+              }
+            }}
+            className="w-full mt-8 bg-gradient-to-r from-[#FFD54F] to-[#F56060] hover:opacity-90 text-black font-bold py-3.5 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 uppercase tracking-wider text-sm"
+          >
+            Register Now
+          </button>
         </div>
+      </div>
 
-        <div className="container mx-auto px-6 md:px-12 relative z-10 max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-start">
-            <div>
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[72px] font-[900] mb-4 leading-[1.1] tracking-tight text-white drop-shadow-md">
-                CODECRAFTER <br className="hidden md:block" /> 3.0
-              </h1>
-              <p className="text-lg md:text-xl text-[#d0e1ff] max-w-xl font-medium leading-relaxed mb-12 drop-shadow-sm">
-                Unleash your coding potential and build something extraordinary for the Tech-Verse flagship hackathon.
-              </p>
+      {/* Right Highlights Card */}
+      <div className="flex lg:justify-end">
+        <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 sm:p-10 border border-white/20 shadow-2xl max-w-md w-full hover:scale-[1.02] transition-all duration-300">
+          <h3 className="text-2xl font-bold text-white mb-8 text-center">
+            Event Highlights
+          </h3>
 
-              {/* Unique Interactive Timer Card */}
-              <div className="bg-gradient-to-br from-[#1e3061] to-[#253970] rounded-2xl p-6 sm:p-8 max-w-md shadow-[0_15px_40px_rgba(0,0,0,0.25)] border border-[#486eb7]/40 backdrop-blur-sm group hover:border-[#6392ec]/60 transition-all duration-300">
-                <h3 className="text-2xl font-bold text-[#e1ecff] mb-6 flex items-center gap-2">
-                  <span className="w-2 h-6 bg-[#FFD54F] rounded-full inline-block"></span>
-                  Registration Closes In:
-                </h3>
-                <CountdownTimer targetDate={new Date("2026-04-23T00:00:00")} />
-                <button
-                  onClick={() => setActiveTab('register')}
-                  className="w-full mt-8 bg-gradient-to-r from-[#4d81e7] to-[#3a6bc6] hover:from-[#5b8eed] hover:to-[#4076d1] text-white font-bold py-3.5 rounded-xl shadow-[0_4px_14px_rgba(77,129,231,0.4)] transition-all transform hover:-translate-y-0.5 uppercase tracking-wider text-sm"
-                >
-                  Register Now
-                </button>
-              </div>
-            </div>
-
-            {/* Premium Event Highlights Card */}
-            <div className="lg:mt-0 mt-8 flex lg:justify-end">
-              <div className="bg-[#1c2c59] rounded-2xl p-8 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-[#3e5b9e]/30 max-w-md w-full relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#4676E6] blur-[80px] opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
-
-                <h3 className="text-3xl font-bold text-white mb-8 text-center relative z-10">
-                  Event Highlights
-                </h3>
-                <ul className="space-y-5 relative z-10">
-                  {[
-                    "24-hour intense coding challenge",
-                    "100k+ INR in prizes",
-                    "Networking with industry experts",
-                    "Workshops and mentorship",
-                    "Opportunity to showcase your skills"
-                  ].map((highlight, idx) => (
-                    <li key={idx} className="flex items-center text-[#d0e1ff] font-medium text-[15.5px]">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#6495ed] shadow-[0_0_8px_rgba(100,149,237,0.8)] mr-4 flex-shrink-0 relative">
-                        <span className="absolute inset-0 rounded-full bg-[#6495ed] animate-ping opacity-20"></span>
-                      </span>
-                      {highlight}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
+          <ul className="space-y-5">
+            {[
+              "24-hour intense coding challenge",
+              "100k+ INR in prizes",
+              "Networking with industry experts",
+              "Workshops and mentorship",
+              "Opportunity to showcase your skills"
+            ].map((highlight, idx) => (
+              <li key={idx} className="flex items-center text-white/90 font-medium text-[15.5px]">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#FFD54F] shadow-md mr-4 flex-shrink-0 animate-pulse"></span>
+                {highlight}
+              </li>
+            ))}
+          </ul>
         </div>
-      </section>
+      </div>
+
+    </div>
+  </div>
+</section>
 
       {/* Form Section */}
-      <section className="py-12 md:py-20 relative">
+      <section ref={formSectionRef} className="py-12 md:py-20 relative">
         <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 flex justify-center pointer-events-none">
+  <div className="w-[800px] h-[800px] bg-[#4676E6]/10 blur-[120px] rounded-full"></div>
+</div>
           <div className="absolute top-32 left-1/4 w-72 h-72 bg-[#4676E6]/10 blur-3xl rounded-full"></div>
           <div className="absolute bottom-32 right-1/4 w-72 h-72 bg-[#252D6F]/10 blur-3xl rounded-full"></div>
         </div>
@@ -392,7 +415,7 @@ const TeamRegistrationForm = () => {
                   className={`flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 md:px-10 py-4 rounded-2xl font-bold tracking-widest transition-all duration-500 shadow-md transform 
                   ${isActive
                       ? 'bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-white scale-110 -translate-y-2 shadow-xl shadow-[#4676E6]/40 ring-2 ring-white/50 z-20'
-                      : 'bg-white/80 backdrop-blur-md text-[#252D6F] hover:bg-white hover:scale-105 hover:-translate-y-1 hover:shadow-lg border border-[#4676E6]/20'
+                      : 'bg-white/60 backdrop-blur-xl shadow-sm hover:shadow-md text-[#252D6F] hover:bg-white hover:scale-105 hover:-translate-y-1 hover:shadow-lg border border-[#4676E6]/20'
                     }`}
                 >
                   <Icon size={isActive ? 22 : 18} className={`transition-all duration-300 ${isActive ? 'text-[#FFD54F]' : 'text-[#4676E6]'}`} />
@@ -405,7 +428,7 @@ const TeamRegistrationForm = () => {
             })}
           </div>
 
-          <div className="relative bg-card/90 backdrop-blur-2xl border border-primary/20 rounded-3xl p-6 sm:p-8 md:p-12 shadow-2xl overflow-hidden min-h-[400px]">
+          <div className="relative bg-white/70 backdrop-blur-2xl border border-white/40 shadow-[0_20px_60px_rgba(37,45,111,0.2)] rounded-3xl p-6 sm:p-8 md:p-12 shadow-2xl overflow-hidden min-h-[400px]">
             {/* subtle glow accent */}
             <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#4676E6]/10 blur-3xl rounded-full pointer-events-none"></div>
             <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-[#252D6F]/10 blur-3xl rounded-full pointer-events-none"></div>
@@ -413,7 +436,7 @@ const TeamRegistrationForm = () => {
             {activeTab === 'rules' && (
               <div className="animate-fade-in-up">
                 <div className="text-center mb-12">
-                  <h2 className="text-3xl font-extrabold text-[#252D6F] uppercase tracking-wide">
+                  <h2 className="text-3xl font-extrabold bg-gradient-to-r from-[#252D6F] to-[#4676E6] bg-clip-text text-transparent uppercase tracking-wide">
                     HACKATHON RULES
                   </h2>
                   <div className="h-[3px] w-16 bg-[#4676E6] mx-auto mt-4 mb-6"></div>
@@ -468,7 +491,7 @@ const TeamRegistrationForm = () => {
             {activeTab === 'schedules' && (
               <div className="animate-fade-in-up">
                 <div className="text-center mb-12">
-                  <h2 className="text-3xl font-extrabold text-[#252D6F] uppercase tracking-wide">
+                  <h2 className="text-3xl font-extrabold bg-gradient-to-r from-[#252D6F] to-[#4676E6] bg-clip-text text-transparent uppercase tracking-wide">
                     EVENT SCHEDULE
                   </h2>
                   <div className="h-[3px] w-16 bg-[#4676E6] mx-auto mt-4 mb-6"></div>
@@ -520,7 +543,7 @@ const TeamRegistrationForm = () => {
             {activeTab === 'about' && (
               <div className="animate-fade-in-up">
                 <div className="text-center mb-12">
-                  <h2 className="text-3xl font-extrabold text-[#252D6F] uppercase tracking-wide">
+                  <h2 className="text-3xl font-extrabold bg-gradient-to-r from-[#252D6F] to-[#4676E6] bg-clip-text text-transparent uppercase tracking-wide">
                     ABOUT CODE CRAFTER
                   </h2>
                   <div className="h-[3px] w-16 bg-[#4676E6] mx-auto mt-4 mb-6"></div>
