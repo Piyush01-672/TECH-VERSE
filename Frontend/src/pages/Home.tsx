@@ -8,93 +8,9 @@ import TechverseLogo from "@/assets/techverse-logo.jpg";
 import UniversityLogo from "@/assets/univeee-logo.png";
 import SoetLogo from "@/assets/soet-logo.png";
 import { EnquiryDialog } from "@/components/EnquiryDialog";
-import { FaInstagram, FaWhatsapp, FaLinkedin} from "react-icons/fa6";
-import {  Code2, Cpu, Database, Globe,  Binary } from "lucide-react";
-
-import { Send } from "lucide-react";
-
-const socialLinks = [
-  {
-    label: "Instagram",
-    icon: <FaInstagram size={20} />,
-    link: "https://www.instagram.com/tech.versectu/",
-    color: "bg-pink-500",
-  },
-  {
-    label: "WhatsApp",
-    icon: <FaWhatsapp size={20} />,
-    link: "https://chat.whatsapp.com/IiClyLPXlooJZWlJ66CnlN?mode=wwt",
-    color: "bg-green-500",
-  },
-  {
-    label: "Mail Us",
-    icon: <Mail size={20} />,
-    link: "mailto:techverse@ctuniversity.in",
-    color: "bg-gray-800",
-  },
-  {
-    label: "LinkedIn",
-    icon: <FaLinkedin size={20} />,
-    link: "https://www.linkedin.com/company/techverse-club-ct-university/",
-    color: "bg-blue-600",
-  },
-];
-
-export function FloatingSocials() {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div
-      className="fixed bottom-6"
-      style={{
-        right: 24,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-end",
-        gap: "12px",
-        zIndex: 9999,
-      }}
-    >
-      {socialLinks.map((item, index) => (
-        <a
-          key={index}
-          href={item.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          title={item.label}
-          className={`flex items-center justify-center text-white shadow-lg rounded-full p-3 transition-all duration-300 transform
-            ${item.color}
-            ${open ? `opacity-100 translate-y-0` : `opacity-0 translate-y-4 pointer-events-none`}
-          `}
-          style={{
-            transitionDelay: `${index * 80}ms`,
-          }}
-          // Hover styles using tailwind classes added inline:
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "scale(1.15)";
-            e.currentTarget.style.boxShadow = "0 0 10px rgba(255,255,255,0.6)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "";
-            e.currentTarget.style.boxShadow = "";
-          }}
-        >
-          {item.icon}
-        </a>
-      ))}
-
-      <button
-  onClick={() => setOpen(!open)}
-  className="bg-blue-600 text-white p-4 rounded-2xl shadow-xl transition-all duration-300
-             hover:bg-blue-500 hover:scale-105 hover:shadow-[0_0_15px_rgba(59,130,246,0.7)]"
->
-  <Send size={22} />
-</button>
-    </div>
-  );
-}
-
-
+import { Code2, Cpu, Database, Globe, Binary } from "lucide-react";
+import { FloatingSocials } from "@/components/FloatingSocials";
+import { FeatureCard } from "@/components/FeatureCard";
 
 const Home = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -400,20 +316,7 @@ const Home = () => {
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 gap-8 mt-6">
           {features.map((feature, index) => {
             const Icon = feature.icon;
-            return (
-              <div
-                key={index}
-                className="bg-white/10 backdrop-blur-md rounded-2xl p-6 shadow-lg transition-all duration-300 hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.6)] hover:-translate-y-2 border border-blue-500/20"
-              >
-                <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
-                  <Icon className="w-6 h-6 text-blue-600" />
-                </div>
-                <h3 className="text-md md:text-xl font-semibold text-foreground mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-sm md:text-base text-muted-foreground">{feature.description}</p>
-              </div>
-            );
+            return <FeatureCard key={index} feature={feature} />;
           })}
         </div>
       </section>
