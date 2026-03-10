@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -9,7 +10,9 @@ app.use(cors({
   // origin: process.env.FRONTEND_URL,
   // credentials: true
 }));
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false,
+}));
 
 // Global Rate Limiter: max 100 requests per 15 minutes
 const globalLimiter = rateLimit({
@@ -30,9 +33,7 @@ mongoose.connect(process.env.MongoDB_url, {
   console.error('MongoDB connection error:', err);
 });
 
-app.get('/', (req, res) => {
-    return res.json('Hello World!');
- })
+
 
  const Gallery = require('./routes/GalleryServer');
  const Contact = require('./routes/ContactServer');
@@ -43,15 +44,22 @@ app.get('/', (req, res) => {
 const Register = require('./routes/RegistrationServer');
 const CodeCrafterRegistration = require('./routes/CodeCrafterRegistrationServer');
 
-app.use('/leaders', Leader);
-app.use('/gallery', Gallery);
-app.use('/contact', Contact);
-app.use('/aboutus', AboutUs);
-app.use('/enquiry', Enquiry);
-app.use('/mentors', Mentor);
-app.use('/register', Register);
-app.use('/codecrafter-register', CodeCrafterRegistration);
+app.use('/api/leaders', Leader);
+app.use('/api/gallery', Gallery);
+app.use('/api/contact', Contact);
+app.use('/api/aboutus', AboutUs);
+app.use('/api/enquiry', Enquiry);
+app.use('/api/mentors', Mentor);
+app.use('/api/register', Register);
+app.use('/api/codecrafter-register', CodeCrafterRegistration);
+
+const frontendDistPath = path.join(__dirname, '..', 'Frontend', 'dist');
+console.log(frontendDistPath);
+app.use(express.static(frontendDistPath));
+app.get(/^(.*)$/, (req, res) => {
+  res.sendFile(path.join(frontendDistPath, 'index.html'));
+});
  
- app.listen(process.env.PORT || 5000, () => {
+ app.listen(process.env.PORT || 5000, '0.0.0.0', () => {
     console.log(`Server is running on port ${process.env.PORT || 5000}`);
  })

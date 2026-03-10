@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Contact = () => {
   const { toast } = useToast();
@@ -42,7 +41,7 @@ const Contact = () => {
       return;
     }
       try {
-        const res = await fetch(`${BACKEND_URL}/contact`, { method: "POST",
+        const res = await fetch(`/api/contact`, { method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),});
         if (!res.ok) throw new Error("Server error");

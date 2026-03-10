@@ -97,7 +97,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/enquiry", {
+      const response = await fetch("/api/enquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

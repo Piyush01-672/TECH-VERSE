@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import Category_navbar from "@/components/category_navbar";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import { Card } from "@/components/ui/card";
 const Events = () => {
   const [galleryItems, setGalleryItems] = useState([]);
   useEffect(() => {
-    fetch(`${BACKEND_URL}/gallery`)
+    fetch(`/api/gallery`)
       .then((res) => res.json())
       .then((data) => setGalleryItems(data))
       .catch((error) => console.error("Error fetching gallery items:", error));

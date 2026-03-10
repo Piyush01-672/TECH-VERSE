@@ -1,7 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export const registerTeam = async (submissionData: any) => {
-  const response = await fetch(`${API_BASE_URL}/register`, {
+  const response = await fetch(`/api/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -26,7 +25,7 @@ export const registerTeam = async (submissionData: any) => {
 };
 
 export const registerCodeCrafterTeam = async (submissionData: any) => {
-  const response = await fetch(`${API_BASE_URL}/codecrafter-register`, {
+  const response = await fetch(`/api/codecrafter-register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

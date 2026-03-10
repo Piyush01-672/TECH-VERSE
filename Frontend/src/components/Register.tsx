@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast"; // adjust import path if needed
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL; // ✅ environment-safe backend URL
 
 const Register = () => {
   const { toast } = useToast();
@@ -41,7 +40,7 @@ const Register = () => {
     const formData = { teamName, teamMembers, members };
 
     try {
-      const res = await fetch(`${BACKEND_URL}/register`, {
+      const res = await fetch(`/api/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

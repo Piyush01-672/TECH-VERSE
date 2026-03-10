@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Linkedin, Github, Mail } from "lucide-react";
 import Logo from "@/assets/techverse-logo.jpg";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import { cloudinary } from "@/hooks/cloudinary";
 
 
@@ -112,9 +111,9 @@ const HeroUrlMobile = cloudinary(
   
 useEffect(() => {
   Promise.all([
-    fetch(`${BACKEND_URL}/leaders`).then((res) => res.json()),
-    fetch(`${BACKEND_URL}/AboutUs`).then((res) => res.json()),
-    fetch(`${BACKEND_URL}/mentors`).then((res) => res.json()),
+    fetch(`/api/leaders`).then((res) => res.json()),
+    fetch(`/api/AboutUs`).then((res) => res.json()),
+    fetch(`/api/mentors`).then((res) => res.json()),
   ])
     .then(([leadersData, aboutUsData, mentorsData]) => {
       setLeaders(Array.isArray(leadersData) ? leadersData : [leadersData]);
