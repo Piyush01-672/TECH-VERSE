@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { BookOpen, CalendarHeart, Info, UserPlus } from "lucide-react";
+import { BookOpen, CalendarHeart, Download, Info, UserPlus } from "lucide-react";
 import CountdownTimer from "../components/CountdownTimer";
 import TeamRegistrationForm from "../components/TeamRegistrationForm";
 import EventHighlights from "../components/EventHighlights";
@@ -26,10 +26,12 @@ const CodeCrafter = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div>
-              <h1 className="text-4xl sm:text-6xl lg:text-[72px] font-extrabold leading-[1.1] tracking-tight mb-4 bg-gradient-to-r from-[#FFD54F] via-white to-[#4676E6] bg-clip-text text-transparent drop-shadow-xl animate-fade-in-up">
+              <h1 className="text-4xl sm:text-6xl font-extrabold leading-[1.1] tracking-tight mb-4 bg-gradient-to-r from-[#FFD54F] via-white to-[#4676E6] bg-clip-text text-transparent drop-shadow-xl animate-fade-in-up">
                 CODECRAFTER 3.0
               </h1>
-
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+                Hackathon 2026
+              </h2>
               <p className="text-lg md:text-xl text-white/90 max-w-xl font-medium leading-relaxed mb-8 animate-fade-in">
                 Unleash your coding potential and build something extraordinary.
                 24 hours. Infinite creativity. One epic build.
@@ -160,11 +162,11 @@ const CodeCrafter = () => {
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <button className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity shadow-md">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0l-4-4m4 4V4" /></svg>
+                    <Download size={18} />
                     Download Rule Book
                   </button>
                   <button className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity shadow-md">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0l-4-4m4 4V4" /></svg>
+                    <Download size={18} />
                     Download Problem Statements
                   </button>
                 </div>
