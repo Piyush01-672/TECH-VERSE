@@ -199,9 +199,8 @@ const Home = () => {
     </p>
   </div>
   <div className="animate-marquee text-blue-400 font-semibold text-sm md:text-lg tracking-wide mt-10 z-1">
-    <span>🎮 TechVerse E-sports League  💡 Stay tuned for more updates!</span>
-    <span className="ml-20">🎮 TechVerse E-sports League  💡 Stay tuned for more updates!</span>
-    <span className="ml-20">🎮 TechVerse E-sports League  💡 Stay tuned for more updates!</span>
+<span> TechVerse presents CodeCrafter 3.0 — Build • Innovate • Hack • Repeat  💡 Stay tuned for more updates!           </span>    
+    {/* <span className="ml-20">🎮 TechVerse E-sports League  💡 Stay tuned for more updates!</span> */}
   </div>
 
   <style>{`
