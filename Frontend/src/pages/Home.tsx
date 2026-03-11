@@ -190,37 +190,44 @@ const Home = () => {
 
 </div>
   {/* Moving Announcement Line */}
-
-
-<div className="absolute bottom-5 w-full mt-1 overflow-hidden flex ">
-  <div className="flex-shrink-0 mt-10 mr-4 bg-black z-10">
-    <p className="text-blue-400 font-semibold text-sm md:text-lg tracking-wide ">
-      🔔 TechVerse Updates:
-    </p>
-  </div>
-  <div className="animate-marquee text-blue-400 font-semibold text-sm md:text-lg tracking-wide mt-10 z-1">
-    <span>🎮 TechVerse E-sports League  💡 Stay tuned for more updates!</span>
-    <span className="ml-20">🎮 TechVerse E-sports League  💡 Stay tuned for more updates!</span>
-    <span className="ml-20">🎮 TechVerse E-sports League  💡 Stay tuned for more updates!</span>
+  <div className="absolute bottom-5 w-full overflow-hidden">
+    <div className="flex items-center gap-6 px-4 py-2 bg-black/80 backdrop-blur-sm rounded-full shadow-2xl">
+      <div className="flex-shrink-0">
+        <span className="text-blue-400 font-bold text-sm md:text-base tracking-wide animate-pulse">
+          🔔 TechVerse Updates:
+        </span>
+      </div>
+      <div className="relative flex-1 overflow-hidden">
+        <div className="flex gap-48 animate-marquee">
+          <span className="text-blue-300 font-semibold text-sm md:text-base whitespace-nowrap">
+            TechVerse presents CodeCrafter 3.0 — Build • Innovate • Hack • Repeat
+          </span>
+          <span className="text-blue-300 font-semibold text-sm md:text-base whitespace-nowrap">
+            TechVerse presents CodeCrafter 3.0 — Build • Innovate • Hack • Repeat
+          </span>
+          <span className="text-blue-300 font-semibold text-sm md:text-base whitespace-nowrap">
+            TechVerse presents CodeCrafter 3.0 — Build • Innovate • Hack • Repeat
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <style>{`
     @keyframes marquee {
       0% {
-        transform: translateX(100vw);
+        transform: translateX(100%);
       }
       100% {
-        transform: translateX(-100vw);
+        transform: translateX(-100%);
       }
     }
 
     .animate-marquee {
-      display: inline-block;
-      white-space: nowrap;
       animation: marquee 15s linear infinite;
+      will-change: transform;
     }
   `}</style>
-</div>
 
 </section>
 

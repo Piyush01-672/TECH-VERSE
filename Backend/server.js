@@ -54,12 +54,15 @@ app.use('/api/register', Register);
 app.use('/api/codecrafter-register', CodeCrafterRegistration);
 
 const frontendDistPath = path.join(__dirname, '..', 'Frontend', 'dist');
-console.log(frontendDistPath);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(frontendDistPath));
-app.get(/^(.*)$/, (req, res) => {
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
   res.sendFile(path.join(frontendDistPath, 'index.html'));
 });
+
  
  app.listen(process.env.PORT || 5000, '0.0.0.0', () => {
     console.log(`Server is running on port ${process.env.PORT || 5000}`);

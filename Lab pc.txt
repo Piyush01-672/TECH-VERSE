@@ -5,3 +5,9 @@ pm2 start server.js --name "techverse"
 pm2-startup
 # Follow any on-screen prompts it gives you
 pm2 save
+
+
+nginx commands
+cd C:\nginx
+start .\nginx.exe
+.\nginx.exe -s reload
