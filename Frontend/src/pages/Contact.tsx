@@ -125,7 +125,7 @@ const Contact = () => {
                   {
                     icon: Phone,
                     title: "Call Us",
-                    desc: "+91 XXX XXX XXXX (General Inquiries)\n+91 XXX XXX XXXX (Sponsorship)",
+                    desc: "+91 7993983771 (General Inquiries)\n+91 9596217411 (Sponsorship)",
                   },
                   {
                     icon: Send,

@@ -44,7 +44,7 @@ const CodeCrafter = () => {
                   Registration Closes In:
                 </h3>
 
-                <CountdownTimer targetDate={new Date("2026-04-23T00:00:00")} />
+                <CountdownTimer targetDate={new Date("2026-04-15T00:00:00")} />
 
                 <button
                   onClick={() => {

@@ -190,24 +190,26 @@ const Home = () => {
 
 </div>
   {/* Moving Announcement Line */}
-  <div className="absolute bottom-5 w-full overflow-hidden">
-    <div className="flex items-center gap-6 px-4 py-2 bg-black/80 backdrop-blur-sm rounded-full shadow-2xl">
-      <div className="flex-shrink-0">
-        <span className="text-blue-400 font-bold text-sm md:text-base tracking-wide animate-pulse">
+  <div className="absolute bottom-5 w-full overflow-hidden cursor-default">
+    <div className="flex items-center gap-4 px-4 py-2 bg-black/80 backdrop-blur-sm rounded-full shadow-2xl">
+      <div className="flex-shrink-0 z-10 pl-2">
+        <span className="text-blue-400 font-bold text-sm md:text-base tracking-wide animate-pulse inline-block">
           🔔 TechVerse Updates:
         </span>
       </div>
-      <div className="relative flex-1 overflow-hidden">
-        <div className="flex gap-48 animate-marquee">
-          <span className="text-blue-300 font-semibold text-sm md:text-base whitespace-nowrap">
-            TechVerse presents CodeCrafter 3.0 — Build • Innovate • Hack • Repeat
-          </span>
-          <span className="text-blue-300 font-semibold text-sm md:text-base whitespace-nowrap">
-            TechVerse presents CodeCrafter 3.0 — Build • Innovate • Hack • Repeat
-          </span>
-          <span className="text-blue-300 font-semibold text-sm md:text-base whitespace-nowrap">
-            TechVerse presents CodeCrafter 3.0 — Build • Innovate • Hack • Repeat
-          </span>
+      <div className="relative flex-1 overflow-hidden flex mask-fade-edges">
+        <div className="flex w-max animate-marquee hover:[animation-play-state:paused]">
+          {/* Two identical groups for a seamless continuous 360 scroll */}
+          {[0, 1].map((blockIdx) => (
+            <div key={blockIdx} className="flex gap-48 pr-48" aria-hidden={blockIdx === 1}>
+              {/* Mapping to prevent writing the same span multiple times in source */}
+              {[...Array(4)].map((_, i) => (
+                <span key={i} className="text-blue-300 font-semibold text-sm md:text-base whitespace-nowrap">
+                  TechVerse presents CodeCrafter 3.0 — Build • Innovate • Hack • Repeat
+                </span>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -215,17 +217,18 @@ const Home = () => {
 
   <style>{`
     @keyframes marquee {
-      0% {
-        transform: translateX(100%);
-      }
-      100% {
-        transform: translateX(-100%);
-      }
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
     }
 
     .animate-marquee {
-      animation: marquee 15s linear infinite;
+      animation: marquee 25s linear infinite;
       will-change: transform;
+    }
+
+    .mask-fade-edges {
+      -webkit-mask-image: linear-gradient(to right, transparent, black 2%, black 98%, transparent);
+      mask-image: linear-gradient(to right, transparent, black 2%, black 98%, transparent);
     }
   `}</style>
 
