@@ -24,13 +24,14 @@ export const registerTeam = async (submissionData: any) => {
   return data;
 };
 
-export const registerCodeCrafterTeam = async (submissionData: any) => {
+export const registerCodeCrafterTeam = async (submissionData: FormData | any) => {
+  const isFormData = submissionData instanceof FormData;
+  const headers = isFormData ? {} : { 'Content-Type': 'application/json' };
+  
   const response = await fetch(`/api/codecrafter-register`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(submissionData),
+    headers,
+    body: isFormData ? submissionData : JSON.stringify(submissionData),
   });
 
   let data;

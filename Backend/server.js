@@ -55,6 +55,7 @@ app.use('/api/codecrafter-register', CodeCrafterRegistration);
 
 const frontendDistPath = path.join(__dirname, '..', 'Frontend', 'dist');
 console.log(frontendDistPath);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(frontendDistPath));
 app.get(/^(.*)$/, (req, res) => {
   res.sendFile(path.join(frontendDistPath, 'index.html'));

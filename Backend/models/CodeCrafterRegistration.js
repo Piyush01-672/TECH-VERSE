@@ -10,9 +10,10 @@ const ParticipantSchema = new mongoose.Schema({
 
 const CodeCrafterRegistrationSchema = new mongoose.Schema({
   teamName: { type: String, required: true },
-  hackathonExperience: { type: String, required: false }, // Optional field
   teamSize: { type: Number, required: true },
   contactNumber: { type: String, required: true },
+  transactionId: { type: String, required: true },
+  transactionImage: { type: String, required: true },
   accommodationRequired: { type: String, required: true, enum: ['Yes', 'No'] },
   accommodationDetails: {
     boysCount: { type: Number, default: 0 },

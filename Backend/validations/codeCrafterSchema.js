@@ -33,6 +33,9 @@ const codeCrafterRegistrationSchema = Joi.object({
     'string.pattern.base': 'Contact Number must be a valid 10-digit number.',
     'any.required': 'Contact Number is required.',
   }),
+  transactionId: Joi.string().required().messages({
+    'string.empty': 'Transaction ID is required.',
+  }),
   accommodationRequired: Joi.string().valid('Yes', 'No').required().messages({
     'any.only': 'Accommodation Required must be Yes or No.',
   }),

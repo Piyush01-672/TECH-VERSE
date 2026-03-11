@@ -7,16 +7,22 @@ const registerCodeCrafterTeam = async (req, res) => {
       hackathonExperience,
       teamSize,
       contactNumber,
+      transactionId,
       accommodationRequired,
       accommodationDetails,
       participants
     } = req.body;
+
+    const serverUrl = `${req.protocol}://${req.get('host')}`;
+    const transactionImage = req.file ? `${serverUrl}/${req.file.path.replace(/\\/g, '/')}` : '';
 
     const newRegistration = new CodeCrafterRegistration({
       teamName,
       hackathonExperience,
       teamSize,
       contactNumber,
+      transactionId,
+      transactionImage,
       accommodationRequired,
       accommodationDetails,
       participants,

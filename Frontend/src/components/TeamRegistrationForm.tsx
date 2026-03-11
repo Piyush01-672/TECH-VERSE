@@ -7,6 +7,8 @@ const TeamRegistrationForm = () => {
     hackathonExperience: "",
     teamSize: 2,
     contactNumber: "",
+    transactionId: "",
+    transactionImage: null as File | null,
     accommodationRequired: "No",
     accommodationDetails: {
       boysCount: 0,
@@ -47,6 +49,11 @@ const TeamRegistrationForm = () => {
       return;
     }
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setFormData(prev => ({ ...prev, transactionImage: file }));
   };
 
   const handleAccommodationChange = (field: "boysCount" | "girlsCount", value: string) => {
@@ -91,8 +98,28 @@ const TeamRegistrationForm = () => {
         setLoading(false);
         return;
       }
+
+      if (!formData.transactionImage) {
+        setError("Please upload a transaction proof image.");
+        setLoading(false);
+        return;
+      }
+
+      // Convert to FormData for file upload
+      const formPayload = new FormData();
+      formPayload.append("teamName", submissionData.teamName);
+      formPayload.append("hackathonExperience", submissionData.hackathonExperience);
+      formPayload.append("teamSize", submissionData.teamSize.toString());
+      formPayload.append("contactNumber", submissionData.contactNumber);
+      formPayload.append("transactionId", submissionData.transactionId);
+      formPayload.append("transactionImage", submissionData.transactionImage);
+      formPayload.append("accommodationRequired", submissionData.accommodationRequired);
+      formPayload.append("accommodationDetails", JSON.stringify(submissionData.accommodationDetails));
+      formPayload.append("participants", JSON.stringify(submissionData.participants));
+
       console.log("Submitting form data:", submissionData);
-      await registerCodeCrafterTeam(submissionData);
+      // Ensure the API call is updated to accept FormData instead of JSON
+      await registerCodeCrafterTeam(formPayload as any); // using as any in case the types aren't updated yet
       setSubmitted(true);
     } catch (err: any) {
       setError(
@@ -113,6 +140,8 @@ const TeamRegistrationForm = () => {
       hackathonExperience: "",
       teamSize: 2,
       contactNumber: "",
+      transactionId: "",
+      transactionImage: null,
       accommodationRequired: "No",
       accommodationDetails: {
         boysCount: 0,
@@ -261,8 +290,26 @@ const TeamRegistrationForm = () => {
                   <input type="number" min="0" max={formData.teamSize} value={formData.accommodationDetails.girlsCount} onChange={(e) => handleAccommodationChange("girlsCount", e.target.value)} disabled={formData.accommodationRequired !== "Yes"} placeholder="Girls" className="w-full p-3 rounded-xl border border-primary/20 bg-background/60 backdrop-blur-md focus:ring-2 focus:ring-[#4676E6]/50 focus:border-[#4676E6] focus:outline-none transition-all duration-200" />
                 </div>
               </div>
+              
+              
             )}
           </div>
+
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-foreground flex items-center gap-3 pb-4">
+              <span className="w-2 h-8 bg-gradient-to-b from-[#252D6F] to-[#4676E6] rounded-full"></span>
+              Transaction Details
+            </h2>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Transaction ID *</label>
+              <input type="text" name="transactionId" value={formData.transactionId} onChange={handleChange} required placeholder="Enter Transaction ID" className="w-full p-3 rounded-xl border border-primary/20 bg-background/60 backdrop-blur-md focus:ring-2 focus:ring-[#4676E6]/50 focus:border-[#4676E6] focus:outline-none transition-all duration-200" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Transaction Proof (Image) *</label>
+              <input type="file" accept="image/*" onChange={handleFileChange} required className="w-full p-3 rounded-xl border border-primary/20 bg-background/60 backdrop-blur-md text-foreground focus:ring-2 focus:ring-[#4676E6]/50 focus:border-[#4676E6] focus:outline-none transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#4676E6]/10 file:text-[#4676E6] hover:file:bg-[#4676E6]/20" />
+            </div>
+          </div>
+
           <div className="pt-6">
             <button type="submit" disabled={loading} className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#252D6F] to-[#4676E6] text-white font-semibold text-lg shadow-lg hover:shadow-2xl hover:scale-[1.02] active:scale-100 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
               {loading ? "Submitting..." : "Register Team"}

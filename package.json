@@ -4,5 +4,24 @@
     "@types/react-dom": "^19.2.3",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
-  }
+  },
+  "name": "techverse",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Piyush01-672/TECH-VERSE.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Piyush01-672/TECH-VERSE/issues"
+  },
+  "homepage": "https://github.com/Piyush01-672/TECH-VERSE#readme"
 }
