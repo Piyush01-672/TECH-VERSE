@@ -17,6 +17,7 @@ const allowedOrigins = [
   'https://techversectu.vercel.app/',
   'http://localhost:3000',
   'http://localhost:5173', // Vite default port
+  'https://techverse.ctuniversity.in',
 ];
 
 app.use(cors({
