@@ -1,5 +1,4 @@
 const express = require('express');
-const path = require('path');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -9,30 +8,44 @@ require('@dotenvx/dotenvx').config({ silent: true });
 
 const app = express();
 
-// ✅ CORS (adjust if frontend separate)
-app.use(cors());
+// ==========================
+// ✅ CORS (from ENV)
+// ==========================
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true
+}));
 
+// ==========================
 // ✅ Security
+// ==========================
 app.use(helmet({
   contentSecurityPolicy: false,
 }));
 
-// ✅ Rate limiter
+// ==========================
+// ✅ Rate Limiter
+// ==========================
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
 }));
 
-// ✅ Body parser
+// ==========================
+// ✅ Middleware
+// ==========================
 app.use(express.json());
 
-// ✅ MongoDB
+// ==========================
+// ✅ MongoDB Connection
+// ==========================
 mongoose.connect(process.env.MongoDB_url)
   .then(() => console.log('✅ MongoDB Connected'))
   .catch(err => console.error('❌ MongoDB Error:', err));
 
-
+// ==========================
 // ✅ Routes
+// ==========================
 app.use('/api/leaders', require('./routes/Leaders'));
 app.use('/api/gallery', require('./routes/GalleryServer'));
 app.use('/api/contact', require('./routes/ContactServer'));
@@ -42,36 +55,22 @@ app.use('/api/mentors', require('./routes/Mentor'));
 app.use('/api/register', require('./routes/RegistrationServer'));
 app.use('/api/codecrafter-register', require('./routes/CodeCrafterRegistrationServer'));
 
-
 // ==========================
-// ✅ FIX STARTS HERE
+// ✅ Health Check Route
 // ==========================
-
-// 👉 Correct frontend build path
-const frontendPath = path.join(__dirname, '../Frontend/dist');
-
-// 👉 Debug log (VERY IMPORTANT)
-console.log("Frontend build path:", frontendPath);
-
-// 👉 Serve static frontend
-app.use(express.static(frontendPath));
-
-// 👉 Uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// 👉 Root check (prevents "Not Found")
 app.get('/', (req, res) => {
-  res.send('🚀 API is running');
+  res.send('🚀 Backend API is running');
 });
-
-// 👉 SPA fallback (ONLY if frontend exists)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(frontendPath, 'index.html'));
-});
-
 
 // ==========================
-// ✅ START SERVER
+// ❌ 404 Handler
+// ==========================
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
+// ==========================
+// ✅ Start Server
 // ==========================
 const PORT = process.env.PORT || 5000;
 
