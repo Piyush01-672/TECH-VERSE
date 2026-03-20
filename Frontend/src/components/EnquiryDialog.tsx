@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { submitEnquiry } from "@/services/api";
 import {
   Dialog,
   DialogContent,
@@ -97,22 +98,13 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
     }
 
     try {
-      const response = await fetch("/api/enquiry", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        toast.success("Enquiry submitted successfully!");
-        onOpenChange(false);
-        setShowOther(false);
-        form.reset();
-      } else {
-        toast.error("Failed to submit enquiry.");
-      }
+      await submitEnquiry(data);
+      toast.success("Enquiry submitted successfully!");
+      onOpenChange(false);
+      setShowOther(false);
+      form.reset();
     } catch (err) {
-      toast.error("Server error: " + err.message);
+      toast.error("Enquiry submission failed: " + (err as Error).message);
     }
   };
 

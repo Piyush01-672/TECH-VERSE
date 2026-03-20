@@ -12,7 +12,7 @@ const app = express();
 // ✅ CORS (from ENV)
 // ==========================
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }));
 
@@ -67,6 +67,17 @@ app.get('/', (req, res) => {
 // ==========================
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
+});
+
+// ==========================
+// ❌ Global Error Handler
+// ==========================
+app.use((err, req, res, next) => {
+  console.error('❌ Error:', err);
+  res.status(err.status || 500).json({
+    message: err.message || 'Internal Server Error',
+    error: process.env.NODE_ENV === 'development' ? err : {}
+  });
 });
 
 // ==========================

@@ -17,7 +17,7 @@ const getRegistrationsCSV = async (req, res) => {
     // Check for API key in headers instead of query for security
     const apiKey = req.headers["x-api-key"];
     if (apiKey !== process.env.REGISTRATION_FORM_KEY) {
-      return res.status(403).send("Unauthorized: Invalid API Key");
+      return res.status(403).json({ message: "Unauthorized: Invalid API Key" });
     }
     const data = await Registration.find().lean();
     const parser = new Parser();
@@ -27,7 +27,7 @@ const getRegistrationsCSV = async (req, res) => {
     res.send(csv);
   } catch (err) {
     console.error("Error generating CSV:", err);
-    res.status(500).send(err.message);
+    res.status(500).json({ message: err.message });
   }
 };
 

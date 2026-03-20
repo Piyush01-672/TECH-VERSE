@@ -5,6 +5,7 @@ import { Linkedin, Github, Mail } from "lucide-react";
 import Logo from "@/assets/techverse-logo.jpg";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { cloudinary } from "@/hooks/cloudinary";
+import { getLeaders, getAboutUs, getMentors } from "@/services/api";
 
 
 // ✅ Re-usable Card Component with responsive sizing
@@ -111,9 +112,9 @@ const HeroUrlMobile = cloudinary(
   
 useEffect(() => {
   Promise.all([
-    fetch(`/api/leaders`).then((res) => res.json()),
-    fetch(`/api/AboutUs`).then((res) => res.json()),
-    fetch(`/api/mentors`).then((res) => res.json()),
+    getLeaders(),
+    getAboutUs(),
+    getMentors(),
   ])
     .then(([leadersData, aboutUsData, mentorsData]) => {
       setLeaders(Array.isArray(leadersData) ? leadersData : [leadersData]);

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import Category_navbar from "@/components/category_navbar";
 import { Card } from "@/components/ui/card";
+import { getGallery } from "@/services/api";
 const Events = () => {
   const [galleryItems, setGalleryItems] = useState([]);
   useEffect(() => {
-    fetch(`/api/gallery`)
-      .then((res) => res.json())
+    getGallery()
       .then((data) => setGalleryItems(data))
       .catch((error) => console.error("Error fetching gallery items:", error));
   }, []);

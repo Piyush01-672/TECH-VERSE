@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { submitContact } from "@/services/api";
 
 
 const Contact = () => {
@@ -41,10 +42,7 @@ const Contact = () => {
       return;
     }
       try {
-        const res = await fetch(`/api/contact`, { method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),});
-        if (!res.ok) throw new Error("Server error");
+        await submitContact(formData);
         toast({
           title: "Message Sent!",
           description: "Thank you for reaching out. We'll get back to you soon.",
