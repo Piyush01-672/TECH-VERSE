@@ -4,66 +4,77 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const app = express();
+
 require('@dotenvx/dotenvx').config({ silent: true });
-app.use(cors({
-  // origin: process.env.FRONTEND_URL,
-  // credentials: true
-}));
+
+const app = express();
+
+// ✅ CORS (adjust if frontend separate)
+app.use(cors());
+
+// ✅ Security
 app.use(helmet({
   contentSecurityPolicy: false,
 }));
 
-// Global Rate Limiter: max 100 requests per 15 minutes
-const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 100, 
-  message: 'Too many requests from this IP, please try again after 15 minutes',
-  standardHeaders: true, 
-  legacyHeaders: false,
-});
-app.use(globalLimiter);
+// ✅ Rate limiter
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+}));
 
+// ✅ Body parser
 app.use(express.json());
 
-mongoose.connect(process.env.MongoDB_url, {
-}).then(() => {
-  console.log('Connected to MongoDB Database!');
-}).catch((err) => {
-  console.error('MongoDB connection error:', err);
-});
+// ✅ MongoDB
+mongoose.connect(process.env.MongoDB_url)
+  .then(() => console.log('✅ MongoDB Connected'))
+  .catch(err => console.error('❌ MongoDB Error:', err));
 
 
+// ✅ Routes
+app.use('/api/leaders', require('./routes/Leaders'));
+app.use('/api/gallery', require('./routes/GalleryServer'));
+app.use('/api/contact', require('./routes/ContactServer'));
+app.use('/api/aboutus', require('./routes/AboutServer'));
+app.use('/api/enquiry', require('./routes/Enquiry'));
+app.use('/api/mentors', require('./routes/Mentor'));
+app.use('/api/register', require('./routes/RegistrationServer'));
+app.use('/api/codecrafter-register', require('./routes/CodeCrafterRegistrationServer'));
 
- const Gallery = require('./routes/GalleryServer');
- const Contact = require('./routes/ContactServer');
- const AboutUs = require('./routes/AboutServer');
- const Enquiry = require('./routes/Enquiry');
- const Mentor = require('./routes/Mentor');
- const Leader = require('./routes/Leaders');
-const Register = require('./routes/RegistrationServer');
-const CodeCrafterRegistration = require('./routes/CodeCrafterRegistrationServer');
 
-app.use('/api/leaders', Leader);
-app.use('/api/gallery', Gallery);
-app.use('/api/contact', Contact);
-app.use('/api/aboutus', AboutUs);
-app.use('/api/enquiry', Enquiry);
-app.use('/api/mentors', Mentor);
-app.use('/api/register', Register);
-app.use('/api/codecrafter-register', CodeCrafterRegistration);
+// ==========================
+// ✅ FIX STARTS HERE
+// ==========================
 
-const frontendDistPath = path.join(__dirname, '..', 'Frontend', 'dist');
+// 👉 Correct frontend build path
+const frontendPath = path.join(__dirname, '../Frontend/dist');
+
+// 👉 Debug log (VERY IMPORTANT)
+console.log("Frontend build path:", frontendPath);
+
+// 👉 Serve static frontend
+app.use(express.static(frontendPath));
+
+// 👉 Uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use(express.static(frontendDistPath));
-app.use((req, res, next) => {
-  if (req.path.startsWith('/api')) {
-    return next();
-  }
-  res.sendFile(path.join(frontendDistPath, 'index.html'));
+
+// 👉 Root check (prevents "Not Found")
+app.get('/', (req, res) => {
+  res.send('🚀 API is running');
 });
 
- 
- app.listen(process.env.PORT || 5000, '0.0.0.0', () => {
-    console.log(`Server is running on port ${process.env.PORT || 5000}`);
- })
+// 👉 SPA fallback (ONLY if frontend exists)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});
+
+
+// ==========================
+// ✅ START SERVER
+// ==========================
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Server running on port ${PORT}`);
+});
