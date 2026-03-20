@@ -11,8 +11,25 @@ const app = express();
 // ==========================
 // ✅ CORS (from ENV)
 // ==========================
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:3000',
+  'https://techversectu.vercel.app',
+  'https://techversectu.vercel.app/',
+  'http://localhost:3000',
+  'http://localhost:5173', // Vite default port
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin || allowedOrigins.some(allowed => 
+      origin === allowed || origin === allowed.replace(/\/$/, '') 
+    )) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
