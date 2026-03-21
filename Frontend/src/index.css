@@ -205,3 +205,13 @@ All colors MUST be HSL.
   transition: transform 0.3s ease, z-index 0.3s ease;
   z-index: 10;
 }
+
+@keyframes blockReveal {
+  0% { transform: perspective(800px) translateZ(0) rotateX(0) rotateY(0); opacity: 1; }
+  100% { transform: perspective(800px) translateZ(-400px) rotateX(90deg) rotateY(90deg); opacity: 0; border-radius: 20%; }
+}
+
+@keyframes blockHide {
+  0% { transform: perspective(800px) translateZ(-400px) rotateX(-90deg) rotateY(-90deg); opacity: 0; border-radius: 20%; }
+  100% { transform: perspective(800px) translateZ(0) rotateX(0) rotateY(0); opacity: 1; border-radius: 0; }
+}

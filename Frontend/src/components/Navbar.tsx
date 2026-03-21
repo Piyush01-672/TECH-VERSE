@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import techverseLogo from "@/assets/techverse-logo.jpg";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [cyberGlow, setCyberGlow] = useState(false);
+  const [isHighlighted, setIsHighlighted] = useState(false);
   const location = useLocation();
   const menuRef = useRef(null);
   const toggleBtnRef = useRef(null);
@@ -16,29 +17,85 @@ const Navbar = () => {
     { name: "About us", path: "/about" },
     { name: "Sponsors", path: "/sponsors" },
     { name: "Contact", path: "/contact" },
-    { name: "CodeCrafter 3.0", path: "/codecrafter" },
-
+    { name: "CodeCrafter", path: "/codecrafter" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
 
+  // Listen for the custom event to highlight CodeCrafter
+  useEffect(() => {
+    const handleHighlight = () => {
+      setIsHighlighted(true);
+      setTimeout(() => setIsHighlighted(false), 3000); // Pop up available for 3 seconds
+    };
+    window.addEventListener('highlightCodeCrafter', handleHighlight);
+    return () => window.removeEventListener('highlightCodeCrafter', handleHighlight);
+  }, []);
+
+  // Add the 2-second cyber glow effect periodically
+  useEffect(() => {
+    const triggerGlow = () => {
+      setCyberGlow(true);
+      setTimeout(() => setCyberGlow(false), 2000); // Effect lasts 2 seconds
+    };
+    
+    const initialTimeout = setTimeout(triggerGlow, 2000);
+    const interval = setInterval(triggerGlow, 8000);
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(interval);
+    };
+  }, []);
+
   useEffect(() => {
     if (!isOpen || window.innerWidth >= 1024) return;
 
-    function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target) && toggleBtnRef.current && !toggleBtnRef.current.contains(event.target)) {
+    function handleClickOutside(event: any) {
+      if (menuRef.current && !(menuRef.current as any).contains(event.target) && toggleBtnRef.current && !(toggleBtnRef.current as any).contains(event.target)) {
         setIsOpen(false);
       }
     }
-    // document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("touchstart", handleClickOutside);
     return () => {
-      // document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("touchstart", handleClickOutside);
     };
   }, [isOpen]);
+
+  const getNavItemClass = (item: any) => {
+    const isCodeCrafter = item.name === "CodeCrafter";
+    if (isActive(item.path)) {
+      return "bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-primary-foreground";
+    }
+    
+    // During highlight mode, pulse extremely brightly!
+    if (isCodeCrafter && isHighlighted) {
+      return "font-['Orbitron'] text-[#00F0FF] shadow-[0_0_30px_rgba(0,240,255,0.8)] border border-[#00F0FF] bg-black/60 scale-110 tracking-[0.2em] font-bold animate-pulse z-10";
+    }
+    
+    // Normal periodic cyber glow
+    if (isCodeCrafter && cyberGlow) {
+      return "font-['Orbitron'] text-[#00F0FF] shadow-[0_0_20px_rgba(0,240,255,0.4)] border border-[#00F0FF]/60 bg-black/40 scale-105 tracking-wider transition-all duration-300";
+    }
+    
+    return "text-foreground hover:bg-muted transition-all duration-300";
+  };
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
+    <>
+      {/* Mobile Floating Highlight for CodeCrafter */}
+      {isHighlighted && (
+        <div className="lg:hidden fixed top-24 left-0 right-0 flex justify-center z-[60] animate-in fade-in slide-in-from-top-4 duration-500">
+          <Link
+            to="/codecrafter"
+            onClick={() => setIsHighlighted(false)}
+            className="font-['Orbitron'] text-[#00F0FF] shadow-[0_0_30px_rgba(0,240,255,0.9)] border-2 border-[#00F0FF] bg-black/90 px-6 py-3 rounded-xl scale-110 tracking-[0.2em] font-bold animate-pulse text-center"
+          >
+            CodeCrafter
+          </Link>
+        </div>
+      )}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
       <div className="container mx-auto px-3">
         <div className="flex items-center justify-between h-20">
           {/* Logo Section */}
@@ -56,24 +113,19 @@ const Navbar = () => {
               </div>
             </Link>
           </div>
+          
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                  isActive(item.path)
-                    ? "bg-gradient-to-br from-[#252D6F] to-[#4676E6] text-primary-foreground"
-                    : "text-foreground hover:bg-muted"
-                }`}
+                className={`px-4 py-2 rounded-lg font-medium ease-in-out ${getNavItemClass(item)}`}
               >
                 {item.name}
               </Link>
             ))}
           </div>
-
-
 
           {/* Mobile Menu Button */}
           <button
@@ -82,7 +134,11 @@ const Navbar = () => {
               e.stopPropagation();
               setIsOpen(!isOpen);
             }}
-            className="lg:hidden p-2 text-foreground hover:bg-muted rounded-lg"
+            className={`lg:hidden p-2 rounded-lg transition-all duration-300 ${
+              isHighlighted && !isOpen 
+                ? "text-[#00F0FF] shadow-[0_0_15px_rgba(0,240,255,0.6)] border border-[#00F0FF] bg-black/40 animate-pulse scale-110"
+                : "text-foreground hover:bg-muted"
+            }`}
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -99,20 +155,16 @@ const Navbar = () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setIsOpen(false)}
-                className={`block px-4 py-3 rounded-lg font-medium transition-all ${
-                  isActive(item.path)
-                    ? "bg-primary text-primary-foreground"
-                    : "text-foreground hover:bg-muted"
-                }`}
+                className={`block px-4 py-3 rounded-lg font-medium ease-in-out ${getNavItemClass(item)}`}
               >
                 {item.name}
               </Link>
             ))}
-
           </div>
         )}
       </div>
     </nav>
+    </>
   );
 };
 

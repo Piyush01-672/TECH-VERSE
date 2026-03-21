@@ -12,8 +12,62 @@ import { Code2, Cpu, Database, Globe, Binary } from "lucide-react";
 import { FloatingSocials } from "@/components/FloatingSocials";
 import { FeatureCard } from "@/components/FeatureCard";
 
+const CodeCrafterTransition = () => {
+  return (
+    <div className="fixed inset-0 z-[100] bg-[#03060d] flex items-center justify-center overflow-hidden animate-[fadeInGlitch_2s_ease-out_forwards,fadeTransition_1s_ease-in_forwards_2.5s]">
+      {/* Glitch Layers (Faded Palette) */}
+      <div className="absolute inset-0 z-10 overflow-hidden">
+        {/* Main background with base glitch */}
+        <div className="absolute inset-0 animate-[glitchMain_3s_infinite] opacity-60 grayscale-[0.3]">
+          <img src="/optimus-megatron.jpg" className="hidden md:block absolute inset-0 w-full h-full object-cover" alt="" />
+          <img src="/codecrafter-mobile-bg.png" className="block md:hidden absolute inset-0 w-full h-full object-cover" alt="" />
+        </div>
+
+        {/* Faded Red Shift Layer */}
+        <div className="absolute inset-0 mix-blend-screen animate-[glitchRed_0.4s_infinite] opacity-20">
+           <img src="/optimus-megatron.jpg" className="hidden md:block absolute inset-0 w-full h-full object-cover contrast-110 saturate-50 hue-rotate-[-15deg] blur-[1px]" alt="" />
+           <img src="/codecrafter-mobile-bg.png" className="block md:hidden absolute inset-0 w-full h-full object-cover contrast-110 saturate-50 hue-rotate-[-15deg] blur-[1px]" alt="" />
+        </div>
+
+        {/* Faded Blue Shift Layer */}
+        <div className="absolute inset-0 mix-blend-screen animate-[glitchBlue_0.3s_infinite] opacity-20">
+           <img src="/optimus-megatron.jpg" className="hidden md:block absolute inset-0 w-full h-full object-cover contrast-110 saturate-50 hue-rotate-[160deg] blur-[1px]" alt="" />
+           <img src="/codecrafter-mobile-bg.png" className="block md:hidden absolute inset-0 w-full h-full object-cover contrast-110 saturate-50 hue-rotate-[160deg] blur-[1px]" alt="" />
+        </div>
+      </div>
+
+      {/* Noise Overlay */}
+      <div className="absolute inset-0 z-20 opacity-15 pointer-events-none mix-blend-overlay animate-[noiseMove_0.2s_infinite]"
+           style={{ backgroundImage: 'url("https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Net_Noise.png")', backgroundSize: '100px 100px' }}></div>
+
+      {/* Slicing Lines Overlay */}
+      <div className="absolute inset-0 z-30 pointer-events-none">
+        {[...Array(12)].map((_, i) => (
+          <div key={i} className="absolute w-full h-[1px] bg-[#00F0FF]/20 animate-[sliceAppear_2.5s_infinite]"
+               style={{ top: `${Math.random() * 100}%`, animationDelay: `${Math.random() * 2}s` }}></div>
+        ))}
+      </div>
+
+      {/* Central Content (Faded & Shaky) */}
+      <div className="hidden md:flex relative z-40 flex-col items-center justify-center pointer-events-none w-full px-4 animate-[contentShake_0.3s_infinite] opacity-80">
+         <div className="inline-flex items-center justify-center px-4 sm:px-8 py-2 sm:py-3 mb-4 sm:mb-8 bg-black/40 backdrop-blur-md border border-[#00F0FF]/20" style={{ clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)' }}>
+            <span className="text-[#00F0FF]/70 font-['Orbitron'] uppercase tracking-[0.2em] sm:tracking-[0.4em] font-bold text-[10px] sm:text-sm">SYSTEMS ENGAGED</span>
+         </div>
+         <h1 className="text-[14vw] sm:text-6xl md:text-[8rem] whitespace-nowrap font-black leading-none tracking-tighter text-white/90 uppercase font-['Black_Ops_One'] text-center w-full">
+            CODE CRAFTER
+         </h1>
+         <div className="mt-2 sm:mt-4 bg-[#00F0FF]/80 px-4 sm:px-6 py-1.5 sm:py-2 transform skew-x-[-15deg]">
+            <span className="block transform skew-x-[15deg] text-black font-['Orbitron'] font-black text-sm sm:text-xl md:text-3xl tracking-[0.1em] sm:tracking-[0.2em]">VERSION 3.0</span>
+         </div>
+      </div>
+    </div>
+  );
+};
+
 const Home = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [hasClosedDialogOnce, setHasClosedDialogOnce] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -22,6 +76,18 @@ const Home = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  const handleDialogClose = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open && !hasClosedDialogOnce) {
+      setHasClosedDialogOnce(true);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setIsTransitioning(false);
+        window.dispatchEvent(new Event('highlightCodeCrafter'));
+      }, 4000); // 4-second transition effect
+    }
+  };
 
   const stats = [
     { label: "Participants", value: "500+", icon: Users },
@@ -57,7 +123,9 @@ const Home = () => {
     },
   ];
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Black+Ops+One&display=swap');`}</style>
+      {isTransitioning && <CodeCrafterTransition />}
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
   {/* Animated Tech Background */}
   <div className="absolute inset-0 overflow-hidden">
@@ -215,22 +283,76 @@ const Home = () => {
     </div>
   </div>
 
-  <style>{`
-    @keyframes marquee {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
+    <style>{`
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Black+Ops+One&display=swap');
 
-    .animate-marquee {
-      animation: marquee 25s linear infinite;
-      will-change: transform;
-    }
+      @keyframes fadeInGlitch {
+        0% { opacity: 0; transform: scale(1.1) blur(10px); }
+        100% { opacity: 1; transform: scale(1) blur(0); }
+      }
 
-    .mask-fade-edges {
-      -webkit-mask-image: linear-gradient(to right, transparent, black 2%, black 98%, transparent);
-      mask-image: linear-gradient(to right, transparent, black 2%, black 98%, transparent);
-    }
-  `}</style>
+      @keyframes fadeTransition {
+        0% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+
+      @keyframes glitchMain {
+        0%, 100% { transform: none; filter: none; }
+        33% { transform: translate(-5px, 2px); filter: contrast(1.1); }
+        66% { transform: translate(5px, -2px); filter: brightness(1.05); }
+      }
+
+      @keyframes glitchRed {
+        0% { transform: translate(0); clip-path: inset(44% 0 1% 0); }
+        20% { transform: translate(-5px, 2px); clip-path: inset(10% 0 50% 0); }
+        40% { transform: translate(5px, -2px); clip-path: inset(80% 0 5% 0); }
+        60% { transform: translate(-2px, 0); clip-path: inset(20% 0 60% 0); }
+        80% { transform: translate(2px, 2px); clip-path: inset(50% 0 20% 0); }
+        100% { transform: translate(0); clip-path: inset(44% 0 1% 0); }
+      }
+
+      @keyframes glitchBlue {
+        0% { transform: translate(0); clip-path: inset(10% 0 80% 0); }
+        20% { transform: translate(5px, -2px); clip-path: inset(40% 0 20% 0); }
+        40% { transform: translate(-5px, 2px); clip-path: inset(10% 0 50% 0); }
+        60% { transform: translate(2px, 0); clip-path: inset(70% 0 10% 0); }
+        80% { transform: translate(-2px, -2px); clip-path: inset(20% 0 60% 0); }
+        100% { transform: translate(0); clip-path: inset(10% 0 80% 0); }
+      }
+
+      @keyframes noiseMove {
+        0% { background-position: 0 0; }
+        100% { background-position: 100% 100%; }
+      }
+
+      @keyframes sliceAppear {
+        0%, 100% { opacity: 0; transform: translateX(-100%); }
+        50% { opacity: 1; transform: translateX(100%); }
+      }
+
+      @keyframes contentShake {
+        0% { transform: translate(0); }
+        25% { transform: translate(1px, -1px); }
+        50% { transform: translate(-1px, 1px); }
+        75% { transform: translate(1px, 0px); }
+        100% { transform: translate(0); }
+      }
+      
+      @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+
+      .animate-marquee {
+        animation: marquee 25s linear infinite;
+        will-change: transform;
+      }
+
+      .mask-fade-edges {
+        -webkit-mask-image: linear-gradient(to right, transparent, black 2%, black 98%, transparent);
+        mask-image: linear-gradient(to right, transparent, black 2%, black 98% , transparent);
+      }
+    `}</style>
 
 </section>
 
@@ -358,7 +480,7 @@ const Home = () => {
         </div>
       </section>
        {/* Enquiry Dialog */}
-      <EnquiryDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
+      <EnquiryDialog open={isDialogOpen} onOpenChange={handleDialogClose} />
       <FloatingSocials />
     </div>
   );
