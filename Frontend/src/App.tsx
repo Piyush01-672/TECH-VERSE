@@ -64,6 +64,7 @@ const AppContent: React.FC = () => {
         <Route path="/codecrafter" element={<CodeCrafter />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      {location.pathname !== '/codecrafter' && <Footer />}
     </>
   );
 };
@@ -76,7 +77,6 @@ const App: React.FC = () => (
       <BrowserRouter>
         <Navbar />
         <AppContent />
-        <Footer />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

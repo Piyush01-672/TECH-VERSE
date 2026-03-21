@@ -73,20 +73,7 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden lg:block">
-            <Link to="/register">
-              <Button
-                variant="default"
-                className="bg-gradient-to-br from-[#252D6F] to-[#4676E6] shadow-lg 
-               transition-transform transform hover:scale-105 
-               hover:from-blue-500 hover:to-blue-700
-               active:scale-95 active:from-blue-600 active:to-blue-800"
-              >
-                Register Now
-              </Button>
-            </Link>
-          </div>
+
 
           {/* Mobile Menu Button */}
           <button
@@ -121,17 +108,7 @@ const Navbar = () => {
                 {item.name}
               </Link>
             ))}
-            <div className="pt-2">
-              <Link to="/register" onClick={() => setIsOpen(false)}>
-                <Button
-                  variant="default"
-                  className="w-full bg-gradient-to-r from-[#252D6F] to-[#4676E6] 
-               hover:from-blue-500 hover:to-blue-700"
-                >
-                  Register Now
-                </Button>
-              </Link>
-            </div>
+
           </div>
         )}
       </div>

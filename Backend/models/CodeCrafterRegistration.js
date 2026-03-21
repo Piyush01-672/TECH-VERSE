@@ -20,6 +20,7 @@ const CodeCrafterRegistrationSchema = new mongoose.Schema({
     girlsCount: { type: Number, default: 0 },
   },
   participants: { type: [ParticipantSchema], required: true },
+  extraGaming: { type: String, default: "None" },
   createdAt: { type: Date, default: Date.now },
 });
 

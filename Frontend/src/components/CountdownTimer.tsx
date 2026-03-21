@@ -30,18 +30,19 @@ const CountdownTimer = ({ targetDate }: { targetDate: Date }) => {
   }, [targetDate]);
   
   return (
-    <div className="flex justify-between gap-2 mt-4">
+    <div className="flex justify-between gap-3 mt-4 relative z-10 w-full">
       {[
-        { label: 'Days', value: timeLeft.days },
-        { label: 'Hours', value: timeLeft.hours },
-        { label: 'Minutes', value: timeLeft.minutes },
-        { label: 'Seconds', value: timeLeft.seconds }
+        { label: 'DYS', value: timeLeft.days },
+        { label: 'HRS', value: timeLeft.hours },
+        { label: 'MIN', value: timeLeft.minutes },
+        { label: 'SEC', value: timeLeft.seconds }
       ].map((item, idx) => (
-        <div key={idx} className="flex flex-col items-center flex-1">
-          <div className="bg-white/15 backdrop-blur-md border border-white/20 text-white text-3xl font-bold rounded-xl w-full py-4 flex items-center justify-center shadow-lg hover:scale-105 transition-all duration-300">
-            {item.value}
+        <div key={idx} className="flex flex-col items-center flex-1 relative group w-full">
+          <div className="absolute inset-0 bg-[#00F0FF]/5 blur-md transform group-hover:bg-[#00F0FF]/20 transition-all"></div>
+          <div className="bg-[#0a0f18] border border-[#1A5BFF]/40 border-t-[#00F0FF] text-[#00F0FF] font-black font-mono text-xl sm:text-2xl md:text-3xl rounded-sm w-full py-3 flex items-center justify-center relative z-10 shadow-[inner_0_0_10px_rgba(26,91,255,0.2)]">
+            {item.value.toString().padStart(2, '0')}
           </div>
-          <span className="text-white/80 text-xs mt-2 uppercase font-semibold">{item.label}</span>
+          <span className="text-white/50 text-[10px] sm:text-xs mt-2 uppercase tracking-[0.2em] font-bold">{item.label}</span>
         </div>
       ))}
     </div>

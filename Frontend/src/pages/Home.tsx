@@ -358,7 +358,7 @@ const Home = () => {
         </div>
       </section>
        {/* Enquiry Dialog */}
-      {/* <EnquiryDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} /> */}
+      <EnquiryDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
       <FloatingSocials />
     </div>
   );

@@ -1,4 +1,5 @@
 const CodeCrafterRegistration = require('../models/CodeCrafterRegistration');
+const nodemailer = require('nodemailer');
 
 const registerCodeCrafterTeam = async (req, res) => {
   try {
@@ -10,8 +11,23 @@ const registerCodeCrafterTeam = async (req, res) => {
       transactionId,
       accommodationRequired,
       accommodationDetails,
+      extraGaming,
       participants
     } = req.body;
+
+    let parsedAccommodationDetails = accommodationDetails;
+    let parsedParticipants = participants;
+
+    try {
+      if (typeof accommodationDetails === 'string') {
+        parsedAccommodationDetails = JSON.parse(accommodationDetails);
+      }
+      if (typeof participants === 'string') {
+        parsedParticipants = JSON.parse(participants);
+      }
+    } catch (parseError) {
+      console.error("JSON parsing error for FormData:", parseError);
+    }
 
     const serverUrl = `${req.protocol}://${req.get('host')}`;
     const transactionImage = req.file ? `${serverUrl}/${req.file.path.replace(/\\/g, '/')}` : '';
@@ -24,11 +40,67 @@ const registerCodeCrafterTeam = async (req, res) => {
       transactionId,
       transactionImage,
       accommodationRequired,
-      accommodationDetails,
-      participants,
+      accommodationDetails: parsedAccommodationDetails,
+      extraGaming: extraGaming || "None",
+      participants: parsedParticipants,
     });
 
     await newRegistration.save();
+
+    try {
+      if (participants && participants.length > 0) {
+        const teamLeader = participants[0];
+        if (teamLeader.email) {
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: process.env.EMAIL_USER,
+              pass: process.env.EMAIL_PASS,
+            },
+          });
+          
+          const totalMembersHtml = participants.map((p, idx) => `<li><strong>Operator ${idx + 1}:</strong> ${p.name} - ${p.college}</li>`).join('');
+
+          const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: teamLeader.email,
+            subject: 'CodeCrafter 3.0 - Registration Successful',
+            html: `
+              <div style="font-family: 'Courier New', Courier, monospace; max-width: 600px; margin: auto; padding: 20px; background-color: #060a12; color: #00F0FF; border: 2px solid #1A5BFF;">
+                <h2 style="color: #FFD54F; text-transform: uppercase;">Thank you for completing registration!</h2>
+                <p>Hello <strong>${teamLeader.name}</strong>,</p>
+                <p>Your team <strong style="color: #fff; font-size: 1.1em;">${teamName}</strong> has successfully initialized the registration sequence for Code Crafter 3.0.</p>
+                
+                <h3 style="color: #1A5BFF; border-bottom: 1px solid #00F0FF; padding-bottom: 5px;">Team Protocol Details:</h3>
+                <ul>
+                  <li><strong>Alliance Name:</strong> ${teamName}</li>
+                  <li><strong>Total Units:</strong> ${participants.length}</li>
+                </ul>
+                
+                <h3 style="color: #1A5BFF; border-bottom: 1px solid #00F0FF; padding-bottom: 5px;">Operator Register:</h3>
+                <ul style="color: #ffffff;">
+                  ${totalMembersHtml}
+                </ul>
+                
+                <br />
+                <p style="color: #00FF66; font-weight: bold;">[ SYSTEM STATUS: ENROLLED ]</p>
+                <p style="color: #00F0FF; font-size: 0.8em;">Prepare your engines.</p>
+                <p style="opacity: 0.5;">TechVerse 2026 Admin</p>
+              </div>
+            `,
+          };
+
+          if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+            await transporter.sendMail(mailOptions);
+            console.log(`Confirmation email sent to ${teamLeader.email}`);
+          } else {
+            console.log("Email env variables not set. Skipping registration email.");
+          }
+        }
+      }
+    } catch (emailError) {
+      console.error("Failed to send CodeCrafter confirmation email:", emailError);
+    }
 
     res.status(201).json({
       success: true,

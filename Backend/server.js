@@ -22,10 +22,15 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin || allowedOrigins.some(allowed => 
-      origin === allowed || origin === allowed.replace(/\/$/, '') 
-    )) {
+    // Allow requests with no origin, or localhost/127.0.0.1 for local dev, or allowed origins list
+    if (
+      !origin || 
+      origin.startsWith('http://localhost:') || 
+      origin.startsWith('http://127.0.0.1:') ||
+      allowedOrigins.some(allowed => 
+        origin === allowed || origin === allowed.replace(/\/$/, '') 
+      )
+    ) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
