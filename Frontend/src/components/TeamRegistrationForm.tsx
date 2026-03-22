@@ -385,6 +385,10 @@ const TeamRegistrationForm = () => {
                     <span className="font-bold text-xl text-white">6239500585m@pnb</span>
                   </div>
                   <div>
+                    <span className="text-[#FFD54F] text-xs grid opacity-70">REGISTRATION AMOUNT</span>
+                    <span className="font-bold text-xl text-white">500rs</span>
+                  </div>
+                  <div>
                     <span className="text-[#FFD54F] text-xs grid opacity-70">MERCHANT</span>
                     <span className="font-bold text-lg text-white">CT UNIVERSITY</span>
                   </div>
