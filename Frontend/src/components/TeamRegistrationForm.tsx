@@ -26,7 +26,7 @@ const TeamRegistrationForm = () => {
       { name: "", email: "", gender: "", college: "", program: "" },
     ],
   });
-  
+
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -179,7 +179,7 @@ const TeamRegistrationForm = () => {
             {ordinalSuffix} Operator
             {i === 0 && <span className="ml-3 text-xs text-[#FFD54F] tracking-[0.3em] font-normal">[ ALPHA ]</span>}
           </h3>
-          
+
           <div className="space-y-5">
             <div>
               <label className={labelClass}>Call Sign (Name) *</label>
@@ -219,7 +219,7 @@ const TeamRegistrationForm = () => {
         <div className="text-center py-16 bg-[#0a0f18] border border-[#00F0FF] shadow-[0_0_40px_rgba(0,240,255,0.15)] relative">
           <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-[#00F0FF]"></div>
           <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-[#00F0FF]"></div>
-          
+
           <div className="w-24 h-24 mx-auto rounded-none border-2 border-[#00F0FF] bg-[#00F0FF]/10 flex items-center justify-center text-[#00F0FF] text-4xl mb-8 shadow-[0_0_30px_rgba(0,240,255,0.4)] relative before:absolute before:inset-0 before:-m-2 before:border before:border-[#00F0FF]/30 before:animate-spin-slow">
             <Target size={40} className="animate-pulse" />
           </div>
@@ -237,7 +237,7 @@ const TeamRegistrationForm = () => {
         <form onSubmit={handleSubmit} className="space-y-12">
           {error && (
             <div className="p-4 border-l-4 border-red-500 bg-red-500/10 text-red-500 text-sm font-bold uppercase tracking-widest flex items-center gap-3 animate-pulse">
-               <span>[!]</span> {error}
+              <span>[!]</span> {error}
             </div>
           )}
 
@@ -257,14 +257,7 @@ const TeamRegistrationForm = () => {
                 <input type="tel" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required pattern="[0-9]{10}" placeholder="Leader's contact number" className={inputClass} />
               </div>
             </div>
-            <div className="space-y-2">
-              <label className={labelClass}>Combat Records (Hackathon Experience)</label>
-              <input type="text" name="hackathonExperience" value={formData.hackathonExperience} onChange={handleChange} placeholder="Briefly mention past hackathons attended (optional)" className={inputClass} />
-            </div>
-            <div className="space-y-2">
-              <label className={labelClass}>Comlink (Contact Number) *</label>
-              <input type="tel" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required pattern="\d{10}" placeholder="10-digit mobile number" className={inputClass} />
-            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className={labelClass}>CHOOSE YOUR FIGHT *</label>
@@ -339,17 +332,20 @@ const TeamRegistrationForm = () => {
               <option value="No" className="bg-[#060a12]">No lodging required</option>
               <option value="Yes" className="bg-[#060a12]">Yes, we need quarters</option>
             </select>
-            
-            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 transition-all duration-500 overflow-hidden ${formData.accommodationRequired === 'Yes' ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-              <div className="space-y-2 pt-2">
-                <label className={labelClass}>Male Operators</label>
-                <input type="number" min="0" max={formData.teamSize} value={formData.accommodationDetails.boysCount} onChange={(e) => handleAccommodationChange("boysCount", e.target.value)} placeholder="0" className={inputClass} />
+
+            {formData.accommodationRequired === 'Yes' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-fade-in">
+                <div className="space-y-2 pt-2">
+                  <label className={labelClass}>Male Operators</label>
+                  <input type="number" min="0" max={formData.teamSize} value={formData.accommodationDetails.boysCount} onChange={(e) => handleAccommodationChange("boysCount", e.target.value)} placeholder="0" className={inputClass} />
+                </div>
+                <div className="space-y-2 pt-2 min-h-[100px] mb-6 block">
+                  <label className={labelClass}>Female Operators</label>
+                  <input type="number" min="0" max={formData.teamSize} value={formData.accommodationDetails.girlsCount} onChange={(e) => handleAccommodationChange("girlsCount", e.target.value)} placeholder="0" className={`${inputClass} min-h-[50px] !h-14 block relative border-b-2`} />
+                  <div className="h-6 w-full clear-both"></div>
+                </div>
               </div>
-              <div className="space-y-2 pt-2">
-                <label className={labelClass}>Female Operators</label>
-                <input type="number" min="0" max={formData.teamSize} value={formData.accommodationDetails.girlsCount} onChange={(e) => handleAccommodationChange("girlsCount", e.target.value)} placeholder="0" className={inputClass} />
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Section 4: Extra Gaming */}
@@ -375,33 +371,33 @@ const TeamRegistrationForm = () => {
               Credit Transfer (Payment)
             </h2>
             <div className="bg-[#1A5BFF]/10 border border-[#1A5BFF]/30 p-6 flex flex-col md:flex-row gap-8 items-center cursor-crosshair">
-               <div className="flex-1 w-full space-y-4">
-                  <p className="text-[#00F0FF] text-xs leading-relaxed uppercase tracking-widest border-b border-[#1A5BFF]/30 pb-2">
-                     Scan the generated QR or use direct account transfer. Attach valid proof below.
-                  </p>
-                  <div className="text-white font-mono text-sm space-y-4 mt-4 tracking-wider">
-                     <div>
-                        <span className="text-[#FFD54F] text-xs grid opacity-70">BANK ACC NO</span>
-                        <span className="font-bold text-lg text-white">0980100100004973</span>
-                     </div>
-                     <div>
-                        <span className="text-[#FFD54F] text-xs grid opacity-70">UPI ID</span>
-                        <span className="font-bold text-xl text-white">6239500585m@pnb</span>
-                     </div>
-                     <div>
-                        <span className="text-[#FFD54F] text-xs grid opacity-70">MERCHANT</span>
-                        <span className="font-bold text-lg text-white">CT UNIVERSITY</span>
-                     </div>
+              <div className="flex-1 w-full space-y-4">
+                <p className="text-[#00F0FF] text-xs leading-relaxed uppercase tracking-widest border-b border-[#1A5BFF]/30 pb-2">
+                  Scan the generated QR or use direct account transfer. Attach valid proof below.
+                </p>
+                <div className="text-white font-mono text-sm space-y-4 mt-4 tracking-wider">
+                  <div>
+                    <span className="text-[#FFD54F] text-xs grid opacity-70">BANK ACC NO</span>
+                    <span className="font-bold text-lg text-white">0980100100004973</span>
                   </div>
-               </div>
-               
-               {/* QR Code Graphic Box (Auto-resizing to tightly hug the tall image) */}
-               <div className="bg-white p-2 sm:p-3 border-2 border-[#00F0FF] relative group shadow-[0_0_30px_rgba(0,240,255,0.2)] hover:shadow-[0_0_40px_rgba(0,240,255,0.5)] transition-all shrink-0 max-w-sm flex items-center justify-center">
-                  <img src={`/payment_qr.jpeg?timestamp=${new Date().getTime()}`} alt="UPI QR Code" className="h-56 sm:h-64 md:h-72 w-auto object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                  <div className="absolute inset-0 bg-[#00F0FF]/10 animate-pulse pointer-events-none"></div>
-                  <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-[#00F0FF]"></div>
-                  <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-[#00F0FF]"></div>
-               </div>
+                  <div>
+                    <span className="text-[#FFD54F] text-xs grid opacity-70">UPI ID</span>
+                    <span className="font-bold text-xl text-white">6239500585m@pnb</span>
+                  </div>
+                  <div>
+                    <span className="text-[#FFD54F] text-xs grid opacity-70">MERCHANT</span>
+                    <span className="font-bold text-lg text-white">CT UNIVERSITY</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* QR Code Graphic Box (Auto-resizing to tightly hug the tall image) */}
+              <div className="bg-white p-2 sm:p-3 border-2 border-[#00F0FF] relative group shadow-[0_0_30px_rgba(0,240,255,0.2)] hover:shadow-[0_0_40px_rgba(0,240,255,0.5)] transition-all shrink-0 max-w-sm flex items-center justify-center">
+                <img src={`/payment_qr.jpeg?timestamp=${new Date().getTime()}`} alt="UPI QR Code" className="h-56 sm:h-64 md:h-72 w-auto object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                <div className="absolute inset-0 bg-[#00F0FF]/10 animate-pulse pointer-events-none"></div>
+                <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-[#00F0FF]"></div>
+                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-[#00F0FF]"></div>
+              </div>
             </div>
             <div className="space-y-2">
               <label className={labelClass}>Transmission Hash (Txn ID) *</label>
@@ -415,9 +411,9 @@ const TeamRegistrationForm = () => {
 
           <div className="pt-8 relative">
             <button type="submit" disabled={loading} className="w-full relative py-4 sm:py-6 bg-[#00F0FF]/10 text-[#00F0FF] font-black uppercase tracking-[0.15em] sm:tracking-[0.4em] text-sm sm:text-xl border border-[#00F0FF] hover:bg-[#00F0FF] hover:text-[#060a12] shadow-[0_0_20px_rgba(0,240,255,0.1)] hover:shadow-[0_0_40px_rgba(0,240,255,0.6)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden">
-               <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] bg-[length:250%_250%,100%_100%] bg-no-repeat bg-[position:-100%_0,0_0] group-hover:animate-[shimmer_1.5s_infinite]"></div>
+              <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] bg-[length:250%_250%,100%_100%] bg-no-repeat bg-[position:-100%_0,0_0] group-hover:animate-[shimmer_1.5s_infinite]"></div>
               <span className="relative z-10 flex items-center justify-center gap-4">
-                 {loading ? "PROCESSING..." : "FINALIZE REGISTRATION"}
+                {loading ? "PROCESSING..." : "FINALIZE REGISTRATION"}
               </span>
             </button>
           </div>
