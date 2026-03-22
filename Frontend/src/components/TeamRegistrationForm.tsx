@@ -247,9 +247,19 @@ const TeamRegistrationForm = () => {
               <span className="w-2 h-2 bg-[#FFD54F] inline-block animate-ping"></span>
               Squad Configuration
             </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className={labelClass}>Alliance Designation (Team Name) *</label>
+                <input type="text" name="teamName" value={formData.teamName} onChange={handleChange} required placeholder="Enter your team's name" className={inputClass} />
+              </div>
+              <div className="space-y-2">
+                <label className={labelClass}>Liaison Contact (10-Digit Mobile) *</label>
+                <input type="tel" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required pattern="[0-9]{10}" placeholder="Leader's contact number" className={inputClass} />
+              </div>
+            </div>
             <div className="space-y-2">
-              <label className={labelClass}>Alliance Designation (Team Name) *</label>
-              <input type="text" name="teamName" value={formData.teamName} onChange={handleChange} required placeholder="Enter your team's name" className={inputClass} />
+              <label className={labelClass}>Combat Records (Hackathon Experience)</label>
+              <input type="text" name="hackathonExperience" value={formData.hackathonExperience} onChange={handleChange} placeholder="Briefly mention past hackathons attended (optional)" className={inputClass} />
             </div>
             <div className="space-y-2">
               <label className={labelClass}>Comlink (Contact Number) *</label>
@@ -287,18 +297,7 @@ const TeamRegistrationForm = () => {
             </div>
           </div>
 
-          {/* Section 2: Participants */}
-          <div className="space-y-6">
-            <h2 className={sectionTitleClass}>
-              <span className="w-2 h-2 bg-[#FFD54F] inline-block animate-ping"></span>
-              Operator Details [{formData.teamSize}]
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {renderParticipantFields()}
-            </div>
-          </div>
-
-          {/* Section 2.5: Theme Selection (Conditional) */}
+          {/* Section 1.5: Theme Selection (Conditional) */}
           {formData.selectedEvent === "Code Crafter 3.0 (Hackathon)" && (
             <div className="space-y-6 animate-fade-in">
               <h2 className={sectionTitleClass}>
@@ -317,6 +316,18 @@ const TeamRegistrationForm = () => {
               </div>
             </div>
           )}
+
+          {/* Section 2: Participants */}
+          <div className="space-y-6">
+            <h2 className={sectionTitleClass}>
+              <span className="w-2 h-2 bg-[#FFD54F] inline-block animate-ping"></span>
+              Operator Details [{formData.teamSize}]
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {renderParticipantFields()}
+            </div>
+          </div>
+
 
           {/* Section 3: Accommodation */}
           <div className="space-y-6">
