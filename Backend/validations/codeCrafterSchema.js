@@ -29,8 +29,11 @@ const codeCrafterRegistrationSchema = Joi.object({
     'number.max': 'Team size cannot exceed 5.',
     'any.required': 'Team size is required.',
   }),
-  contactNumber: Joi.string().pattern(/^\d{10}$/).optional().messages({
+  contactNumber: Joi.string().pattern(/^\d{10}$/).allow('').optional().messages({
     'string.pattern.base': 'Contact Number must be a valid 10-digit number.',
+  }),
+  extraGaming: Joi.string().valid('None', 'BGMI', 'Valorant').optional().messages({
+    'any.only': 'Extra Gaming must be None, BGMI, or Valorant.',
   }),
   selectedEvent: Joi.string().valid('Robo Mec 2.0', 'Code Crafter 3.0 (Hackathon)').required().messages({
     'any.only': 'Please select a valid event.',

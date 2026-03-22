@@ -9,6 +9,7 @@ const registerCodeCrafterTeam = async (req, res) => {
       teamSize,
       contactNumber,
       selectedEvent,
+      selectedTheme,
       transactionId,
       accommodationRequired,
       accommodationDetails,
@@ -30,8 +31,12 @@ const registerCodeCrafterTeam = async (req, res) => {
       console.error("JSON parsing error for FormData:", parseError);
     }
 
-    const serverUrl = `${req.protocol}://${req.get('host')}`;
-    const transactionImage = req.file ? `${serverUrl}/${req.file.path.replace(/\\/g, '/')}` : '';
+    let transactionImage = '';
+    if (req.file) {
+      const b64 = Buffer.from(req.file.buffer).toString("base64");
+      const mimeType = req.file.mimetype;
+      transactionImage = `data:${mimeType};base64,${b64}`;
+    }
 
     const newRegistration = new CodeCrafterRegistration({
       teamName,

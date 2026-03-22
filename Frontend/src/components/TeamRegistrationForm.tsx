@@ -251,6 +251,10 @@ const TeamRegistrationForm = () => {
               <label className={labelClass}>Alliance Designation (Team Name) *</label>
               <input type="text" name="teamName" value={formData.teamName} onChange={handleChange} required placeholder="Enter your team's name" className={inputClass} />
             </div>
+            <div className="space-y-2">
+              <label className={labelClass}>Comlink (Contact Number) *</label>
+              <input type="tel" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required pattern="\d{10}" placeholder="10-digit mobile number" className={inputClass} />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className={labelClass}>CHOOSE YOUR FIGHT *</label>
