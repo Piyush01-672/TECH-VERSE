@@ -8,6 +8,7 @@ const registerCodeCrafterTeam = async (req, res) => {
       hackathonExperience,
       teamSize,
       contactNumber,
+      selectedEvent,
       transactionId,
       accommodationRequired,
       accommodationDetails,
@@ -37,6 +38,8 @@ const registerCodeCrafterTeam = async (req, res) => {
       hackathonExperience,
       teamSize,
       contactNumber,
+      selectedEvent,
+      selectedTheme,
       transactionId,
       transactionImage,
       accommodationRequired,
@@ -64,16 +67,18 @@ const registerCodeCrafterTeam = async (req, res) => {
           const mailOptions = {
             from: process.env.EMAIL_USER,
             to: teamLeader.email,
-            subject: 'CodeCrafter 3.0 - Registration Successful',
+            subject: `${selectedEvent} - Registration Successful`,
             html: `
               <div style="font-family: 'Courier New', Courier, monospace; max-width: 600px; margin: auto; padding: 20px; background-color: #060a12; color: #00F0FF; border: 2px solid #1A5BFF;">
                 <h2 style="color: #FFD54F; text-transform: uppercase;">Thank you for completing registration!</h2>
                 <p>Hello <strong>${teamLeader.name}</strong>,</p>
-                <p>Your team <strong style="color: #fff; font-size: 1.1em;">${teamName}</strong> has successfully initialized the registration sequence for Code Crafter 3.0.</p>
+                <p>Your team <strong style="color: #fff; font-size: 1.1em;">${teamName}</strong> has successfully initialized the registration sequence for <strong>${selectedEvent}</strong>.</p>
                 
                 <h3 style="color: #1A5BFF; border-bottom: 1px solid #00F0FF; padding-bottom: 5px;">Team Protocol Details:</h3>
                 <ul>
                   <li><strong>Alliance Name:</strong> ${teamName}</li>
+                  <li><strong>Selected Event:</strong> ${selectedEvent}</li>
+                  ${selectedTheme ? `<li><strong>Selected Theme:</strong> ${selectedTheme}</li>` : ''}
                   <li><strong>Total Units:</strong> ${participants.length}</li>
                 </ul>
                 

@@ -17,7 +17,7 @@ const Navbar = () => {
     { name: "About us", path: "/about" },
     { name: "Sponsors", path: "/sponsors" },
     { name: "Contact", path: "/contact" },
-    { name: "CodeCrafter", path: "/codecrafter" },
+    { name: "CodeCrafter 3.0", path: "/codecrafter" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -89,9 +89,10 @@ const Navbar = () => {
           <Link
             to="/codecrafter"
             onClick={() => setIsHighlighted(false)}
-            className="font-['Orbitron'] text-[#00F0FF] shadow-[0_0_30px_rgba(0,240,255,0.9)] border-2 border-[#00F0FF] bg-black/90 px-6 py-3 rounded-xl scale-110 tracking-[0.2em] font-bold animate-pulse text-center"
+            className="font-['Orbitron'] text-[#00F0FF] shadow-[0_0_40px_rgba(0,240,255,1)] border-2 border-[#00F0FF] bg-black/90 px-8 py-4 rounded-xl scale-110 tracking-[0.2em] font-bold animate-[pulse_2s_infinite,hueRotate_4s_linear_infinite] text-center"
+            style={{ textShadow: '0 0 10px rgba(0,240,255,0.8)' }}
           >
-            CodeCrafter
+            CodeCrafter 3.0
           </Link>
         </div>
       )}

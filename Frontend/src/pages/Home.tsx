@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import {Mail,MapPin, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
@@ -15,30 +16,44 @@ import { FeatureCard } from "@/components/FeatureCard";
 const CodeCrafterTransition = () => {
   return (
     <div className="fixed inset-0 z-[100] bg-[#03060d] flex items-center justify-center overflow-hidden animate-[fadeInGlitch_2s_ease-out_forwards,fadeTransition_1s_ease-in_forwards_2.5s]">
-      {/* Glitch Layers (Faded Palette) */}
+      {/* Glitch & Fade Layers */}
       <div className="absolute inset-0 z-10 overflow-hidden">
-        {/* Main background with base glitch */}
-        <div className="absolute inset-0 animate-[glitchMain_3s_infinite] opacity-60 grayscale-[0.3]">
-          <img src="/optimus-megatron.jpg" className="hidden md:block absolute inset-0 w-full h-full object-cover" alt="" />
-          <img src="/codecrafter-mobile-bg.png" className="block md:hidden absolute inset-0 w-full h-full object-cover" alt="" />
+        {/* DESKTOP ONLY: Main background with base glitch */}
+        <div className="hidden md:block absolute inset-0 animate-[glitchMain_3s_infinite] opacity-70">
+          <img src="/optimus-megatron.jpg" className="absolute inset-0 w-full h-full object-cover" alt="" />
         </div>
 
-        {/* Faded Red Shift Layer */}
-        <div className="absolute inset-0 mix-blend-screen animate-[glitchRed_0.4s_infinite] opacity-20">
-           <img src="/optimus-megatron.jpg" className="hidden md:block absolute inset-0 w-full h-full object-cover contrast-110 saturate-50 hue-rotate-[-15deg] blur-[1px]" alt="" />
-           <img src="/codecrafter-mobile-bg.png" className="block md:hidden absolute inset-0 w-full h-full object-cover contrast-110 saturate-50 hue-rotate-[-15deg] blur-[1px]" alt="" />
+        {/* MOBILE ONLY: Clean Fade Colours Poster */}
+        <div className="md:hidden absolute inset-0 animate-[pulse_3s_ease-in-out_infinite,hueRotate_6s_linear_infinite] opacity-100">
+          <img src="/codecrafter-poster-fade.png" className="absolute inset-0 w-full h-full object-cover" alt="" />
+        </div>
+
+        {/* DESKTOP ONLY: Faded Red Shift Layer */}
+        <div className="hidden md:block absolute inset-0 mix-blend-screen animate-[glitchRed_0.4s_infinite] opacity-20">
+           <img src="/optimus-megatron.jpg" className="absolute inset-0 w-full h-full object-cover contrast-110 saturate-150 hue-rotate-[-15deg] blur-[1px]" alt="" />
         </div>
 
         {/* Faded Blue Shift Layer */}
         <div className="absolute inset-0 mix-blend-screen animate-[glitchBlue_0.3s_infinite] opacity-20">
-           <img src="/optimus-megatron.jpg" className="hidden md:block absolute inset-0 w-full h-full object-cover contrast-110 saturate-50 hue-rotate-[160deg] blur-[1px]" alt="" />
-           <img src="/codecrafter-mobile-bg.png" className="block md:hidden absolute inset-0 w-full h-full object-cover contrast-110 saturate-50 hue-rotate-[160deg] blur-[1px]" alt="" />
+           <img src="/optimus-megatron.jpg" className="hidden md:block absolute inset-0 w-full h-full object-cover contrast-110 saturate-150 hue-rotate-[160deg] blur-[1px]" alt="" />
+           <img src="/codecrafter-poster-final.png" className="block md:hidden absolute inset-0 w-full h-full object-cover contrast-150 saturate-200 hue-rotate-[180deg] blur-[2px]" alt="" />
+        </div>
+
+        {/* Intense Tearing Glitch Layer (Mobile Only) */}
+        <div className="md:hidden absolute inset-0 z-20 mix-blend-difference animate-[intenseGlitch_0.4s_infinite] opacity-30">
+           <img src="/codecrafter-poster-final.png" className="w-full h-full object-cover" alt="" />
         </div>
       </div>
 
+      {/* scanLine Overlay */}
+      <div className="absolute inset-0 z-25 pointer-events-none opacity-20 overflow-hidden">
+        <div className="w-full h-1/2 bg-gradient-to-b from-transparent via-[#00F0FF]/40 to-transparent animate-[scanLine_2s_linear_infinite]"></div>
+      </div>
+
       {/* Noise Overlay */}
-      <div className="absolute inset-0 z-20 opacity-15 pointer-events-none mix-blend-overlay animate-[noiseMove_0.2s_infinite]"
-           style={{ backgroundImage: 'url("https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Net_Noise.png")', backgroundSize: '100px 100px' }}></div>
+      <div className="absolute inset-0 z-20 opacity-30 pointer-events-none mix-blend-overlay animate-[noiseMove_0.1s_infinite]"
+           style={{ backgroundImage: 'url("https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Net_Noise.png")', backgroundSize: '150px 150px' }}></div>
+
 
       {/* Slicing Lines Overlay */}
       <div className="absolute inset-0 z-30 pointer-events-none">
@@ -482,6 +497,7 @@ const Home = () => {
        {/* Enquiry Dialog */}
       <EnquiryDialog open={isDialogOpen} onOpenChange={handleDialogClose} />
       <FloatingSocials />
+      {isTransitioning && ReactDOM.createPortal(<CodeCrafterTransition />, document.body)}
     </div>
   );
 };

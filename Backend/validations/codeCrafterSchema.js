@@ -24,14 +24,25 @@ const codeCrafterRegistrationSchema = Joi.object({
     'string.empty': 'Team Name is required.',
   }),
   hackathonExperience: Joi.string().allow('').optional(),
-  teamSize: Joi.number().integer().min(2).max(4).required().messages({
+  teamSize: Joi.number().integer().min(2).max(5).required().messages({
     'number.min': 'Team size must be at least 2.',
-    'number.max': 'Team size cannot exceed 4.',
+    'number.max': 'Team size cannot exceed 5.',
     'any.required': 'Team size is required.',
   }),
-  contactNumber: Joi.string().pattern(/^\d{10}$/).required().messages({
+  contactNumber: Joi.string().pattern(/^\d{10}$/).optional().messages({
     'string.pattern.base': 'Contact Number must be a valid 10-digit number.',
-    'any.required': 'Contact Number is required.',
+  }),
+  selectedEvent: Joi.string().valid('Robo Mec 2.0', 'Code Crafter 3.0 (Hackathon)').required().messages({
+    'any.only': 'Please select a valid event.',
+    'any.required': 'Event selection is required.',
+  }),
+  selectedTheme: Joi.string().when('selectedEvent', {
+    is: 'Code Crafter 3.0 (Hackathon)',
+    then: Joi.string().valid('FinTech', 'Agri tech', 'HealthTech', 'Open Innovation').required(),
+    otherwise: Joi.string().allow('').optional()
+  }).messages({
+    'any.only': 'Please select a valid theme.',
+    'any.required': 'Theme selection is required for the hackathon.',
   }),
   transactionId: Joi.string().required().messages({
     'string.empty': 'Transaction ID is required.',

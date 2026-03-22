@@ -11,7 +11,9 @@ const ParticipantSchema = new mongoose.Schema({
 const CodeCrafterRegistrationSchema = new mongoose.Schema({
   teamName: { type: String, required: true },
   teamSize: { type: Number, required: true },
-  contactNumber: { type: String, required: true },
+  contactNumber: { type: String, required: false },
+  selectedEvent: { type: String, required: true },
+  selectedTheme: { type: String, required: false },
   transactionId: { type: String, required: true },
   transactionImage: { type: String, required: true },
   accommodationRequired: { type: String, required: true, enum: ['Yes', 'No'] },

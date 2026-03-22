@@ -8,6 +8,8 @@ const TeamRegistrationForm = () => {
     hackathonExperience: "",
     teamSize: 2,
     contactNumber: "",
+    selectedEvent: "",
+    selectedTheme: "",
     transactionId: "",
     transactionImage: null as File | null,
     accommodationRequired: "No",
@@ -17,6 +19,7 @@ const TeamRegistrationForm = () => {
     },
     extraGaming: "None",
     participants: [
+      { name: "", email: "", gender: "", college: "", program: "" },
       { name: "", email: "", gender: "", college: "", program: "" },
       { name: "", email: "", gender: "", college: "", program: "" },
       { name: "", email: "", gender: "", college: "", program: "" },
@@ -35,7 +38,7 @@ const TeamRegistrationForm = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (name === "teamSize") {
-      const newSize = Math.min(Math.max(parseInt(value, 10) || 2, 2), 4);
+      const newSize = Math.min(Math.max(parseInt(value, 10) || 2, 2), 5);
       setFormData(prev => ({ ...prev, teamSize: newSize }));
       return;
     }
@@ -113,6 +116,8 @@ const TeamRegistrationForm = () => {
       formPayload.append("hackathonExperience", submissionData.hackathonExperience);
       formPayload.append("teamSize", submissionData.teamSize.toString());
       formPayload.append("contactNumber", submissionData.contactNumber);
+      formPayload.append("selectedEvent", submissionData.selectedEvent);
+      formPayload.append("selectedTheme", submissionData.selectedTheme);
       formPayload.append("transactionId", submissionData.transactionId);
       formPayload.append("transactionImage", submissionData.transactionImage);
       formPayload.append("accommodationRequired", submissionData.accommodationRequired);
@@ -137,12 +142,15 @@ const TeamRegistrationForm = () => {
       hackathonExperience: "",
       teamSize: 2,
       contactNumber: "",
+      selectedEvent: "",
+      selectedTheme: "",
       transactionId: "",
       transactionImage: null,
       accommodationRequired: "No",
       accommodationDetails: { boysCount: 0, girlsCount: 0 },
       extraGaming: "None",
       participants: [
+        { name: "", email: "", gender: "", college: "", program: "" },
         { name: "", email: "", gender: "", college: "", program: "" },
         { name: "", email: "", gender: "", college: "", program: "" },
         { name: "", email: "", gender: "", college: "", program: "" },
@@ -160,7 +168,7 @@ const TeamRegistrationForm = () => {
   const renderParticipantFields = () => {
     const participantFields = [];
     for (let i = 0; i < formData.teamSize; i++) {
-      const ordinalSuffix = ["First", "Second", "Third", "Fourth"][i];
+      const ordinalSuffix = ["First", "Second", "Third", "Fourth", "Fifth"][i];
       participantFields.push(
         <div key={`participant-${i}`} className="relative p-6 bg-[#0a0f18] border border-[#1A5BFF]/30 hover:border-[#00F0FF]/60 transition-colors duration-300 group">
           {/* Cyber bracket corners */}
@@ -245,16 +253,32 @@ const TeamRegistrationForm = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className={labelClass}>Total Units (Size) *</label>
-                <select name="teamSize" value={formData.teamSize} onChange={handleChange} className={inputClass + " appearance-none cursor-pointer"}>
-                  <option value="2" className="bg-[#060a12]">2 Operators</option>
-                  <option value="3" className="bg-[#060a12]">3 Operators</option>
-                  <option value="4" className="bg-[#060a12]">4 Operators</option>
+                <label className={labelClass}>CHOOSE YOUR FIGHT *</label>
+                <select name="selectedEvent" value={formData.selectedEvent} onChange={(e) => {
+                  const event = e.target.value;
+                  setFormData(prev => ({
+                    ...prev,
+                    selectedEvent: event,
+                    // Auto-adjust team size if current exceeds new limit
+                    teamSize: event === "Code Crafter 3.0 (Hackathon)" && prev.teamSize > 4 ? 4 : prev.teamSize
+                  }));
+                }} required className={inputClass + " appearance-none cursor-pointer"}>
+                  <option value="" disabled className="bg-[#060a12]">Select your fight</option>
+                  <option value="Code Crafter 3.0 (Hackathon)" className="bg-[#060a12]">Code Crafter 3.0 (Hackathon)</option>
+                  <option value="Robo Mec 2.0" className="bg-[#060a12]">Robo Mec 2.0</option>
                 </select>
               </div>
               <div className="space-y-2">
-                <label className={labelClass}>Comms Channel (Contact) *</label>
-                <input type="tel" pattern="[0-9]{10}" inputMode="numeric" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required maxLength={10} placeholder="10-digit transmission ID" className={inputClass} />
+                <label className={labelClass}>Total Units (Size) *</label>
+                <select name="teamSize" value={formData.teamSize} onChange={handleChange} className={inputClass + " appearance-none cursor-pointer"} disabled={!formData.selectedEvent}>
+                  <option value="2" className="bg-[#060a12]">2 Operators</option>
+                  <option value="3" className="bg-[#060a12]">3 Operators</option>
+                  <option value="4" className="bg-[#060a12]">4 Operators</option>
+                  {formData.selectedEvent === "Robo Mec 2.0" && (
+                    <option value="5" className="bg-[#060a12]">5 Operators</option>
+                  )}
+                </select>
+                {!formData.selectedEvent && <p className="text-[9px] text-[#00F0FF]/50 mt-1 italic">Please select an event first</p>}
               </div>
             </div>
           </div>
@@ -269,6 +293,26 @@ const TeamRegistrationForm = () => {
               {renderParticipantFields()}
             </div>
           </div>
+
+          {/* Section 2.5: Theme Selection (Conditional) */}
+          {formData.selectedEvent === "Code Crafter 3.0 (Hackathon)" && (
+            <div className="space-y-6 animate-fade-in">
+              <h2 className={sectionTitleClass}>
+                <span className="w-2 h-2 bg-[#FFD54F] inline-block animate-ping"></span>
+                Theme Selection
+              </h2>
+              <div className="space-y-2">
+                <label className={labelClass}>Choose Theme for Hackathon *</label>
+                <select name="selectedTheme" value={formData.selectedTheme} onChange={handleChange} required className={inputClass + " appearance-none cursor-pointer"}>
+                  <option value="" disabled className="bg-[#060a12]">Select a theme</option>
+                  <option value="FinTech" className="bg-[#060a12]">FinTech</option>
+                  <option value="Agri tech" className="bg-[#060a12]">Agri tech</option>
+                  <option value="HealthTech" className="bg-[#060a12]">HealthTech</option>
+                  <option value="Open Innovation" className="bg-[#060a12]">Open Innovation</option>
+                </select>
+              </div>
+            </div>
+          )}
 
           {/* Section 3: Accommodation */}
           <div className="space-y-6">

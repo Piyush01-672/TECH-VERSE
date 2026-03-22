@@ -128,6 +128,7 @@ const CodeCrafter = () => {
   const [caughtPos, setCaughtPos] = useState({ x: 0, y: 0 });
   const [customFlight, setCustomFlight] = useState(false);
   const [shattered, setShattered] = useState(false);
+  const [hoveredEvent, setHoveredEvent] = useState<number | null>(null);
   
   const shipRef = useRef<HTMLDivElement>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
@@ -135,8 +136,8 @@ const CodeCrafter = () => {
   const lastPos = useRef({ x: 0, y: 0, time: 0 });
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const gatewayOpenDate = new Date("2026-03-23T00:00:00");
-  const eventCloseDate = new Date("2026-04-15T00:00:00");
+  const gatewayOpenDate = new Date("2026-03-20T00:00:00");
+  const eventCloseDate = new Date("2026-04-18T23:59:59");
   const [isGatewayOpen, setIsGatewayOpen] = useState(new Date() >= gatewayOpenDate);
 
   useEffect(() => {
@@ -254,8 +255,19 @@ const CodeCrafter = () => {
       
       {/* Booting Overlay - Cinematic Transformers Boot */}
       {booting && (
-        <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center pointer-events-none">
-          <div className="relative w-64 h-64 flex items-center justify-center">
+        <div className="fixed inset-0 z-[100] bg-[#03060d] flex flex-col items-center justify-center pointer-events-none overflow-hidden">
+          {/* Mobile ONLY: Poster Background for the Booting Screen with Intense Glitch */}
+          <div className="md:hidden absolute inset-0 z-0 opacity-40 animate-[intenseGlitch_0.5s_infinite]">
+             <img src="/codecrafter-poster-final.png" className="w-full h-full object-cover" alt="" />
+             <div className="absolute inset-0 bg-gradient-to-t from-[#03060d] via-transparent to-[#03060d]"></div>
+          </div>
+
+          {/* scanLine Overlay */}
+          <div className="absolute inset-0 z-5 pointer-events-none opacity-20 overflow-hidden">
+            <div className="w-full h-1/2 bg-gradient-to-b from-transparent via-[#00F0FF]/40 to-transparent animate-[scanLine_2s_linear_infinite]"></div>
+          </div>
+          
+          <div className="relative z-10 w-64 h-64 flex items-center justify-center">
             {/* Outer spinning glow ring */}
             <div className="absolute w-48 h-48 rounded-full border-2 border-[#00F0FF]/20 animate-[spin_4s_linear_infinite]"
                  style={{ boxShadow: '0 0 30px rgba(0,240,255,0.1)' }}></div>
@@ -294,7 +306,7 @@ const CodeCrafter = () => {
               </g>
             </svg>
           </div>
-          <div className="text-[#00F0FF] font-['Orbitron'] tracking-[0.2em] sm:tracking-[0.5em] text-xs sm:text-sm animate-pulse mt-8 text-center px-4 w-full">
+          <div className="text-[#00F0FF] font-['Orbitron'] tracking-[0.2em] sm:tracking-[0.5em] text-xs sm:text-sm animate-[pulse_2s_infinite,rgbSplit_2s_infinite] mt-8 text-center px-4 w-full">
             INITIALIZING CODE CRAFTER...
           </div>
           <div className="w-64 sm:w-80 max-w-[90vw] h-[2px] bg-white/10 mt-6 relative overflow-hidden">
@@ -368,15 +380,15 @@ const CodeCrafter = () => {
                }}
             />
             
-            {/* Mobile Background (Using new portrait poster) */}
-            <img 
-               src="/codecrafter-mobile-bg.png" 
-               alt="Transformers Epic Background" 
-               className="block md:hidden w-full h-full object-cover"
-               onError={(e) => {
-                 console.log("Image load failed");
-               }}
-            />
+             {/* Mobile Background (9:21 tall aspect ratio for modern phones) */}
+             <img 
+                src="/codecrafter-mobile-bg.png" 
+                alt="Transformers Epic Background" 
+                className="block md:hidden w-full h-full object-cover object-top"
+                onError={(e) => {
+                  console.log("Image load failed");
+                }}
+             />
             
             {/* Soft shadow purely at the very bottom so content seamlessly flows down */}
             <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#010308] to-transparent"></div>
@@ -433,10 +445,10 @@ const CodeCrafter = () => {
           </div>
 
           {/* Spacer for Mobile so content below is pushed down appropriately */}
-          <div className="md:hidden h-[40vh] w-full pointer-events-none"></div>
+          <div className="md:hidden h-[50vh] w-full pointer-events-none"></div>
 
           {/* System Metrics with Mechanical Connectors */}
-          <div className="flex flex-row items-stretch justify-center w-full max-w-5xl mx-auto mt-8 sm:mt-16 px-1 lg:px-2 gap-1 sm:gap-0">
+          <div className="flex flex-row items-stretch justify-center w-full max-w-5xl mx-auto mt-4 sm:mt-16 px-1 lg:px-2 gap-1 sm:gap-0">
             <div className="flex-1 min-w-0">
               <HexBadge title="Total Bounty" value="₹ 2,50,000" icon={<Trophy size={24} />} delay={0.1} />
             </div>
@@ -556,11 +568,15 @@ const CodeCrafter = () => {
             <div className="mt-4 w-24 h-1 bg-[#1A5BFF] mx-auto"></div>
           </div>
 
-          <div className="relative w-full max-w-[600px] h-[350px] sm:h-[450px] flex items-center justify-center [perspective:1200px] mb-20">
+          <div className="relative w-full max-w-4xl h-[420px] sm:h-[450px] flex items-center justify-center [perspective:1200px] mb-20">
             {/* Card 1: Code Crafter 3.0 (The Hackathon) */}
-            <div className="absolute w-[280px] sm:w-[350px] h-full bg-[#0a0f1a] border-2 border-[#00F0FF]/40 rounded-xl p-6 shadow-[0_0_50px_rgba(0,240,255,0.15)] transform transition-all duration-700 ease-out 
-                            hover:z-50 hover:rotate-0 hover:translate-x-0 hover:scale-105 group cursor-pointer
-                            -rotate-12 -translate-x-20 sm:-translate-x-32" 
+            <div 
+              onMouseEnter={() => setHoveredEvent(1)}
+              onMouseLeave={() => setHoveredEvent(null)}
+              className={`absolute w-[280px] sm:w-[350px] h-full bg-[#0a0f1a] border-2 border-[#00F0FF]/40 rounded-xl p-6 shadow-[0_0_50px_rgba(0,240,255,0.15)] transform transition-all duration-700 ease-out 
+                          cursor-pointer group
+                          ${hoveredEvent === 1 ? 'z-50 rotate-0 translate-x-0 scale-105' : 'z-10 -rotate-12 -translate-x-16 sm:-translate-x-32 scale-90 sm:scale-100'}
+                          ${hoveredEvent === 2 ? 'blur-[2px] opacity-40 scale-95' : 'opacity-100'}`}
                  style={{ 
                    clipPath: 'polygon(0 20px, 20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%)',
                    backdropFilter: 'blur(10px)'
@@ -576,13 +592,13 @@ const CodeCrafter = () => {
                     <span className="text-[10px] font-mono text-[#00F0FF] opacity-60 tracking-widest">EVENT_ID: CC3.0</span>
                   </div>
                   
-                  <h3 className="text-3xl sm:text-4xl font-['Black_Ops_One'] text-white mb-2 leading-tight">CODE CRAFTER <span className="text-[#00F0FF]">3.0</span></h3>
+                  <h1 className="text-2xl sm:text-4xl font-['Black_Ops_One'] text-white mb-2 leading-tight">CODE CRAFTER <span className="text-[#00F0FF]">3.0</span></h1>
                   <div className="flex items-center gap-2 text-[#00F0FF] mb-6">
                     <Calendar size={16} />
                     <span className="font-mono text-xs font-bold tracking-widest uppercase">21-22 APRIL 2026</span>
                   </div>
                   
-                  <p className="text-gray-400 text-sm font-mono leading-relaxed mb-4">
+                  <p className="text-gray-400 text-[10px] sm:text-sm font-mono leading-relaxed mb-4">
                     The ultimate 24-hour hackathon where structural visionaries and elite coders forge real-world frameworks.
                   </p>
                 </div>
@@ -600,9 +616,13 @@ const CodeCrafter = () => {
             </div>
 
             {/* Card 2: Robo Mec 2.0 (Robo Race) */}
-            <div className="absolute w-[280px] sm:w-[350px] h-full bg-[#0a0f1a] border-2 border-[#1A5BFF]/40 rounded-xl p-6 shadow-[0_0_50px_rgba(26,91,255,0.15)] transform transition-all duration-700 ease-out 
-                            hover:z-50 hover:rotate-0 hover:translate-x-0 hover:scale-105 group cursor-pointer
-                            rotate-12 translate-x-20 sm:translate-x-32" 
+            <div 
+              onMouseEnter={() => setHoveredEvent(2)}
+              onMouseLeave={() => setHoveredEvent(null)}
+              className={`absolute w-[280px] sm:w-[350px] h-full bg-[#0a0f1a] border-2 border-[#1A5BFF]/40 rounded-xl p-6 shadow-[0_0_50px_rgba(26,91,255,0.15)] transform transition-all duration-700 ease-out 
+                          cursor-pointer group
+                          ${hoveredEvent === 2 ? 'z-50 rotate-0 translate-x-0 scale-105' : 'z-10 rotate-12 translate-x-16 sm:translate-x-32 scale-90 sm:scale-100'}
+                          ${hoveredEvent === 1 ? 'blur-[2px] opacity-40 scale-95' : 'opacity-100'}`}
                  style={{ 
                    clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20% 100%, 0 calc(100% - 20px))',
                    backdropFilter: 'blur(10px)'
@@ -618,13 +638,13 @@ const CodeCrafter = () => {
                     <span className="text-[10px] font-mono text-[#1A5BFF] opacity-60 tracking-widest">EVENT_ID: RM2.0</span>
                   </div>
                   
-                  <h3 className="text-3xl sm:text-4xl font-['Black_Ops_One'] text-white mb-2 leading-tight">ROBO MEC <span className="text-[#1A5BFF]">2.0</span></h3>
+                  <h1 className="text-2xl sm:text-4xl font-['Black_Ops_One'] text-white mb-2 leading-tight">ROBO MEC <span className="text-[#1A5BFF]">2.0</span></h1>
                   <div className="flex items-center gap-2 text-[#1A5BFF] mb-6">
                     <Calendar size={16} />
                     <span className="font-mono text-xs font-bold tracking-widest uppercase">21st APRIL 2026</span>
                   </div>
                   
-                  <div className="space-y-2 mb-4">
+                  <div className="space-y-1 mb-4">
                     {['ROBO TUG-OF-WAR', 'OBSTACLE RACE', 'LAP RACE'].map((item) => (
                       <div key={item} className="flex items-center gap-2 text-[10px] sm:text-xs font-mono text-gray-300">
                         <span className="w-1.5 h-1.5 bg-[#1A5BFF] rounded-full"></span>
