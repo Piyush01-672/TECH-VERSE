@@ -196,7 +196,7 @@ useEffect(() => {
               and Technology, is a dynamic community of innovators, developers,
               and tech enthusiasts driven by a shared passion for technology and
               creativity. Guided by the visionary leadership of Prof. Dr. Arvind
-              Kumar (Head of School), coordinated by Ms. Mandeep Kaur, and
+              Kumar (Head of School), with valuable guidance from Dr. Rajeev Sharma(Head of Department), coordinated by Ms. Mandeep Kaur, and
               supported by Dr. Harinder Pal Singh (Director – IT), the club
               serves as a vibrant platform for students to explore emerging
               technologies, enhance practical skills, and collaborate on
@@ -236,7 +236,7 @@ useEffect(() => {
             </div>
 
             {/* ✅ FIX: grid-cols-2 for mobile, lg:grid-cols-5 for desktop */}
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5 md:gap-12 lg:gap-x-16 justify-items-center">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 md:gap-12 lg:gap-x-16 justify-items-center ">
               {aboutUs.slice(3).map((member, index) => {
                 const actualIndex = index + 3;
                 const sliceLength = aboutUs.slice(3).length;
@@ -270,7 +270,7 @@ useEffect(() => {
         </div>
         <div className="flex flex-col items-center gap-14">
           {/* ✅ FIX: grid-cols-2 for mobile, lg:grid-cols-3 for desktop */}
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 md:gap-12 lg:gap-x-28 justify-items-center">
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 md:gap-12 lg:gap-x-28 justify-items-center">
             {mentors.map((member, index) => {
               const sliceLength = mentors.length;
               const isLastItemAndOdd = (index === sliceLength - 1) && (sliceLength % 2 !== 0);
@@ -429,35 +429,32 @@ useEffect(() => {
                 rounded-full blur-3xl"
               ></div>
               <svg
-                className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[200px] pointer-events-none"
-                viewBox="0 0 800 200"
-                preserveAspectRatio="xMidYMin meet"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M400 0 L400 120" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
-                <path d="M0 80 L800 80" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
-                <path d="M200 80 L600 80" className="block md:hidden" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
-                <path d="M100 80 L100 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
-                <path d="M250 80 L250 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
-                <path d="M400 80 L400 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
-                <path d="M550 80 L550 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
-                <path d="M700 80 L700 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
-                <path d="M200 80 L200 100" className="block md:hidden" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
-                <path d="M600 80 L600 100" className="block md:hidden" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
-              </svg>
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[160px] pointer-events-none"
+              viewBox="0 0 800 200"
+              preserveAspectRatio="xMidYMin meet"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M400 0 L400 80" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M50 80 L750 80" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M200 80 L600 80" className="block md:hidden" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M150 80 L150 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M316 80 L316 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M484 80 L484 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M650 80 L650 100" className="hidden md:block" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M200 80 L200 100" className="block md:hidden" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+              <path d="M600 80 L600 100" className="block md:hidden" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+            </svg>
             </div>
 
             <div className="container mx-auto px-4 mt-16 md:mt-32">
-              <div className="grid grid-cols-2 gap-4 md:flex md:justify-center md:gap-10 justify-items-center md:flex-nowrap z-10">
-                {leaders.slice(12, 17).map((member, index) => {
+              <div className="grid grid-cols-2 gap-4 md:flex md:justify-center md:gap-12 justify-items-center md:flex-nowrap">
+                {leaders.slice(12, 16).map((member, index) => {
                   const lift =
-                    index === 0 || index === 4
+                    index === 0 || index === 3
                       ? "md:-translate-y-40"
-                      : index === 1 || index === 3
+                      : index === 1 || index === 2
                       ? "md:-translate-y-7"
-                      : index === 2
-                      ? "md:-translate-y-5"
                       : "";
                   return (
                     <div key={member._id || index} className={`transition-transform duration-700 ${lift}`}>
@@ -481,7 +478,7 @@ useEffect(() => {
           </h2>
           {/* Row 7 — Single Centered Card */}
           <div className="flex justify-center mt-24 relative z-10">
-            {leaders.slice(17, 18).map((member, index) => (
+            {leaders.slice(16, 17).map((member, index) => (
               <MemberCard
                 key={member._id || index}
                 member={member}
@@ -517,7 +514,7 @@ useEffect(() => {
           {/* Row 8 — Four Cards */}
           <div className="container mx-auto px-4 mt-8 md:mt-12">
             <div className="grid grid-cols-2 gap-4 md:flex md:justify-center md:gap-12 justify-items-center md:flex-nowrap">
-              {leaders.slice(18, 22).map((member, index) => {
+              {leaders.slice(17, 21).map((member, index) => {
                 const lift =
                   index === 0 || index === 3
                     ? "md:-translate-y-32"
@@ -543,7 +540,7 @@ useEffect(() => {
 
           {/* Final Row — Leader connected to Worker */}
           <div className="relative flex flex-col justify-center items-center mt-24 gap-4">
-            {leaders.slice(22, 23).map((member, index) => (
+            {leaders.slice(21, 22).map((member, index) => (
               <MemberCard
                 key={member._id || index}
                 member={member}
@@ -569,7 +566,7 @@ useEffect(() => {
               />
             </svg>
 
-            {leaders.slice(23, 24).map((member, index) => (
+            {leaders.slice(22, 23).map((member, index) => (
               <MemberCard
                 key={member._id || index}
                 member={member}
