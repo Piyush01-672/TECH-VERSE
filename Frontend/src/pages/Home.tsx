@@ -12,6 +12,8 @@ import { EnquiryDialog } from "@/components/EnquiryDialog";
 import { Code2, Cpu, Database, Globe, Binary } from "lucide-react";
 import { FloatingSocials } from "@/components/FloatingSocials";
 import { FeatureCard } from "@/components/FeatureCard";
+import { useNavigate } from "react-router-dom";
+
 
 const CodeCrafterTransition = () => {
   return (
@@ -83,7 +85,8 @@ const Home = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [hasClosedDialogOnce, setHasClosedDialogOnce] = useState(false);
-
+    const navigate = useNavigate();
+    
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsDialogOpen(true);
@@ -273,7 +276,7 @@ const Home = () => {
 
 </div>
   {/* Moving Announcement Line */}
-  <div className="absolute bottom-5 w-full overflow-hidden cursor-default">
+  <div className="absolute bottom-5 w-full overflow-hidden cursor-default" onClick={() => navigate("/codecrafter")}>
     <div className="flex items-center gap-4 px-4 py-2 bg-black/80 backdrop-blur-sm rounded-full shadow-2xl">
       <div className="flex-shrink-0 z-10 pl-2">
         <span className="text-blue-400 font-bold text-sm md:text-base tracking-wide animate-pulse inline-block">
