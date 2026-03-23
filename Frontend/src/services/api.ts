@@ -1,17 +1,12 @@
 // API Base URL - uses environment variable or defaults to relative path for local development
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || '';
 
-// Debug log to see what URL is being used
-if (typeof window !== 'undefined') {
-  console.log('✅ API_BASE_URL:', API_BASE_URL);
-  console.log('✅ VITE_BACKEND_URL env:', import.meta.env.VITE_BACKEND_URL);
-}
+// URL logs removed for prod safety
 
 // ==================== Get Requests ====================
 
 export const getLeaders = async () => {
   const url = `${API_BASE_URL}/api/leaders`;
-  console.log('Fetching leaders from:', url);
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -24,7 +19,6 @@ export const getLeaders = async () => {
 
 export const getAboutUs = async () => {
   const url = `${API_BASE_URL}/api/aboutus`;
-  console.log('Fetching about us from:', url);
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -37,7 +31,6 @@ export const getAboutUs = async () => {
 
 export const getMentors = async () => {
   const url = `${API_BASE_URL}/api/mentors`;
-  console.log('Fetching mentors from:', url);
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -52,7 +45,6 @@ export const getGallery = async (category?: string) => {
   const url = category 
     ? `${API_BASE_URL}/api/gallery?category=${category}`
     : `${API_BASE_URL}/api/gallery`;
-  console.log('Fetching gallery from:', url);
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -67,7 +59,6 @@ export const getGallery = async (category?: string) => {
 
 export const submitContact = async (contactData: any) => {
   const url = `${API_BASE_URL}/api/contact`;
-  console.log('Submitting contact to:', url);
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -99,7 +90,6 @@ export const submitContact = async (contactData: any) => {
 
 export const submitEnquiry = async (enquiryData: any) => {
   const url = `${API_BASE_URL}/api/enquiry`;
-  console.log('Submitting enquiry to:', url);
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -131,7 +121,6 @@ export const submitEnquiry = async (enquiryData: any) => {
 
 export const registerTeam = async (submissionData: any) => {
   const url = `${API_BASE_URL}/api/register`;
-  console.log('Registering team to:', url);
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -165,7 +154,6 @@ export const registerCodeCrafterTeam = async (submissionData: FormData | any) =>
   const isFormData = submissionData instanceof FormData;
   const headers = isFormData ? {} : { 'Content-Type': 'application/json' };
   const url = `${API_BASE_URL}/api/codecrafter-register`;
-  console.log('Registering CodeCrafter team to:', url);
   
   try {
     const response = await fetch(url, {
