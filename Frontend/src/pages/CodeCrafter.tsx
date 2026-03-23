@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { BookOpen, CalendarHeart, Info, UserPlus, MapPin, Calendar, Trophy, Cpu, Zap, Target, ShieldAlert, Hexagon } from "lucide-react";
+import { BookOpen, CalendarHeart, Info, UserPlus, MapPin, Calendar, Trophy, Cpu, Zap, Target, ShieldAlert, Hexagon, Linkedin, Instagram, MessageCircle, Mail, Phone } from "lucide-react";
 import { Typewriter } from "react-simple-typewriter";
 import CountdownTimer from "../components/CountdownTimer";
 import TeamRegistrationForm from "../components/TeamRegistrationForm";
@@ -842,6 +842,81 @@ const CodeCrafter = () => {
                 </div>
               )}
 
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact & Community Section */}
+      <section className="relative z-20 py-16 px-4 bg-[#010308] border-t border-[#00F0FF]/30 overflow-hidden">
+        {/* Decorative Grid */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#00F0FF 1px, transparent 1px), linear-gradient(90deg, #00F0FF 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        
+        <div className="max-w-6xl mx-auto relative z-10">
+          
+          <div className="text-center mb-12 animate-[fadeIn_0.5s_ease-in-out]">
+            <h2 className="text-3xl sm:text-5xl font-['Black_Ops_One'] uppercase text-white tracking-[0.2em] drop-shadow-[0_0_15px_rgba(0,240,255,0.4)]">
+              COMM<span className="text-[#00F0FF]">-</span>LINK
+            </h2>
+            <div className="mt-4 w-24 h-1 bg-[#00F0FF] mx-auto shadow-[0_0_10px_#00F0FF]"></div>
+          </div>
+          
+          <div className="flex flex-col md:flex-row gap-8 lg:gap-12 justify-center w-full">
+            
+            {/* Social Links Panel */}
+            <div className="flex-1 bg-[#0a0f1a] border border-[#00F0FF]/30 p-8 relative group"
+                 style={{ clipPath: 'polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)' }}>
+              <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-[#00F0FF] opacity-50"></div>
+              <h3 className="text-[#00F0FF] font-['Orbitron'] font-bold text-xl mb-6 tracking-widest uppercase flex items-center gap-3">
+                <Hexagon size={20} className="animate-[spin_4s_linear_infinite]" /> Network Hub
+              </h3>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <a href="#" className="flex items-center gap-4 text-gray-400 hover:text-[#00F0FF] transition-all p-3 bg-black/40 border border-[#00F0FF]/10 hover:border-[#00F0FF]/50 rounded-none group/link">
+                  <Linkedin size={24} className="group-hover/link:scale-110 transition-transform" />
+                  <span className="font-mono text-sm uppercase tracking-wider">LinkedIn</span>
+                </a>
+                <a href="#" className="flex items-center gap-4 text-gray-400 hover:text-[#FF007F] transition-all p-3 bg-black/40 border border-[#FF007F]/10 hover:border-[#FF007F]/50 rounded-none group/link">
+                  <Instagram size={24} className="group-hover/link:scale-110 transition-transform" />
+                  <span className="font-mono text-sm uppercase tracking-wider">Instagram</span>
+                </a>
+                <a href="#" className="flex items-center gap-4 text-gray-400 hover:text-[#25D366] transition-all p-3 bg-black/40 border border-[#25D366]/10 hover:border-[#25D366]/50 rounded-none group/link">
+                  <MessageCircle size={24} className="group-hover/link:scale-110 transition-transform" />
+                  <span className="font-mono text-sm uppercase tracking-wider">WhatsApp Comm</span>
+                </a>
+                <a href="mailto:techverse@ctuniversity.in?subject=Enquiry:%20Code%20Crafter%203.0" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-gray-400 hover:text-white transition-all p-3 bg-black/40 border border-white/10 hover:border-white/50 rounded-none group/link">
+                  <Mail size={24} className="group-hover/link:scale-110 transition-transform shrink-0" />
+                  <span className="font-mono text-[10px] sm:text-xs tracking-wider break-all">techverse@ctuniversity.in</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Direct Lines Panel */}
+            <div className="flex-1 bg-[#0a0f1a] border border-[#1A5BFF]/30 p-8 relative group"
+                 style={{ clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px))' }}>
+              <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-[#1A5BFF] opacity-50"></div>
+              <h3 className="text-[#1A5BFF] font-['Orbitron'] font-bold text-xl mb-6 tracking-widest uppercase flex items-center gap-3">
+                <Target size={20} className="animate-pulse" /> Direct Operators
+              </h3>
+              
+              <div className="space-y-4">
+                {[
+                  { name: "Dr. Rajeev Sharma", role: "Convener", phone: "+91 95305 80394" },
+                  { name: "Mannat Behal", role: "Co-Convener", phone: "+91 98779 23514" },
+                  { name: "Rajdeep Singh", role: "Coordination", phone: "+91 79939 83771" }
+                ].map((op, i) => (
+                  <div key={i} className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-black/40 border border-[#1A5BFF]/10 hover:border-[#1A5BFF]/50 transition-colors group/op">
+                    <div>
+                      <div className="text-white font-['Orbitron'] tracking-wider text-sm">{op.name}</div>
+                      <div className="text-[10px] text-gray-500 font-mono uppercase mt-0.5 group-hover/op:text-[#1A5BFF] transition-colors">{op.role}</div>
+                    </div>
+                    <div className="flex items-center gap-2 text-[#1A5BFF] font-mono text-xs sm:text-sm whitespace-nowrap shrink-0 mt-1 sm:mt-0">
+                      <Phone size={14} className="group-hover/op:animate-bounce shrink-0" />
+                      <a href={`tel:${op.phone.replace(/\s+/g, '')}`} className="hover:text-white transition-colors">{op.phone}</a>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
