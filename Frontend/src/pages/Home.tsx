@@ -271,6 +271,18 @@ const Home = () => {
     >
       <Link to="/about">About us</Link>
     </Button>
+    <Button
+      size="lg"
+      variant="outline"
+      className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500
+      text-white
+      shadow-lg shadow-cyan-500/20
+      hover:shadow-purple-500/30
+      transition-all duration-300
+      hover:scale-105 px-10 py-6 text-lg backdrop-blur-sm hover:shadow-[0_0_25px_rgba(255,255,255,0.6)] transition-all duration-300 rounded-xl"
+    >
+      <Link to="/codecrafter">CodeCrafter</Link>
+    </Button>
     
   </div>
 

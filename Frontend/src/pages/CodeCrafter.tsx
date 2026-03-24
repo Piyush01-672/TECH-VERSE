@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { BookOpen, CalendarHeart, Info, UserPlus, MapPin, Calendar, Trophy, Cpu, Zap, Target, ShieldAlert, Hexagon, Linkedin, Instagram, MessageCircle, Mail, Phone } from "lucide-react";
+import { BookOpen, CalendarHeart, Info, UserPlus, MapPin, Calendar, Trophy, Cpu, Zap, Target, ShieldAlert, Hexagon, Linkedin, Instagram, MessageCircle, Mail, Phone, Download } from "lucide-react";
 import { Typewriter } from "react-simple-typewriter";
 import CountdownTimer from "../components/CountdownTimer";
 import TeamRegistrationForm from "../components/TeamRegistrationForm";
@@ -571,8 +571,7 @@ const CodeCrafter = () => {
           <div className="relative w-full max-w-4xl h-[420px] sm:h-[450px] flex items-center justify-center [perspective:1200px] mb-20">
             {/* Card 1: Code Crafter 3.0 (The Hackathon) */}
             <div
-              onMouseEnter={() => setHoveredEvent(1)}
-              onMouseLeave={() => setHoveredEvent(null)}
+              onClick={() => setHoveredEvent(prev => prev === 1 ? null : 1)}
               className={`absolute w-[280px] sm:w-[350px] h-full bg-[#00F0FF]/40 p-[2px] shadow-[0_0_50px_rgba(0,240,255,0.15)] transform transition-all duration-700 ease-out 
                           cursor-pointer group
                           ${hoveredEvent === 1 ? 'z-50 rotate-0 translate-x-0 scale-105' : 'z-10 -rotate-12 -translate-x-16 sm:-translate-x-32 scale-90 sm:scale-100'}
@@ -624,8 +623,7 @@ const CodeCrafter = () => {
 
             {/* Card 2: Robo Mec 2.0 (Robo Race) */}
             <div
-              onMouseEnter={() => setHoveredEvent(2)}
-              onMouseLeave={() => setHoveredEvent(null)}
+              onClick={() => setHoveredEvent(prev => prev === 2 ? null : 2)}
               className={`absolute w-[280px] sm:w-[350px] h-full bg-[#1A5BFF]/40 p-[2px] shadow-[0_0_50px_rgba(26,91,255,0.15)] transform transition-all duration-700 ease-out 
                           cursor-pointer group
                           ${hoveredEvent === 2 ? 'z-50 rotate-0 translate-x-0 scale-105' : 'z-10 rotate-12 translate-x-16 sm:translate-x-32 scale-90 sm:scale-100'}
@@ -781,6 +779,19 @@ const CodeCrafter = () => {
                         ))}
                       </ul>
                     </div>
+                  </div>
+
+                  <div className="flex justify-center mt-12">
+                    <a
+                      href="/rulebook.pdf"
+                      download="CodeCrafter_3.0_Rulebook.pdf"
+                      className="relative px-8 py-4 bg-[#0a0f1a] border border-[#00F0FF]/50 text-[#00F0FF] font-['Orbitron'] font-bold uppercase tracking-[0.2em] group overflow-hidden transition-all hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] flex items-center gap-3 hover:border-[#00F0FF]"
+                      style={{ clipPath: 'polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)' }}
+                    >
+                      <span className="absolute inset-0 bg-gradient-to-r from-[#00F0FF]/0 via-[#00F0FF]/20 to-[#00F0FF]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></span>
+                      <Download size={20} className="relative z-10 group-hover:-translate-y-1 transition-transform duration-300" />
+                      <span className="relative z-10">DOWNLOAD RULEBOOK</span>
+                    </a>
                   </div>
                 </div>
               )}
