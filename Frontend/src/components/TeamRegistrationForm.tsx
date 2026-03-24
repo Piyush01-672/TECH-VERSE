@@ -7,7 +7,6 @@ const TeamRegistrationForm = () => {
     teamName: "",
     hackathonExperience: "",
     teamSize: 2,
-    contactNumber: "",
     selectedEvent: "",
     selectedTheme: "",
     transactionId: "",
@@ -19,11 +18,11 @@ const TeamRegistrationForm = () => {
     },
     extraGaming: "None",
     participants: [
-      { name: "", email: "", gender: "", college: "", program: "" },
-      { name: "", email: "", gender: "", college: "", program: "" },
-      { name: "", email: "", gender: "", college: "", program: "" },
-      { name: "", email: "", gender: "", college: "", program: "" },
-      { name: "", email: "", gender: "", college: "", program: "" },
+      { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
+      { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
+      { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
+      { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
+      { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
     ],
   });
 
@@ -115,7 +114,6 @@ const TeamRegistrationForm = () => {
       formPayload.append("teamName", submissionData.teamName);
       formPayload.append("hackathonExperience", submissionData.hackathonExperience);
       formPayload.append("teamSize", submissionData.teamSize.toString());
-      formPayload.append("contactNumber", submissionData.contactNumber);
       formPayload.append("selectedEvent", submissionData.selectedEvent);
       formPayload.append("selectedTheme", submissionData.selectedTheme);
       formPayload.append("transactionId", submissionData.transactionId);
@@ -141,7 +139,6 @@ const TeamRegistrationForm = () => {
       teamName: "",
       hackathonExperience: "",
       teamSize: 2,
-      contactNumber: "",
       selectedEvent: "",
       selectedTheme: "",
       transactionId: "",
@@ -150,11 +147,11 @@ const TeamRegistrationForm = () => {
       accommodationDetails: { boysCount: 0, girlsCount: 0 },
       extraGaming: "None",
       participants: [
-        { name: "", email: "", gender: "", college: "", program: "" },
-        { name: "", email: "", gender: "", college: "", program: "" },
-        { name: "", email: "", gender: "", college: "", program: "" },
-        { name: "", email: "", gender: "", college: "", program: "" },
-        { name: "", email: "", gender: "", college: "", program: "" },
+        { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
+        { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
+        { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
+        { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
+        { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
       ],
     });
     setSubmitted(false);
@@ -188,6 +185,10 @@ const TeamRegistrationForm = () => {
             <div>
               <label className={labelClass}>Network Uplink (Email) *</label>
               <input type="email" name={`participant${i + 1}Email`} value={formData.participants[i].email} onChange={(e) => handleParticipantChange(i, "email", e.target.value)} required placeholder={`Enter email`} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Comms Link (10-Digit Mobile) *</label>
+              <input type="tel" name={`participant${i + 1}Contact`} value={formData.participants[i].contactNumber} onChange={(e) => handleParticipantChange(i, "contactNumber", e.target.value)} required pattern="[0-9]{10}" placeholder="Operator's contact number" className={inputClass} />
             </div>
             <div>
               <label className={labelClass}>Identity (Gender) *</label>
@@ -248,13 +249,9 @@ const TeamRegistrationForm = () => {
               Squad Configuration
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
+              <div className="space-y-2 md:col-span-2">
                 <label className={labelClass}>Alliance Designation (Team Name) *</label>
                 <input type="text" name="teamName" value={formData.teamName} onChange={handleChange} required placeholder="Enter your team's name" className={inputClass} />
-              </div>
-              <div className="space-y-2">
-                <label className={labelClass}>Liaison Contact (10-Digit Mobile) *</label>
-                <input type="tel" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required pattern="[0-9]{10}" placeholder="Leader's contact number" className={inputClass} />
               </div>
             </div>
 

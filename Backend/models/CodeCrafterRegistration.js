@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const ParticipantSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
+  contactNumber: { type: String, required: true },
   gender: { type: String, required: true },
   college: { type: String, required: true },
   program: { type: String, required: true },
@@ -11,7 +12,6 @@ const ParticipantSchema = new mongoose.Schema({
 const CodeCrafterRegistrationSchema = new mongoose.Schema({
   teamName: { type: String, required: true },
   teamSize: { type: Number, required: true },
-  contactNumber: { type: String, required: false },
   selectedEvent: { type: String, required: true },
   selectedTheme: { type: String, required: false },
   transactionId: { type: String, required: true },

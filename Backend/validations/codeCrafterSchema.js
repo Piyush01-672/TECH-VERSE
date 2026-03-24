@@ -8,6 +8,10 @@ const participantSchema = Joi.object({
     'string.email': 'Participant must provide a valid email.',
     'string.empty': 'Participant email is required.',
   }),
+  contactNumber: Joi.string().pattern(/^\d{10}$/).required().messages({
+    'string.pattern.base': 'Contact Number must be a valid 10-digit number.',
+    'string.empty': 'Participant contact number is required.',
+  }),
   gender: Joi.string().valid('Male', 'Female', 'Other').required().messages({
     'any.only': 'Gender must be Male, Female, or Other.',
   }),
@@ -28,9 +32,6 @@ const codeCrafterRegistrationSchema = Joi.object({
     'number.min': 'Team size must be at least 2.',
     'number.max': 'Team size cannot exceed 5.',
     'any.required': 'Team size is required.',
-  }),
-  contactNumber: Joi.string().pattern(/^\d{10}$/).allow('').optional().messages({
-    'string.pattern.base': 'Contact Number must be a valid 10-digit number.',
   }),
   extraGaming: Joi.string().valid('None', 'BGMI', 'Valorant').optional().messages({
     'any.only': 'Extra Gaming must be None, BGMI, or Valorant.',

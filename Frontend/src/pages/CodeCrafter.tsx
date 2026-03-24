@@ -914,7 +914,7 @@ const CodeCrafter = () => {
                 {[
                   { name: "Faculty Co-ordinator", phone: "+91 95305 80394" },
                   { name: "Student Co-ordinator", phone: "+91 9596217411" },
-                  { name: "Student Co-ordinator", phone: "+91 79939 83771" }
+                  { name: "Student Coordinator", phone: "+91 79939 83771" }
                 ].map((op, i) => (
                   <div key={i} className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-black/40 border border-[#1A5BFF]/10 hover:border-[#1A5BFF]/50 transition-colors group/op">
                     <div>
