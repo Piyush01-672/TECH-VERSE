@@ -883,15 +883,15 @@ const CodeCrafter = () => {
               </h3>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <a href="#" className="flex items-center gap-4 text-gray-400 hover:text-[#00F0FF] transition-all p-3 bg-black/40 border border-[#00F0FF]/10 hover:border-[#00F0FF]/50 rounded-none group/link">
+                <a href="https://www.linkedin.com/in/tech-verse-aa3357351?utm_source=share_via&utm_content=profile&utm_medium=member_android" className="flex items-center gap-4 text-gray-400 hover:text-[#00F0FF] transition-all p-3 bg-black/40 border border-[#00F0FF]/10 hover:border-[#00F0FF]/50 rounded-none group/link">
                   <Linkedin size={24} className="group-hover/link:scale-110 transition-transform" />
                   <span className="font-mono text-sm uppercase tracking-wider">LinkedIn</span>
                 </a>
-                <a href="#" className="flex items-center gap-4 text-gray-400 hover:text-[#FF007F] transition-all p-3 bg-black/40 border border-[#FF007F]/10 hover:border-[#FF007F]/50 rounded-none group/link">
+                <a href="https://www.instagram.com/tech.versectu?igsh=czd1Z3Rrd24zdDFr" className="flex items-center gap-4 text-gray-400 hover:text-[#FF007F] transition-all p-3 bg-black/40 border border-[#FF007F]/10 hover:border-[#FF007F]/50 rounded-none group/link">
                   <Instagram size={24} className="group-hover/link:scale-110 transition-transform" />
                   <span className="font-mono text-sm uppercase tracking-wider">Instagram</span>
                 </a>
-                <a href="#" className="flex items-center gap-4 text-gray-400 hover:text-[#25D366] transition-all p-3 bg-black/40 border border-[#25D366]/10 hover:border-[#25D366]/50 rounded-none group/link">
+                <a href="https://chat.whatsapp.com/Dj76TB35v07JFirQjgzMR6?mode=gi_t" className="flex items-center gap-4 text-gray-400 hover:text-[#25D366] transition-all p-3 bg-black/40 border border-[#25D366]/10 hover:border-[#25D366]/50 rounded-none group/link">
                   <MessageCircle size={24} className="group-hover/link:scale-110 transition-transform" />
                   <span className="font-mono text-sm uppercase tracking-wider">WhatsApp Comm</span>
                 </a>
@@ -912,14 +912,13 @@ const CodeCrafter = () => {
               
               <div className="space-y-4">
                 {[
-                  { name: "Dr. Rajeev Sharma", role: "Convener", phone: "+91 95305 80394" },
-                  { name: "Mannat Behal", role: "Co-Convener", phone: "+91 98779 23514" },
-                  { name: "Rajdeep Singh", role: "Coordination", phone: "+91 79939 83771" }
+                  { name: "Faculty Cordinator", phone: "+91 95305 80394" },
+                  { name: "Student Cordinator", phone: "+91 9596217411" },
+                  { name: "Student Coordinator", phone: "+91 79939 83771" }
                 ].map((op, i) => (
                   <div key={i} className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-black/40 border border-[#1A5BFF]/10 hover:border-[#1A5BFF]/50 transition-colors group/op">
                     <div>
                       <div className="text-white font-['Orbitron'] tracking-wider text-sm">{op.name}</div>
-                      <div className="text-[10px] text-gray-500 font-mono uppercase mt-0.5 group-hover/op:text-[#1A5BFF] transition-colors">{op.role}</div>
                     </div>
                     <div className="flex items-center gap-2 text-[#1A5BFF] font-mono text-xs sm:text-sm whitespace-nowrap shrink-0 mt-1 sm:mt-0">
                       <Phone size={14} className="group-hover/op:animate-bounce shrink-0" />
