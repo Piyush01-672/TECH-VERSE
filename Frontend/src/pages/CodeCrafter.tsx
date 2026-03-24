@@ -883,7 +883,7 @@ const CodeCrafter = () => {
               </h3>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <a href="https://www.linkedin.com/in/tech-verse-aa3357351?utm_source=share_via&utm_content=profile&utm_medium=member_android" className="flex items-center gap-4 text-gray-400 hover:text-[#00F0FF] transition-all p-3 bg-black/40 border border-[#00F0FF]/10 hover:border-[#00F0FF]/50 rounded-none group/link">
+                <a href="https://www.linkedin.com/company/techverse-club-ct-university/" className="flex items-center gap-4 text-gray-400 hover:text-[#00F0FF] transition-all p-3 bg-black/40 border border-[#00F0FF]/10 hover:border-[#00F0FF]/50 rounded-none group/link">
                   <Linkedin size={24} className="group-hover/link:scale-110 transition-transform" />
                   <span className="font-mono text-sm uppercase tracking-wider">LinkedIn</span>
                 </a>
@@ -912,9 +912,9 @@ const CodeCrafter = () => {
               
               <div className="space-y-4">
                 {[
-                  { name: "Faculty Cordinator", phone: "+91 95305 80394" },
-                  { name: "Student Cordinator", phone: "+91 9596217411" },
-                  { name: "Student Coordinator", phone: "+91 79939 83771" }
+                  { name: "Faculty Co-ordinator", phone: "+91 95305 80394" },
+                  { name: "Student Co-ordinator", phone: "+91 9596217411" },
+                  { name: "Student Co-ordinator", phone: "+91 79939 83771" }
                 ].map((op, i) => (
                   <div key={i} className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-black/40 border border-[#1A5BFF]/10 hover:border-[#1A5BFF]/50 transition-colors group/op">
                     <div>
