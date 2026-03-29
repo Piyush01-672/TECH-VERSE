@@ -374,7 +374,7 @@ const TeamRegistrationForm = () => {
             </h2>
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className={labelClass}>How did you hear about us?</label>
+
                 <select name="referralType" value={formData.referralType} onChange={handleChange} className={inputClass + " appearance-none cursor-pointer"}>
                   <option value="" className="bg-[#060a12]">Select Referral...</option>
                   <option value="Community" className="bg-[#060a12]">Community</option>
