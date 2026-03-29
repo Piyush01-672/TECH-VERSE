@@ -13,7 +13,9 @@ const registerCodeCrafterTeam = async (req, res) => {
       accommodationRequired,
       accommodationDetails,
       extraGaming,
-      participants
+      participants,
+      referralType,
+      referralCommunityName
     } = req.body;
 
     let parsedAccommodationDetails = accommodationDetails;
@@ -57,6 +59,8 @@ const registerCodeCrafterTeam = async (req, res) => {
       accommodationDetails: parsedAccommodationDetails,
       extraGaming: extraGaming || "None",
       participants: parsedParticipants,
+      referralType: referralType || '',
+      referralCommunityName: referralCommunityName || '',
     });
 
     await newRegistration.save();

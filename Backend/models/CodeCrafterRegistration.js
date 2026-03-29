@@ -23,6 +23,8 @@ const CodeCrafterRegistrationSchema = new mongoose.Schema({
   },
   participants: { type: [ParticipantSchema], required: true },
   extraGaming: { type: String, default: "None" },
+  referralType: { type: String, enum: ['Community', 'Other', ''], default: '' },
+  referralCommunityName: { type: String, default: '' },
   createdAt: { type: Date, default: Date.now },
 });
 
