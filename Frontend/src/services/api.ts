@@ -181,3 +181,35 @@ export const registerCodeCrafterTeam = async (submissionData: FormData | any) =>
     throw error;
   }
 };
+
+export const registerRoboMechTeam = async (submissionData: FormData | any) => {
+  const isFormData = submissionData instanceof FormData;
+  const headers = isFormData ? {} : { 'Content-Type': 'application/json' };
+  const url = `${API_BASE_URL}/api/robomech-register`;
+  
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: isFormData ? submissionData : JSON.stringify(submissionData),
+    });
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (e) {
+      data = {};
+    }
+
+    if (!response.ok) {
+      const error: any = new Error(data.message || 'Registration failed. Please try again.');
+      error.response = { data };
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error registering RoboMech team:', error);
+    throw error;
+  }
+};

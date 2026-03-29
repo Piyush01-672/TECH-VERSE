@@ -122,6 +122,7 @@ const CodeCrafter = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [booting, setBooting] = useState(true);
   const [rebuilding, setRebuilding] = useState(false);
+  const [displayEvent, setDisplayEvent] = useState<"cc" | "rm">("cc");
 
   // --- Spaceship Interaction States ---
   const [isCaught, setIsCaught] = useState(false);
@@ -571,7 +572,10 @@ const CodeCrafter = () => {
           <div className="relative w-full max-w-4xl h-[420px] sm:h-[450px] flex items-center justify-center [perspective:1200px] mb-20">
             {/* Card 1: Code Crafter 3.0 (The Hackathon) */}
             <div
-              onClick={() => setHoveredEvent(prev => prev === 1 ? null : 1)}
+              onClick={() => {
+                setHoveredEvent(prev => prev === 1 ? null : 1);
+                setDisplayEvent("cc");
+              }}
               className={`absolute w-[280px] sm:w-[350px] h-full bg-[#00F0FF]/40 p-[2px] shadow-[0_0_50px_rgba(0,240,255,0.15)] transform transition-all duration-700 ease-out 
                           cursor-pointer group
                           ${hoveredEvent === 1 ? 'z-50 rotate-0 translate-x-0 scale-105' : 'z-10 -rotate-12 -translate-x-16 sm:-translate-x-32 scale-90 sm:scale-100'}
@@ -623,7 +627,10 @@ const CodeCrafter = () => {
 
             {/* Card 2: Robo Mec 2.0 (Robo Race) */}
             <div
-              onClick={() => setHoveredEvent(prev => prev === 2 ? null : 2)}
+              onClick={() => {
+                setHoveredEvent(prev => prev === 2 ? null : 2);
+                setDisplayEvent("rm");
+              }}
               className={`absolute w-[280px] sm:w-[350px] h-full bg-[#1A5BFF]/40 p-[2px] shadow-[0_0_50px_rgba(26,91,255,0.15)] transform transition-all duration-700 ease-out 
                           cursor-pointer group
                           ${hoveredEvent === 2 ? 'z-50 rotate-0 translate-x-0 scale-105' : 'z-10 rotate-12 translate-x-16 sm:translate-x-32 scale-90 sm:scale-100'}
@@ -686,6 +693,32 @@ const CodeCrafter = () => {
         <div className="absolute -top-[14px] left-1/2 -translate-x-1/2 w-8 h-8 rotate-45 border-b border-r border-[#00F0FF] bg-[#010308]"></div>
 
         <div className="max-w-6xl mx-auto">
+          {/* Event Selector Toggle */}
+          <div className="flex justify-center mb-8">
+            <div className="bg-[#03050a] border border-[#00F0FF]/30 p-1 flex shadow-[0_0_15px_rgba(0,240,255,0.1)]" style={{ clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)' }}>
+              <button 
+                onClick={() => {
+                  setDisplayEvent("cc");
+                  setHoveredEvent(1);
+                  document.querySelector('.relative.w-full.max-w-4xl.h-\\[420px\\]')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); // gently scroll up
+                }}
+                className={`px-8 py-2 font-['Orbitron'] text-[10px] sm:text-xs font-bold uppercase transition-all tracking-[0.2em] ${displayEvent === "cc" ? "bg-[#00F0FF]/20 text-[#00F0FF] border border-[#00F0FF]" : "text-gray-500 hover:text-white border border-transparent"} `}
+                style={{ clipPath: 'polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%)' }}>
+                Code Crafter
+              </button>
+              <button 
+                onClick={() => {
+                  setDisplayEvent("rm");
+                  setHoveredEvent(2);
+                  document.querySelector('.relative.w-full.max-w-4xl.h-\\[420px\\]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }}
+                className={`px-8 py-2 font-['Orbitron'] text-[10px] sm:text-xs font-bold uppercase transition-all tracking-[0.2em] ${displayEvent === "rm" ? "bg-[#1A5BFF]/20 text-[#1A5BFF] border border-[#1A5BFF]" : "text-gray-500 hover:text-white border border-transparent"}`}
+                style={{ clipPath: 'polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%)' }}>
+                Robo Mec
+              </button>
+            </div>
+          </div>
+          
           {/* Mechanical Tab Switches */}
           <div className="flex flex-wrap md:flex-nowrap justify-center gap-4 mb-12">
             {tabs.map((tab) => {
@@ -729,21 +762,36 @@ const CodeCrafter = () => {
 
               {activeTab === 'about' && (
                 <div className="max-w-4xl mx-auto space-y-10">
-                  <h2 className="text-4xl sm:text-5xl font-['Black_Ops_One'] uppercase text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500 mb-8 border-l-4 border-[#00F0FF] pl-6 py-2">
+                  <h2 className={`text-4xl sm:text-5xl font-['Black_Ops_One'] uppercase text-transparent bg-clip-text bg-gradient-to-r ${displayEvent === 'cc' ? 'from-white to-gray-500' : 'from-[#1A5BFF] to-gray-500'} mb-8 border-l-4 ${displayEvent === 'cc' ? 'border-[#00F0FF]' : 'border-[#1A5BFF]'} pl-6 py-2`}>
                     Primary Directive
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-lg font-mono">
-                    <div className="bg-[#0b101a]/80 p-8 border border-[#1A5BFF]/30 relative group hover:border-[#00F0FF] hover:shadow-[0_0_30px_rgba(0,240,255,0.1)] transition-all">
-                      <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-[#00F0FF] opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      <div className="text-[#00F0FF] mb-4"><Zap size={40} /></div>
-                      <p>An advanced 24-hour cycle to unify elite mechanics in programming, interface design, and systems architecture. Our primary objective is to accelerate innovation and forge real-world frameworks.</p>
+                  {displayEvent === "cc" ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-lg font-mono">
+                      <div className="bg-[#0b101a]/80 p-8 border border-[#1A5BFF]/30 relative group hover:border-[#00F0FF] hover:shadow-[0_0_30px_rgba(0,240,255,0.1)] transition-all">
+                        <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-[#00F0FF] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="text-[#00F0FF] mb-4"><Zap size={40} /></div>
+                        <p>An advanced 24-hour cycle to unify elite mechanics in programming, interface design, and systems architecture. Our primary objective is to accelerate innovation and forge real-world frameworks.</p>
+                      </div>
+                      <div className="bg-[#0b101a]/80 p-8 border border-[#1A5BFF]/30 relative group hover:border-[#00F0FF] hover:shadow-[0_0_30px_rgba(0,240,255,0.1)] transition-all">
+                        <div className="absolute bottom-0 left-0 w-12 h-12 border-b border-l border-[#00F0FF] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="text-[#00F0FF] mb-4"><Cpu size={40} /></div>
+                        <p>Whether you are an integrated systems dev, creative architect, or structural visionary, Code Crafter presents an optimal environment to execute data, establish connections, and deploy superior technical solutions.</p>
+                      </div>
                     </div>
-                    <div className="bg-[#0b101a]/80 p-8 border border-[#1A5BFF]/30 relative group hover:border-[#00F0FF] hover:shadow-[0_0_30px_rgba(0,240,255,0.1)] transition-all">
-                      <div className="absolute bottom-0 left-0 w-12 h-12 border-b border-l border-[#00F0FF] opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      <div className="text-[#00F0FF] mb-4"><Cpu size={40} /></div>
-                      <p>Whether you are an integrated systems dev, creative architect, or structural visionary, Code Crafter presents an optimal environment to execute data, establish connections, and deploy superior technical solutions.</p>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-lg font-mono">
+                      <div className="bg-[#0b101a]/80 p-8 border border-[#1A5BFF]/30 relative group hover:border-[#1A5BFF] hover:shadow-[0_0_30px_rgba(26,91,255,0.1)] transition-all">
+                        <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-[#1A5BFF] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="text-[#1A5BFF] mb-4"><Target size={40} /></div>
+                        <p>A battleground for mechanical and robotics engineering minds. Build and command supreme machines in a physical arena. Dominate through engineering, speed, and strategic strength.</p>
+                      </div>
+                      <div className="bg-[#0b101a]/80 p-8 border border-[#1A5BFF]/30 relative group hover:border-[#1A5BFF] hover:shadow-[0_0_30px_rgba(26,91,255,0.1)] transition-all">
+                        <div className="absolute bottom-0 left-0 w-12 h-12 border-b border-l border-[#1A5BFF] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="text-[#1A5BFF] mb-4"><Zap size={40} /></div>
+                        <p>Robo Mec challenges operators to navigate obstacle courses, engage in tug-of-war, and test endurance. Only the strongest and most resilient creations will survive.</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                   <div className="flex flex-nowrap justify-center gap-2 sm:gap-6 mt-12 overflow-x-auto pb-4 sm:pb-0">
                     {[{ n: '24H', l: 'CYCLE' }, { n: '1000+', l: 'OPERATORS' }, { n: '₹2.5L', l: 'PRIZE POOL' }].map((s, i) => (
                       <div key={i} className="flex flex-col items-center justify-center bg-[#060a12] border-y border-[#00F0FF]/20 px-4 sm:px-10 py-4 sm:py-6 min-w-[100px] sm:min-w-[200px] flex-1">
@@ -783,9 +831,9 @@ const CodeCrafter = () => {
 
                   <div className="flex justify-center mt-12">
                     <a
-                      href="/rulebook.pdf"
-                      download="CodeCrafter_3.0_Rulebook.pdf"
-                      className="relative px-8 py-4 bg-[#0a0f1a] border border-[#00F0FF]/50 text-[#00F0FF] font-['Orbitron'] font-bold uppercase tracking-[0.2em] group overflow-hidden transition-all hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] flex items-center gap-3 hover:border-[#00F0FF]"
+                      href={displayEvent === "cc" ? "/rulebook.pdf" : "/roborulebook.pdf"}
+                      download={displayEvent === "cc" ? "CodeCrafter_3.0_Rulebook.pdf" : "RoboMec_2.0_Rulebook.pdf"}
+                      className={`relative px-8 py-4 bg-[#0a0f1a] border ${displayEvent === 'cc' ? 'border-[#00F0FF]/50 text-[#00F0FF] hover:border-[#00F0FF] hover:shadow-[0_0_30px_rgba(0,240,255,0.4)]' : 'border-[#1A5BFF]/50 text-[#1A5BFF] hover:border-[#1A5BFF] hover:shadow-[0_0_30px_rgba(26,91,255,0.4)]'} font-['Orbitron'] font-bold uppercase tracking-[0.2em] group overflow-hidden transition-all flex items-center gap-3`}
                       style={{ clipPath: 'polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)' }}
                     >
                       <span className="absolute inset-0 bg-gradient-to-r from-[#00F0FF]/0 via-[#00F0FF]/20 to-[#00F0FF]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></span>
@@ -837,7 +885,7 @@ const CodeCrafter = () => {
 
                     <div className="relative z-10">
                       {isGatewayOpen ? (
-                        <TeamRegistrationForm />
+                        <TeamRegistrationForm displayEvent={displayEvent} onDisplayEventChange={setDisplayEvent} />
                       ) : (
                         <div className="flex flex-col items-center justify-center py-20 text-center space-y-8">
                           <h3 className="text-2xl sm:text-4xl font-['Orbitron'] text-[#00F0FF] animate-pulse uppercase tracking-widest">

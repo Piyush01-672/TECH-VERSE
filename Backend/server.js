@@ -77,6 +77,7 @@ app.use('/api/enquiry', require('./routes/Enquiry'));
 app.use('/api/mentors', require('./routes/Mentor'));
 app.use('/api/register', require('./routes/RegistrationServer'));
 app.use('/api/codecrafter-register', require('./routes/CodeCrafterRegistrationServer'));
+app.use('/api/robomech-register', require('./routes/RoboMechRegistrationServer'));
 
 // ==========================
 // ✅ Health Check Route

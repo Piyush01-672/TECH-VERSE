@@ -9,11 +9,10 @@ const ParticipantSchema = new mongoose.Schema({
   program: { type: String, required: true },
 });
 
-const CodeCrafterRegistrationSchema = new mongoose.Schema({
+const RoboMechRegistrationSchema = new mongoose.Schema({
   teamName: { type: String, required: true, unique: true },
   teamSize: { type: Number, required: true },
   selectedEvent: { type: String, required: true },
-  selectedTheme: { type: String, required: false },
   transactionId: { type: String, required: true },
   transactionImage: { type: String, required: true },
   accommodationRequired: { type: String, required: true, enum: ['Yes', 'No'] },
@@ -26,4 +25,4 @@ const CodeCrafterRegistrationSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("CodeCrafterRegistration", CodeCrafterRegistrationSchema);
+module.exports = mongoose.model("RoboMechRegistration", RoboMechRegistrationSchema);
