@@ -22,8 +22,9 @@ const TeamRegistrationForm = () => {
       { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
       { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
       { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
-      { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
     ],
+    referralType: "",
+    referralCommunityName: "",
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -121,6 +122,8 @@ const TeamRegistrationForm = () => {
       formPayload.append("accommodationRequired", submissionData.accommodationRequired);
       formPayload.append("accommodationDetails", JSON.stringify(submissionData.accommodationDetails));
       formPayload.append("extraGaming", submissionData.extraGaming as string);
+      formPayload.append("referralType", submissionData.referralType);
+      formPayload.append("referralCommunityName", submissionData.referralCommunityName);
       formPayload.append("participants", JSON.stringify(submissionData.participants));
 
       await registerCodeCrafterTeam(formPayload as any);
@@ -153,6 +156,8 @@ const TeamRegistrationForm = () => {
         { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
         { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
       ],
+      referralType: "",
+      referralCommunityName: "",
     });
     setSubmitted(false);
     setError(null);
@@ -361,7 +366,31 @@ const TeamRegistrationForm = () => {
             </div>
           </div>
 
-          {/* Section 5: Transaction */}
+          {/* Section 5: Referral */}
+          <div className="space-y-6">
+            <h2 className={sectionTitleClass}>
+              <span className="w-2 h-2 bg-[#FFD54F] inline-block animate-ping"></span>
+              Referral Protocol (Optional)
+            </h2>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className={labelClass}>How did you hear about us?</label>
+                <select name="referralType" value={formData.referralType} onChange={handleChange} className={inputClass + " appearance-none cursor-pointer"}>
+                  <option value="" className="bg-[#060a12]">Select Referral...</option>
+                  <option value="Community" className="bg-[#060a12]">Community</option>
+                  <option value="Other" className="bg-[#060a12]">Other</option>
+                </select>
+              </div>
+              {formData.referralType === "Community" && (
+                <div className="space-y-2 animate-fade-in">
+                  <label className={labelClass}>Community Name *</label>
+                  <input type="text" name="referralCommunityName" value={formData.referralCommunityName} onChange={handleChange} placeholder="Enter your community's name" className={inputClass} required={formData.referralType === "Community"} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Section 6: Transaction */}
           <div className="space-y-6">
             <h2 className={sectionTitleClass}>
               <span className="w-2 h-2 bg-[#FFD54F] inline-block animate-ping"></span>
