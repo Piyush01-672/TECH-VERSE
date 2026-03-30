@@ -3,6 +3,7 @@ import { BookOpen, CalendarHeart, Info, UserPlus, MapPin, Calendar, Trophy, Cpu,
 import { Typewriter } from "react-simple-typewriter";
 import CountdownTimer from "../components/CountdownTimer";
 import TeamRegistrationForm from "../components/TeamRegistrationForm";
+import CodeCrafterWhyJoin from '../components/CodeCrafterWhyJoin';
 
 // Mechanical Gear SVG for Transformers-style connectors
 const MechanicalGear = ({ size = 40, className = "" }: { size?: number, className?: string }) => (
@@ -162,7 +163,7 @@ const CodeCrafter = () => {
         // Reset all states and begin standard interval
         triggerSpaceshipFlyby();
       }, 8000); // 6s flight + 2s rest
-    }, 2500);
+    }, 1000);
 
     const handleScroll = () => setScrollY(window.scrollY);
     const handleMouseMove = (e: MouseEvent) => setMousePos({ x: e.clientX, y: e.clientY });
@@ -270,12 +271,12 @@ const CodeCrafter = () => {
 
           <div className="relative z-10 w-64 h-64 flex items-center justify-center">
             {/* Outer spinning glow ring */}
-            <div className="absolute w-48 h-48 rounded-full border-2 border-[#00F0FF]/20 animate-[spin_4s_linear_infinite]"
+            <div className="absolute w-48 h-48 rounded-full border-2 border-[#00F0FF]/20 animate-[spin_2s_linear_infinite]"
               style={{ boxShadow: '0 0 30px rgba(0,240,255,0.1)' }}></div>
-            <div className="absolute w-36 h-36 rounded-full border border-[#1A5BFF]/30 animate-[spin_3s_linear_infinite_reverse]"></div>
+            <div className="absolute w-36 h-36 rounded-full border border-[#1A5BFF]/30 animate-[spin_2s_linear_infinite_reverse]"></div>
 
             {/* Official Autobot Logo Silhouette SVG */}
-            <svg viewBox="0 0 100 100" className="w-24 h-24 absolute animate-[autobotPulse_2s_ease-in-out_infinite] drop-shadow-[0_0_20px_rgba(0,240,255,0.8)]" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 100 100" className="w-24 h-24 absolute animate-[autobotPulse_1.5s_ease-in-out_infinite] drop-shadow-[0_0_20px_rgba(0,240,255,0.8)]" xmlns="http://www.w3.org/2000/svg">
               <g fill="#00F0FF">
                 {/* Center Forehead Crystal Cutout Region */}
                 <path d="M35 25 L65 25 L50 40 Z" fill="#03060d" stroke="#00F0FF" strokeWidth="6" strokeLinejoin="round" />
@@ -311,13 +312,13 @@ const CodeCrafter = () => {
             INITIALIZING CODE CRAFTER...
           </div>
           <div className="w-64 sm:w-80 max-w-[90vw] h-[2px] bg-white/10 mt-6 relative overflow-hidden">
-            <div className="absolute top-0 left-0 h-full bg-[#00F0FF] shadow-[0_0_10px_#00F0FF]" style={{ animation: 'loadingBar 2.5s ease-in-out forwards' }}></div>
+            <div className="absolute top-0 left-0 h-full bg-[#00F0FF] shadow-[0_0_10px_#00F0FF]" style={{ animation: 'loadingBar 1s ease-in-out forwards' }}></div>
           </div>
         </div>
       )}
 
-      {/* Transformer -> Spaceship Reveal Effect (Double Pass and Interactive) */}
-      {rebuilding && (
+      {/* Transformer -> Spaceship Reveal Effect (Double Pass and Interactive) 
+       {rebuilding && (
         <div className={`fixed inset-0 z-[60] overflow-hidden ${isCaught ? 'pointer-events-auto cursor-grabbing' : 'pointer-events-none'}`}>
 
           <div
@@ -335,39 +336,40 @@ const CodeCrafter = () => {
           >
 
             <div className={`relative w-full h-full transform scale-[0.35] sm:scale-[0.6] md:scale-100 origin-bottom-left ${shattered ? 'animate-[spin_1s_linear_forwards]' : ''}`}>
-              {/* Thrust Fire / Trail */}
+             Thrust Fire / Trail 
               {!shattered && <div className="absolute bottom-[-100px] left-1/2 -translate-x-1/2 w-12 h-40 bg-gradient-to-t from-transparent via-[#00F0FF] to-white blur-md opacity-0 origin-top animate-[igniteTrailMobile_6s_linear_forwards] md:animate-[igniteTrail_6s_linear_forwards]"></div>}
 
-              {/* Head -> Cockpit */}
+              Head -> Cockpit 
               <div className={`absolute left-1/2 top-0 -translate-x-1/2 w-10 h-14 bg-gray-300 z-30 shadow-[0_5px_15px_black] ${shattered ? 'animate-[shatterUp_1s_forwards]' : ''}`}
                 style={!shattered ? { clipPath: 'polygon(30% 0, 70% 0, 100% 100%, 0 100%)', animation: isCaught ? 'none' : 'tfHead 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.2s' } : { clipPath: 'polygon(30% 0, 70% 0, 100% 100%, 0 100%)' }}></div>
 
-              {/* Core Body -> Fuselage */}
+             Core Body -> Fuselage 
               <div className={`absolute left-1/2 top-12 -translate-x-1/2 w-16 h-28 bg-gradient-to-b from-gray-400 to-gray-600 z-20 shadow-[0_0_20px_black] ${shattered ? 'animate-[shatterDown_1s_forwards]' : ''}`}
                 style={!shattered ? { clipPath: 'polygon(0 0, 100% 0, 80% 100%, 20% 100%)', animation: isCaught ? 'none' : 'tfBody 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.2s' } : { clipPath: 'polygon(0 0, 100% 0, 80% 100%, 20% 100%)' }}>
                 {!shattered && <div className="absolute inset-0 bg-[#00F0FF] mix-blend-overlay opacity-0 animate-[flashOpacity_0.5s_forwards_1s]"></div>}
               </div>
 
-              {/* Left Arm -> Left Jet Wing */}
+              Left Arm -> Left Jet Wing
               <div className={`absolute left-[-5px] top-12 w-12 h-28 bg-gray-500 origin-top-right z-10 border border-t-0 border-r-0 border-gray-400 ${shattered ? 'animate-[shatterLeft_1s_forwards]' : ''}`}
                 style={!shattered ? { clipPath: 'polygon(0 0, 100% 20%, 100% 100%, 20% 100%)', animation: isCaught ? 'none' : 'tfLeftArm 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.2s' } : { clipPath: 'polygon(0 0, 100% 20%, 100% 100%, 20% 100%)' }}></div>
 
-              {/* Right Arm -> Right Jet Wing */}
+             Right Arm -> Right Jet Wing 
               <div className={`absolute right-[-5px] top-12 w-12 h-28 bg-gray-500 origin-top-left z-10 border border-t-0 border-l-0 border-gray-400 ${shattered ? 'animate-[shatterRight_1s_forwards]' : ''}`}
                 style={!shattered ? { clipPath: 'polygon(0 20%, 100% 0, 80% 100%, 0 100%)', animation: isCaught ? 'none' : 'tfRightArm 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.2s' } : { clipPath: 'polygon(0 20%, 100% 0, 80% 100%, 0 100%)' }}></div>
 
-              {/* Left Leg -> Left Thruster */}
+            Left Leg -> Left Thruster
               <div className={`absolute left-6 top-36 w-12 h-28 bg-gray-700 origin-top z-0 ${shattered ? 'animate-[shatterLeft_1s_forwards]' : ''}`}
                 style={!shattered ? { clipPath: 'polygon(20% 0, 80% 0, 100% 100%, 0 100%)', animation: isCaught ? 'none' : 'tfLeftLeg 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.2s' } : { clipPath: 'polygon(20% 0, 80% 0, 100% 100%, 0 100%)' }}></div>
 
-              {/* Right Leg -> Right Thruster */}
+               Right Leg -> Right Thruster 
               <div className={`absolute right-6 top-36 w-12 h-28 bg-gray-700 origin-top z-0 ${shattered ? 'animate-[shatterRight_1s_forwards]' : ''}`}
                 style={!shattered ? { clipPath: 'polygon(20% 0, 80% 0, 100% 100%, 0 100%)', animation: isCaught ? 'none' : 'tfRightLeg 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.2s' } : { clipPath: 'polygon(20% 0, 80% 0, 100% 100%, 0 100%)' }}></div>
             </div>
 
           </div>
         </div>
-      )}
+      )} */}
+
       {/* Epic Megatron vs Optimus Background */}
       <div className="fixed inset-0 z-0 pointer-events-none transition-opacity duration-1000" style={{ opacity: booting ? 0 : 1 }}>
         <div className="absolute inset-0 z-0">
@@ -905,6 +907,8 @@ const CodeCrafter = () => {
           </div>
         </div>
       </section>
+
+      {displayEvent === "cc" && <CodeCrafterWhyJoin />}
 
       {/* Contact & Community Section */}
       <section className="relative z-20 py-16 px-4 bg-[#010308] border-t border-[#00F0FF]/30 overflow-hidden">
