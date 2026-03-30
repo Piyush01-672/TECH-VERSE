@@ -13,7 +13,7 @@ const RoboMechRegistrationSchema = new mongoose.Schema({
   teamName: { type: String, required: true, unique: true },
   teamSize: { type: Number, required: true },
   selectedEvent: { type: String, required: true },
-  transactionId: { type: String, required: true },
+  transactionId: { type: String, required: true, unique: true },
   transactionImage: { type: String, required: true },
   accommodationRequired: { type: String, required: true, enum: ['Yes', 'No'] },
   accommodationDetails: {

@@ -47,6 +47,14 @@ const registerCodeCrafterTeam = async (req, res) => {
       });
     }
 
+    const existingTransaction = await CodeCrafterRegistration.findOne({ transactionId });
+    if (existingTransaction) {
+      return res.status(400).json({
+        success: false,
+        message: "Code Crafter 3.0: Transaction ID has already been used.",
+      });
+    }
+
     const newRegistration = new CodeCrafterRegistration({
       teamName,
       teamSize,

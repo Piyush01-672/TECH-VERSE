@@ -44,6 +44,14 @@ const registerRoboMechTeam = async (req, res) => {
       });
     }
 
+    const existingTransaction = await RoboMechRegistration.findOne({ transactionId });
+    if (existingTransaction) {
+      return res.status(400).json({
+        success: false,
+        message: "Robo Mec 2.0: Transaction ID has already been used.",
+      });
+    }
+
     const newRegistration = new RoboMechRegistration({
       teamName,
       teamSize,

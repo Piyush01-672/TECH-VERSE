@@ -700,7 +700,7 @@ const CodeCrafter = () => {
                 onClick={() => {
                   setDisplayEvent("cc");
                   setHoveredEvent(1);
-                  document.querySelector('.relative.w-full.max-w-4xl.h-\\[420px\\]')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); // gently scroll up
+                  // document.querySelector('.relative.w-full.max-w-4xl.h-\\[420px\\]')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); // gently scroll up
                 }}
                 className={`px-8 py-2 font-['Orbitron'] text-[10px] sm:text-xs font-bold uppercase transition-all tracking-[0.2em] ${displayEvent === "cc" ? "bg-[#00F0FF]/20 text-[#00F0FF] border border-[#00F0FF]" : "text-gray-500 hover:text-white border border-transparent"} `}
                 style={{ clipPath: 'polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%)' }}>
@@ -710,7 +710,7 @@ const CodeCrafter = () => {
                 onClick={() => {
                   setDisplayEvent("rm");
                   setHoveredEvent(2);
-                  document.querySelector('.relative.w-full.max-w-4xl.h-\\[420px\\]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  // document.querySelector('.relative.w-full.max-w-4xl.h-\\[420px\\]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }}
                 className={`px-8 py-2 font-['Orbitron'] text-[10px] sm:text-xs font-bold uppercase transition-all tracking-[0.2em] ${displayEvent === "rm" ? "bg-[#1A5BFF]/20 text-[#1A5BFF] border border-[#1A5BFF]" : "text-gray-500 hover:text-white border border-transparent"}`}
                 style={{ clipPath: 'polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%)' }}>
