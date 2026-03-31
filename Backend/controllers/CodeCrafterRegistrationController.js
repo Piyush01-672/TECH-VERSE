@@ -1,5 +1,19 @@
 const CodeCrafterRegistration = require('../models/CodeCrafterRegistration');
 const nodemailer = require('nodemailer');
+const cloudinary = require('../config/cloudinary');
+
+const uploadToCloudinary = (buffer, folder) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: folder },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result.secure_url);
+      }
+    );
+    uploadStream.end(buffer);
+  });
+};
 
 const registerCodeCrafterTeam = async (req, res) => {
   try {
@@ -32,13 +46,6 @@ const registerCodeCrafterTeam = async (req, res) => {
       console.error("JSON parsing error for FormData:", parseError);
     }
 
-    let transactionImage = '';
-    if (req.file) {
-      const b64 = Buffer.from(req.file.buffer).toString("base64");
-      const mimeType = req.file.mimetype;
-      transactionImage = `data:${mimeType};base64,${b64}`;
-    }
-
     const existingTeam = await CodeCrafterRegistration.findOne({ teamName });
     if (existingTeam) {
       return res.status(400).json({
@@ -53,6 +60,19 @@ const registerCodeCrafterTeam = async (req, res) => {
         success: false,
         message: "Code Crafter 3.0: Transaction ID has already been used.",
       });
+    }
+
+    let transactionImage = '';
+    if (req.file) {
+      try {
+        transactionImage = await uploadToCloudinary(req.file.buffer, 'codecrafter_transactions');
+      } catch (uploadError) {
+        console.error("Cloudinary Upload Error:", uploadError);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to upload transaction image. Please try again.",
+        });
+      }
     }
 
     const newRegistration = new CodeCrafterRegistration({

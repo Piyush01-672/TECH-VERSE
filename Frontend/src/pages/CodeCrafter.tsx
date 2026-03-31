@@ -627,7 +627,7 @@ const CodeCrafter = () => {
             </div>
             </div>
 
-            {/* Card 2: Robo Mec 2.0 (Robo Race) */}
+            {/* Card 2: Robo Mech 2.0 (Robo Race) */}
             <div
               onClick={() => {
                 setHoveredEvent(prev => prev === 2 ? null : 2);
@@ -658,7 +658,7 @@ const CodeCrafter = () => {
                     <span className="text-[10px] font-mono text-[#1A5BFF] opacity-60 tracking-widest">EVENT_ID: RM2.0</span>
                   </div>
 
-                  <h1 className="text-2xl sm:text-4xl font-['Black_Ops_One'] text-white mb-2 leading-tight">ROBO MEC <span className="text-[#1A5BFF]">2.0</span></h1>
+                  <h1 className="text-2xl sm:text-4xl font-['Black_Ops_One'] text-white mb-2 leading-tight">ROBO MECH <span className="text-[#1A5BFF]">2.0</span></h1>
                   <div className="flex items-center gap-2 text-[#1A5BFF] mb-6">
                     <Calendar size={16} />
                     <span className="font-mono text-xs font-bold tracking-widest uppercase">21st APRIL 2026</span>
@@ -716,7 +716,7 @@ const CodeCrafter = () => {
                 }}
                 className={`px-8 py-2 font-['Orbitron'] text-[10px] sm:text-xs font-bold uppercase transition-all tracking-[0.2em] ${displayEvent === "rm" ? "bg-[#1A5BFF]/20 text-[#1A5BFF] border border-[#1A5BFF]" : "text-gray-500 hover:text-white border border-transparent"}`}
                 style={{ clipPath: 'polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%)' }}>
-                Robo Mec
+                Robo Mech
               </button>
             </div>
           </div>
@@ -790,7 +790,7 @@ const CodeCrafter = () => {
                       <div className="bg-[#0b101a]/80 p-8 border border-[#1A5BFF]/30 relative group hover:border-[#1A5BFF] hover:shadow-[0_0_30px_rgba(26,91,255,0.1)] transition-all">
                         <div className="absolute bottom-0 left-0 w-12 h-12 border-b border-l border-[#1A5BFF] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         <div className="text-[#1A5BFF] mb-4"><Zap size={40} /></div>
-                        <p>Robo Mec challenges operators to navigate obstacle courses, engage in tug-of-war, and test endurance. Only the strongest and most resilient creations will survive.</p>
+                        <p>Robo Mech challenges operators to navigate obstacle courses, engage in tug-of-war, and test endurance. Only the strongest and most resilient creations will survive.</p>
                       </div>
                     </div>
                   )}
