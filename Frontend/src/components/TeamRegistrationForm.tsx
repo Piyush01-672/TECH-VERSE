@@ -195,8 +195,8 @@ const TeamRegistrationForm = ({ displayEvent, onDisplayEventChange }: TeamRegist
           <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[#1A5BFF] group-hover:border-[#00F0FF] transition-colors"></div>
 
           <h3 className="text-lg font-black text-[#00F0FF] uppercase tracking-widest mb-6 border-b border-[#1A5BFF]/20 pb-2">
-            {ordinalSuffix} Operator
-            {i === 0 && <span className="ml-3 text-xs text-[#FFD54F] tracking-[0.3em] font-normal">[ ALPHA ]</span>}
+            {ordinalSuffix} Participant
+            {i === 0 && <span className="ml-3 text-xs text-[#FFD54F] tracking-[0.3em] font-normal">[ LEADER ]</span>}
           </h3>
 
           <div className="space-y-5">
@@ -343,8 +343,8 @@ const TeamRegistrationForm = ({ displayEvent, onDisplayEventChange }: TeamRegist
               Stasis Quarters (Accommodation)
             </h2>
             <select name="accommodationRequired" value={formData.accommodationRequired} onChange={handleChange} className={inputClass + " appearance-none"}>
-              <option value="No" className="bg-[#060a12]">No lodging required</option>
-              <option value="Yes" className="bg-[#060a12]">Yes, we need quarters</option>
+              <option value="No" className="bg-[#060a12]">No accommodation required</option>
+              <option value="Yes" className="bg-[#060a12]">Yes, we need accommodation</option>
             </select>
 
             {formData.accommodationRequired === 'Yes' && (
