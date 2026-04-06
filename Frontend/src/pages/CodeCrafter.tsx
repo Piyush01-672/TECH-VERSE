@@ -3,6 +3,7 @@ import { BookOpen, CalendarHeart, Info, UserPlus, MapPin, Calendar, Trophy, Cpu,
 import { Typewriter } from "react-simple-typewriter";
 import CountdownTimer from "../components/CountdownTimer";
 import TeamRegistrationForm from "../components/TeamRegistrationForm";
+import CodeCrafterWhyJoin from '../components/CodeCrafterWhyJoin';
 
 // Mechanical Gear SVG for Transformers-style connectors
 const MechanicalGear = ({ size = 40, className = "" }: { size?: number, className?: string }) => (
@@ -122,6 +123,7 @@ const CodeCrafter = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [booting, setBooting] = useState(true);
   const [rebuilding, setRebuilding] = useState(false);
+  const [displayEvent, setDisplayEvent] = useState<"cc" | "rm">("cc");
 
   // --- Spaceship Interaction States ---
   const [isCaught, setIsCaught] = useState(false);
@@ -137,7 +139,7 @@ const CodeCrafter = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const gatewayOpenDate = new Date("2026-03-20T00:00:00");
-  const eventCloseDate = new Date("2026-04-18T23:59:59");
+  const eventCloseDate = new Date("2026-04-15T23:59:59");
   const [isGatewayOpen, setIsGatewayOpen] = useState(new Date() >= gatewayOpenDate);
 
   useEffect(() => {
@@ -161,7 +163,7 @@ const CodeCrafter = () => {
         // Reset all states and begin standard interval
         triggerSpaceshipFlyby();
       }, 8000); // 6s flight + 2s rest
-    }, 2500);
+    }, 1000);
 
     const handleScroll = () => setScrollY(window.scrollY);
     const handleMouseMove = (e: MouseEvent) => setMousePos({ x: e.clientX, y: e.clientY });
@@ -269,12 +271,12 @@ const CodeCrafter = () => {
 
           <div className="relative z-10 w-64 h-64 flex items-center justify-center">
             {/* Outer spinning glow ring */}
-            <div className="absolute w-48 h-48 rounded-full border-2 border-[#00F0FF]/20 animate-[spin_4s_linear_infinite]"
+            <div className="absolute w-48 h-48 rounded-full border-2 border-[#00F0FF]/20 animate-[spin_2s_linear_infinite]"
               style={{ boxShadow: '0 0 30px rgba(0,240,255,0.1)' }}></div>
-            <div className="absolute w-36 h-36 rounded-full border border-[#1A5BFF]/30 animate-[spin_3s_linear_infinite_reverse]"></div>
+            <div className="absolute w-36 h-36 rounded-full border border-[#1A5BFF]/30 animate-[spin_2s_linear_infinite_reverse]"></div>
 
             {/* Official Autobot Logo Silhouette SVG */}
-            <svg viewBox="0 0 100 100" className="w-24 h-24 absolute animate-[autobotPulse_2s_ease-in-out_infinite] drop-shadow-[0_0_20px_rgba(0,240,255,0.8)]" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 100 100" className="w-24 h-24 absolute animate-[autobotPulse_1.5s_ease-in-out_infinite] drop-shadow-[0_0_20px_rgba(0,240,255,0.8)]" xmlns="http://www.w3.org/2000/svg">
               <g fill="#00F0FF">
                 {/* Center Forehead Crystal Cutout Region */}
                 <path d="M35 25 L65 25 L50 40 Z" fill="#03060d" stroke="#00F0FF" strokeWidth="6" strokeLinejoin="round" />
@@ -310,13 +312,13 @@ const CodeCrafter = () => {
             INITIALIZING CODE CRAFTER...
           </div>
           <div className="w-64 sm:w-80 max-w-[90vw] h-[2px] bg-white/10 mt-6 relative overflow-hidden">
-            <div className="absolute top-0 left-0 h-full bg-[#00F0FF] shadow-[0_0_10px_#00F0FF]" style={{ animation: 'loadingBar 2.5s ease-in-out forwards' }}></div>
+            <div className="absolute top-0 left-0 h-full bg-[#00F0FF] shadow-[0_0_10px_#00F0FF]" style={{ animation: 'loadingBar 1s ease-in-out forwards' }}></div>
           </div>
         </div>
       )}
 
-      {/* Transformer -> Spaceship Reveal Effect (Double Pass and Interactive) */}
-      {rebuilding && (
+      {/* Transformer -> Spaceship Reveal Effect (Double Pass and Interactive) 
+       {rebuilding && (
         <div className={`fixed inset-0 z-[60] overflow-hidden ${isCaught ? 'pointer-events-auto cursor-grabbing' : 'pointer-events-none'}`}>
 
           <div
@@ -334,39 +336,40 @@ const CodeCrafter = () => {
           >
 
             <div className={`relative w-full h-full transform scale-[0.35] sm:scale-[0.6] md:scale-100 origin-bottom-left ${shattered ? 'animate-[spin_1s_linear_forwards]' : ''}`}>
-              {/* Thrust Fire / Trail */}
+             Thrust Fire / Trail 
               {!shattered && <div className="absolute bottom-[-100px] left-1/2 -translate-x-1/2 w-12 h-40 bg-gradient-to-t from-transparent via-[#00F0FF] to-white blur-md opacity-0 origin-top animate-[igniteTrailMobile_6s_linear_forwards] md:animate-[igniteTrail_6s_linear_forwards]"></div>}
 
-              {/* Head -> Cockpit */}
+              Head -> Cockpit 
               <div className={`absolute left-1/2 top-0 -translate-x-1/2 w-10 h-14 bg-gray-300 z-30 shadow-[0_5px_15px_black] ${shattered ? 'animate-[shatterUp_1s_forwards]' : ''}`}
                 style={!shattered ? { clipPath: 'polygon(30% 0, 70% 0, 100% 100%, 0 100%)', animation: isCaught ? 'none' : 'tfHead 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.2s' } : { clipPath: 'polygon(30% 0, 70% 0, 100% 100%, 0 100%)' }}></div>
 
-              {/* Core Body -> Fuselage */}
+             Core Body -> Fuselage 
               <div className={`absolute left-1/2 top-12 -translate-x-1/2 w-16 h-28 bg-gradient-to-b from-gray-400 to-gray-600 z-20 shadow-[0_0_20px_black] ${shattered ? 'animate-[shatterDown_1s_forwards]' : ''}`}
                 style={!shattered ? { clipPath: 'polygon(0 0, 100% 0, 80% 100%, 20% 100%)', animation: isCaught ? 'none' : 'tfBody 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.2s' } : { clipPath: 'polygon(0 0, 100% 0, 80% 100%, 20% 100%)' }}>
                 {!shattered && <div className="absolute inset-0 bg-[#00F0FF] mix-blend-overlay opacity-0 animate-[flashOpacity_0.5s_forwards_1s]"></div>}
               </div>
 
-              {/* Left Arm -> Left Jet Wing */}
+              Left Arm -> Left Jet Wing
               <div className={`absolute left-[-5px] top-12 w-12 h-28 bg-gray-500 origin-top-right z-10 border border-t-0 border-r-0 border-gray-400 ${shattered ? 'animate-[shatterLeft_1s_forwards]' : ''}`}
                 style={!shattered ? { clipPath: 'polygon(0 0, 100% 20%, 100% 100%, 20% 100%)', animation: isCaught ? 'none' : 'tfLeftArm 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.2s' } : { clipPath: 'polygon(0 0, 100% 20%, 100% 100%, 20% 100%)' }}></div>
 
-              {/* Right Arm -> Right Jet Wing */}
+             Right Arm -> Right Jet Wing 
               <div className={`absolute right-[-5px] top-12 w-12 h-28 bg-gray-500 origin-top-left z-10 border border-t-0 border-l-0 border-gray-400 ${shattered ? 'animate-[shatterRight_1s_forwards]' : ''}`}
                 style={!shattered ? { clipPath: 'polygon(0 20%, 100% 0, 80% 100%, 0 100%)', animation: isCaught ? 'none' : 'tfRightArm 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.2s' } : { clipPath: 'polygon(0 20%, 100% 0, 80% 100%, 0 100%)' }}></div>
 
-              {/* Left Leg -> Left Thruster */}
+            Left Leg -> Left Thruster
               <div className={`absolute left-6 top-36 w-12 h-28 bg-gray-700 origin-top z-0 ${shattered ? 'animate-[shatterLeft_1s_forwards]' : ''}`}
                 style={!shattered ? { clipPath: 'polygon(20% 0, 80% 0, 100% 100%, 0 100%)', animation: isCaught ? 'none' : 'tfLeftLeg 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.2s' } : { clipPath: 'polygon(20% 0, 80% 0, 100% 100%, 0 100%)' }}></div>
 
-              {/* Right Leg -> Right Thruster */}
+               Right Leg -> Right Thruster 
               <div className={`absolute right-6 top-36 w-12 h-28 bg-gray-700 origin-top z-0 ${shattered ? 'animate-[shatterRight_1s_forwards]' : ''}`}
                 style={!shattered ? { clipPath: 'polygon(20% 0, 80% 0, 100% 100%, 0 100%)', animation: isCaught ? 'none' : 'tfRightLeg 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.2s' } : { clipPath: 'polygon(20% 0, 80% 0, 100% 100%, 0 100%)' }}></div>
             </div>
 
           </div>
         </div>
-      )}
+      )} */}
+
       {/* Epic Megatron vs Optimus Background */}
       <div className="fixed inset-0 z-0 pointer-events-none transition-opacity duration-1000" style={{ opacity: booting ? 0 : 1 }}>
         <div className="absolute inset-0 z-0">
@@ -571,7 +574,10 @@ const CodeCrafter = () => {
           <div className="relative w-full max-w-4xl h-[420px] sm:h-[450px] flex items-center justify-center [perspective:1200px] mb-20">
             {/* Card 1: Code Crafter 3.0 (The Hackathon) */}
             <div
-              onClick={() => setHoveredEvent(prev => prev === 1 ? null : 1)}
+              onClick={() => {
+                setHoveredEvent(prev => prev === 1 ? null : 1);
+                setDisplayEvent("cc");
+              }}
               className={`absolute w-[280px] sm:w-[350px] h-full bg-[#00F0FF]/40 p-[2px] shadow-[0_0_50px_rgba(0,240,255,0.15)] transform transition-all duration-700 ease-out 
                           cursor-pointer group
                           ${hoveredEvent === 1 ? 'z-50 rotate-0 translate-x-0 scale-105' : 'z-10 -rotate-12 -translate-x-16 sm:-translate-x-32 scale-90 sm:scale-100'}
@@ -621,9 +627,12 @@ const CodeCrafter = () => {
             </div>
             </div>
 
-            {/* Card 2: Robo Mec 2.0 (Robo Race) */}
+            {/* Card 2: Robo Mech 2.0 (Robo Race) */}
             <div
-              onClick={() => setHoveredEvent(prev => prev === 2 ? null : 2)}
+              onClick={() => {
+                setHoveredEvent(prev => prev === 2 ? null : 2);
+                setDisplayEvent("rm");
+              }}
               className={`absolute w-[280px] sm:w-[350px] h-full bg-[#1A5BFF]/40 p-[2px] shadow-[0_0_50px_rgba(26,91,255,0.15)] transform transition-all duration-700 ease-out 
                           cursor-pointer group
                           ${hoveredEvent === 2 ? 'z-50 rotate-0 translate-x-0 scale-105' : 'z-10 rotate-12 translate-x-16 sm:translate-x-32 scale-90 sm:scale-100'}
@@ -649,7 +658,7 @@ const CodeCrafter = () => {
                     <span className="text-[10px] font-mono text-[#1A5BFF] opacity-60 tracking-widest">EVENT_ID: RM2.0</span>
                   </div>
 
-                  <h1 className="text-2xl sm:text-4xl font-['Black_Ops_One'] text-white mb-2 leading-tight">ROBO MEC <span className="text-[#1A5BFF]">2.0</span></h1>
+                  <h1 className="text-2xl sm:text-4xl font-['Black_Ops_One'] text-white mb-2 leading-tight">ROBO MECH <span className="text-[#1A5BFF]">2.0</span></h1>
                   <div className="flex items-center gap-2 text-[#1A5BFF] mb-6">
                     <Calendar size={16} />
                     <span className="font-mono text-xs font-bold tracking-widest uppercase">21st APRIL 2026</span>
@@ -686,6 +695,32 @@ const CodeCrafter = () => {
         <div className="absolute -top-[14px] left-1/2 -translate-x-1/2 w-8 h-8 rotate-45 border-b border-r border-[#00F0FF] bg-[#010308]"></div>
 
         <div className="max-w-6xl mx-auto">
+          {/* Event Selector Toggle */}
+          <div className="flex justify-center mb-8">
+            <div className="bg-[#03050a] border border-[#00F0FF]/30 p-1 flex shadow-[0_0_15px_rgba(0,240,255,0.1)]" style={{ clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)' }}>
+              <button 
+                onClick={() => {
+                  setDisplayEvent("cc");
+                  setHoveredEvent(1);
+                  // document.querySelector('.relative.w-full.max-w-4xl.h-\\[420px\\]')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); // gently scroll up
+                }}
+                className={`px-8 py-2 font-['Orbitron'] text-[10px] sm:text-xs font-bold uppercase transition-all tracking-[0.2em] ${displayEvent === "cc" ? "bg-[#00F0FF]/20 text-[#00F0FF] border border-[#00F0FF]" : "text-gray-500 hover:text-white border border-transparent"} `}
+                style={{ clipPath: 'polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%)' }}>
+                Code Crafter
+              </button>
+              <button 
+                onClick={() => {
+                  setDisplayEvent("rm");
+                  setHoveredEvent(2);
+                  // document.querySelector('.relative.w-full.max-w-4xl.h-\\[420px\\]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }}
+                className={`px-8 py-2 font-['Orbitron'] text-[10px] sm:text-xs font-bold uppercase transition-all tracking-[0.2em] ${displayEvent === "rm" ? "bg-[#1A5BFF]/20 text-[#1A5BFF] border border-[#1A5BFF]" : "text-gray-500 hover:text-white border border-transparent"}`}
+                style={{ clipPath: 'polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%)' }}>
+                Robo Mech
+              </button>
+            </div>
+          </div>
+          
           {/* Mechanical Tab Switches */}
           <div className="flex flex-wrap md:flex-nowrap justify-center gap-4 mb-12">
             {tabs.map((tab) => {
@@ -729,21 +764,36 @@ const CodeCrafter = () => {
 
               {activeTab === 'about' && (
                 <div className="max-w-4xl mx-auto space-y-10">
-                  <h2 className="text-4xl sm:text-5xl font-['Black_Ops_One'] uppercase text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500 mb-8 border-l-4 border-[#00F0FF] pl-6 py-2">
+                  <h2 className={`text-4xl sm:text-5xl font-['Black_Ops_One'] uppercase text-transparent bg-clip-text bg-gradient-to-r ${displayEvent === 'cc' ? 'from-white to-gray-500' : 'from-[#1A5BFF] to-gray-500'} mb-8 border-l-4 ${displayEvent === 'cc' ? 'border-[#00F0FF]' : 'border-[#1A5BFF]'} pl-6 py-2`}>
                     Primary Directive
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-lg font-mono">
-                    <div className="bg-[#0b101a]/80 p-8 border border-[#1A5BFF]/30 relative group hover:border-[#00F0FF] hover:shadow-[0_0_30px_rgba(0,240,255,0.1)] transition-all">
-                      <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-[#00F0FF] opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      <div className="text-[#00F0FF] mb-4"><Zap size={40} /></div>
-                      <p>An advanced 24-hour cycle to unify elite mechanics in programming, interface design, and systems architecture. Our primary objective is to accelerate innovation and forge real-world frameworks.</p>
+                  {displayEvent === "cc" ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-lg font-mono">
+                      <div className="bg-[#0b101a]/80 p-8 border border-[#1A5BFF]/30 relative group hover:border-[#00F0FF] hover:shadow-[0_0_30px_rgba(0,240,255,0.1)] transition-all">
+                        <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-[#00F0FF] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="text-[#00F0FF] mb-4"><Zap size={40} /></div>
+                        <p>An advanced 24-hour cycle to unify elite mechanics in programming, interface design, and systems architecture. Our primary objective is to accelerate innovation and forge real-world frameworks.</p>
+                      </div>
+                      <div className="bg-[#0b101a]/80 p-8 border border-[#1A5BFF]/30 relative group hover:border-[#00F0FF] hover:shadow-[0_0_30px_rgba(0,240,255,0.1)] transition-all">
+                        <div className="absolute bottom-0 left-0 w-12 h-12 border-b border-l border-[#00F0FF] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="text-[#00F0FF] mb-4"><Cpu size={40} /></div>
+                        <p>Whether you are an integrated systems dev, creative architect, or structural visionary, Code Crafter presents an optimal environment to execute data, establish connections, and deploy superior technical solutions.</p>
+                      </div>
                     </div>
-                    <div className="bg-[#0b101a]/80 p-8 border border-[#1A5BFF]/30 relative group hover:border-[#00F0FF] hover:shadow-[0_0_30px_rgba(0,240,255,0.1)] transition-all">
-                      <div className="absolute bottom-0 left-0 w-12 h-12 border-b border-l border-[#00F0FF] opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      <div className="text-[#00F0FF] mb-4"><Cpu size={40} /></div>
-                      <p>Whether you are an integrated systems dev, creative architect, or structural visionary, Code Crafter presents an optimal environment to execute data, establish connections, and deploy superior technical solutions.</p>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-lg font-mono">
+                      <div className="bg-[#0b101a]/80 p-8 border border-[#1A5BFF]/30 relative group hover:border-[#1A5BFF] hover:shadow-[0_0_30px_rgba(26,91,255,0.1)] transition-all">
+                        <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-[#1A5BFF] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="text-[#1A5BFF] mb-4"><Target size={40} /></div>
+                        <p>A battleground for mechanical and robotics engineering minds. Build and command supreme machines in a physical arena. Dominate through engineering, speed, and strategic strength.</p>
+                      </div>
+                      <div className="bg-[#0b101a]/80 p-8 border border-[#1A5BFF]/30 relative group hover:border-[#1A5BFF] hover:shadow-[0_0_30px_rgba(26,91,255,0.1)] transition-all">
+                        <div className="absolute bottom-0 left-0 w-12 h-12 border-b border-l border-[#1A5BFF] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="text-[#1A5BFF] mb-4"><Zap size={40} /></div>
+                        <p>Robo Mech challenges operators to navigate obstacle courses, engage in tug-of-war, and test endurance. Only the strongest and most resilient creations will survive.</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                   <div className="flex flex-nowrap justify-center gap-2 sm:gap-6 mt-12 overflow-x-auto pb-4 sm:pb-0">
                     {[{ n: '24H', l: 'CYCLE' }, { n: '1000+', l: 'OPERATORS' }, { n: '₹2.5L', l: 'PRIZE POOL' }].map((s, i) => (
                       <div key={i} className="flex flex-col items-center justify-center bg-[#060a12] border-y border-[#00F0FF]/20 px-4 sm:px-10 py-4 sm:py-6 min-w-[100px] sm:min-w-[200px] flex-1">
@@ -783,9 +833,9 @@ const CodeCrafter = () => {
 
                   <div className="flex justify-center mt-12">
                     <a
-                      href="/rulebook.pdf"
-                      download="CodeCrafter_3.0_Rulebook.pdf"
-                      className="relative px-8 py-4 bg-[#0a0f1a] border border-[#00F0FF]/50 text-[#00F0FF] font-['Orbitron'] font-bold uppercase tracking-[0.2em] group overflow-hidden transition-all hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] flex items-center gap-3 hover:border-[#00F0FF]"
+                      href={displayEvent === "cc" ? "/rulebook.pdf" : "/roborulebook.pdf"}
+                      download={displayEvent === "cc" ? "CodeCrafter_3.0_Rulebook.pdf" : "RoboMec_2.0_Rulebook.pdf"}
+                      className={`relative px-8 py-4 bg-[#0a0f1a] border ${displayEvent === 'cc' ? 'border-[#00F0FF]/50 text-[#00F0FF] hover:border-[#00F0FF] hover:shadow-[0_0_30px_rgba(0,240,255,0.4)]' : 'border-[#1A5BFF]/50 text-[#1A5BFF] hover:border-[#1A5BFF] hover:shadow-[0_0_30px_rgba(26,91,255,0.4)]'} font-['Orbitron'] font-bold uppercase tracking-[0.2em] group overflow-hidden transition-all flex items-center gap-3`}
                       style={{ clipPath: 'polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)' }}
                     >
                       <span className="absolute inset-0 bg-gradient-to-r from-[#00F0FF]/0 via-[#00F0FF]/20 to-[#00F0FF]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></span>
@@ -837,7 +887,7 @@ const CodeCrafter = () => {
 
                     <div className="relative z-10">
                       {isGatewayOpen ? (
-                        <TeamRegistrationForm />
+                        <TeamRegistrationForm displayEvent={displayEvent} onDisplayEventChange={setDisplayEvent} />
                       ) : (
                         <div className="flex flex-col items-center justify-center py-20 text-center space-y-8">
                           <h3 className="text-2xl sm:text-4xl font-['Orbitron'] text-[#00F0FF] animate-pulse uppercase tracking-widest">
@@ -857,6 +907,8 @@ const CodeCrafter = () => {
           </div>
         </div>
       </section>
+
+      {displayEvent === "cc" && <CodeCrafterWhyJoin />}
 
       {/* Contact & Community Section */}
       <section className="relative z-20 py-16 px-4 bg-[#010308] border-t border-[#00F0FF]/30 overflow-hidden">

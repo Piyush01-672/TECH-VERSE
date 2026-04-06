@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
-import { registerCodeCrafterTeam } from "../services/api";
+import { registerCodeCrafterTeam, registerRoboMechTeam } from "../services/api";
 import { Target } from "lucide-react";
 
-const TeamRegistrationForm = () => {
+interface TeamRegistrationFormProps {
+  displayEvent: "cc" | "rm";
+  onDisplayEventChange: (e: "cc" | "rm") => void;
+}
+
+const TeamRegistrationForm = ({ displayEvent, onDisplayEventChange }: TeamRegistrationFormProps) => {
   const [formData, setFormData] = useState({
     teamName: "",
-    hackathonExperience: "",
     teamSize: 2,
     selectedEvent: "",
     selectedTheme: "",
@@ -34,6 +38,17 @@ const TeamRegistrationForm = () => {
   useEffect(() => {
     if (error) window.scrollTo({ top: 0, behavior: "smooth" });
   }, [error]);
+
+  useEffect(() => {
+    const event = displayEvent === "cc" ? "Code Crafter 3.0 (Hackathon)" : "Robo Mec 2.0";
+    if (formData.selectedEvent !== event) {
+      setFormData(prev => ({
+        ...prev,
+        selectedEvent: event,
+        teamSize: event === "Code Crafter 3.0 (Hackathon)" && prev.teamSize > 4 ? 4 : prev.teamSize
+      }));
+    }
+  }, [displayEvent]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -113,7 +128,6 @@ const TeamRegistrationForm = () => {
       // Convert to FormData for file upload
       const formPayload = new FormData();
       formPayload.append("teamName", submissionData.teamName);
-      formPayload.append("hackathonExperience", submissionData.hackathonExperience);
       formPayload.append("teamSize", submissionData.teamSize.toString());
       formPayload.append("selectedEvent", submissionData.selectedEvent);
       formPayload.append("selectedTheme", submissionData.selectedTheme);
@@ -126,7 +140,11 @@ const TeamRegistrationForm = () => {
       formPayload.append("referralCommunityName", submissionData.referralCommunityName);
       formPayload.append("participants", JSON.stringify(submissionData.participants));
 
-      await registerCodeCrafterTeam(formPayload as any);
+      if (submissionData.selectedEvent === "Code Crafter 3.0 (Hackathon)") {
+        await registerCodeCrafterTeam(formPayload as any);
+      } else if (submissionData.selectedEvent === "Robo Mec 2.0") {
+        await registerRoboMechTeam(formPayload as any);
+      }
       setSubmitted(true);
     } catch (err: any) {
       setError(
@@ -140,7 +158,6 @@ const TeamRegistrationForm = () => {
   const handleReset = () => {
     setFormData({
       teamName: "",
-      hackathonExperience: "",
       teamSize: 2,
       selectedEvent: "",
       selectedTheme: "",
@@ -265,12 +282,7 @@ const TeamRegistrationForm = () => {
                 <label className={labelClass}>CHOOSE YOUR FIGHT *</label>
                 <select name="selectedEvent" value={formData.selectedEvent} onChange={(e) => {
                   const event = e.target.value;
-                  setFormData(prev => ({
-                    ...prev,
-                    selectedEvent: event,
-                    // Auto-adjust team size if current exceeds new limit
-                    teamSize: event === "Code Crafter 3.0 (Hackathon)" && prev.teamSize > 4 ? 4 : prev.teamSize
-                  }));
+                  onDisplayEventChange(event === "Code Crafter 3.0 (Hackathon)" ? "cc" : "rm");
                 }} required className={inputClass + " appearance-none cursor-pointer"}>
                   <option value="" disabled className="bg-[#060a12]">Select your fight</option>
                   <option value="Code Crafter 3.0 (Hackathon)" className="bg-[#060a12]">Code Crafter 3.0 (Hackathon)</option>
@@ -412,7 +424,9 @@ const TeamRegistrationForm = () => {
                   </div>
                   <div>
                     <span className="text-[#FFD54F] text-xs grid opacity-70">REGISTRATION AMOUNT</span>
-                    <span className="font-bold text-xl text-white">500rs</span>
+                    <span className="font-bold text-xl text-white">
+                      {formData.selectedEvent === "Robo Mec 2.0" ? "600rs" : "500rs"}
+                    </span>
                   </div>
                   <div>
                     <span className="text-[#FFD54F] text-xs grid opacity-70">MERCHANT</span>

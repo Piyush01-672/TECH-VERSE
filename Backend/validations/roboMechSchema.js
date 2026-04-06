@@ -23,7 +23,7 @@ const participantSchema = Joi.object({
   }),
 });
 
-const codeCrafterRegistrationSchema = Joi.object({
+const roboMechSchema = Joi.object({
   teamName: Joi.string().required().messages({
     'string.empty': 'Team Name is required.',
   }),
@@ -35,17 +35,9 @@ const codeCrafterRegistrationSchema = Joi.object({
   extraGaming: Joi.string().valid('None', 'BGMI', 'Valorant').optional().messages({
     'any.only': 'Extra Gaming must be None, BGMI, or Valorant.',
   }),
-  selectedEvent: Joi.string().valid('Robo Mec 2.0', 'Code Crafter 3.0 (Hackathon)').required().messages({
+  selectedEvent: Joi.string().valid('Robo Mec 2.0').required().messages({
     'any.only': 'Please select a valid event.',
     'any.required': 'Event selection is required.',
-  }),
-  selectedTheme: Joi.string().when('selectedEvent', {
-    is: 'Code Crafter 3.0 (Hackathon)',
-    then: Joi.string().valid('FinTech', 'Agri tech', 'HealthTech', 'Open Innovation').required(),
-    otherwise: Joi.string().allow('').optional()
-  }).messages({
-    'any.only': 'Please select a valid theme.',
-    'any.required': 'Theme selection is required for the hackathon.',
   }),
   transactionId: Joi.string().required().messages({
     'string.empty': 'Transaction ID is required.',
@@ -57,8 +49,6 @@ const codeCrafterRegistrationSchema = Joi.object({
     boysCount: Joi.number().integer().min(0).optional(),
     girlsCount: Joi.number().integer().min(0).optional(),
   }).optional(),
-  referralType: Joi.string().valid('Community', 'Other', '').optional(),
-  referralCommunityName: Joi.string().allow('').optional(),
   participants: Joi.array()
     .items(participantSchema)
     .min(Joi.ref('teamSize'))
@@ -71,4 +61,4 @@ const codeCrafterRegistrationSchema = Joi.object({
     }),
 });
 
-module.exports = codeCrafterRegistrationSchema;
+module.exports = roboMechSchema;
