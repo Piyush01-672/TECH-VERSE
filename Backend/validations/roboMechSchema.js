@@ -49,6 +49,8 @@ const roboMechSchema = Joi.object({
     boysCount: Joi.number().integer().min(0).optional(),
     girlsCount: Joi.number().integer().min(0).optional(),
   }).optional(),
+  referralType: Joi.string().valid('Community', 'Other', '').optional(),
+  referralCommunityName: Joi.string().allow('').optional(),
   participants: Joi.array()
     .items(participantSchema)
     .min(Joi.ref('teamSize'))

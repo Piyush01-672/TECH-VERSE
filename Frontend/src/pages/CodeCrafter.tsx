@@ -618,7 +618,7 @@ const CodeCrafter = () => {
                 <div className="pt-4 border-t border-[#00F0FF]/20">
                   <div className="flex items-center gap-2 text-[#00F0FF]">
                     <Trophy size={14} />
-                    <span className="text-[10px] font-['Orbitron'] font-bold tracking-widest">PRIZE POOL: ₹2.5L</span>
+                    <span className="text-[10px] font-['Orbitron'] font-bold tracking-widest">PRIZE POOL: ₹2L</span>
                   </div>
                   <div className="mt-2 text-[8px] sm:text-[10px] font-['Orbitron'] font-black text-[#00F0FF] animate-pulse tracking-[0.2em] flex items-center gap-1">
                     <span className="shrink-0 text-xs">{">>>"}</span> NEUTRALIZE MEGATRON
@@ -676,6 +676,10 @@ const CodeCrafter = () => {
                 </div>
 
                 <div className="pt-4 border-t border-[#1A5BFF]/20">
+                  <div className="flex items-center gap-2 text-[#1A5BFF]">
+                    <Trophy size={14} />
+                    <span className="text-[10px] font-['Orbitron'] font-bold tracking-widest">PRIZE POOL: ₹50K</span>
+                  </div>
                   <div className="flex items-center gap-2 text-[#1A5BFF]">
                     <Target size={14} />
                     <span className="text-[10px] font-['Orbitron'] font-bold tracking-widest">GOAL: SUPREME DOMINANCE</span>
@@ -796,7 +800,7 @@ const CodeCrafter = () => {
                     </div>
                   )}
                   <div className="flex flex-nowrap justify-center gap-2 sm:gap-6 mt-12 overflow-x-auto pb-4 sm:pb-0">
-                    {[{ n: '24H', l: 'CYCLE' }, { n: '1000+', l: 'OPERATORS' }, { n: '₹2.5L', l: 'PRIZE POOL' }].map((s, i) => (
+                    {[{ n: '24H', l: 'CYCLE' }, { n: '1000+', l: 'OPERATORS' }, { n: displayEvent === 'cc' ? '₹2L' : '₹50K', l: 'PRIZE POOL' }].map((s, i) => (
                       <div key={i} className="flex flex-col items-center justify-center bg-[#060a12] border-y border-[#00F0FF]/20 px-4 sm:px-10 py-4 sm:py-6 min-w-[100px] sm:min-w-[200px] flex-1">
                         <span className="text-xl sm:text-4xl font-['Black_Ops_One'] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">{s.n}</span>
                         <span className="text-[#00F0FF] font-black tracking-widest text-[8px] sm:text-xs uppercase mt-1 sm:mt-2">{s.l}</span>

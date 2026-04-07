@@ -70,7 +70,7 @@ const CodeCrafterWhyJoin = () => {
       <div className="relative z-20 border-y border-[#00F0FF]/30 bg-[#02040A] flex flex-wrap justify-center overflow-hidden">
         {[
           { num: "₹2.5L+", label: "PRIZE POOL", textMode: "text-[#FFD54F]", icon: <Trophy size={16} /> },
-          { num: "600+", label: "OPERATORS", textMode: "text-[#00F0FF]", icon: <Cpu size={16} /> },
+          { num: "1000+", label: "OPERATORS", textMode: "text-[#00F0FF]", icon: <Cpu size={16} /> },
           { num: "99.9%", label: "SYSTEM UPTIME", textMode: "text-[#00F0FF]", icon: <Zap size={16} /> },
           { num: "02", label: "CORP PARTNERS", textMode: "text-[#FFD54F]", icon: <Shield size={16} /> },
         ].map((stat, i) => (
