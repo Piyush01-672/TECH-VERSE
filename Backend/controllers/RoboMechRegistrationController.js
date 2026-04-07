@@ -26,6 +26,8 @@ const registerRoboMechTeam = async (req, res) => {
       accommodationRequired,
       accommodationDetails,
       extraGaming,
+      referralType,
+      referralCommunityName,
       participants
     } = req.body;
 
@@ -82,6 +84,8 @@ const registerRoboMechTeam = async (req, res) => {
       accommodationRequired,
       accommodationDetails: parsedAccommodationDetails,
       extraGaming: extraGaming || "None",
+      referralType,
+      referralCommunityName,
       participants: parsedParticipants,
     });
 

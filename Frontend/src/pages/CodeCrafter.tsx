@@ -617,7 +617,7 @@ const CodeCrafter = () => {
                 <div className="pt-4 border-t border-[#00F0FF]/20">
                   <div className="flex items-center gap-2 text-[#00F0FF]">
                     <Trophy size={14} />
-                    <span className="text-[10px] font-['Orbitron'] font-bold tracking-widest">PRIZE POOL: ₹2.5L</span>
+                    <span className="text-[10px] font-['Orbitron'] font-bold tracking-widest">PRIZE POOL: ₹2L</span>
                   </div>
                   <div className="mt-2 text-[8px] sm:text-[10px] font-['Orbitron'] font-black text-[#00F0FF] animate-pulse tracking-[0.2em] flex items-center gap-1">
                     <span className="shrink-0 text-xs">{">>>"}</span> NEUTRALIZE MEGATRON
@@ -675,6 +675,10 @@ const CodeCrafter = () => {
                 </div>
 
                 <div className="pt-4 border-t border-[#1A5BFF]/20">
+                  <div className="flex items-center gap-2 text-[#1A5BFF]">
+                    <Trophy size={14} />
+                    <span className="text-[10px] font-['Orbitron'] font-bold tracking-widest">PRIZE POOL: ₹50K</span>
+                  </div>
                   <div className="flex items-center gap-2 text-[#1A5BFF]">
                     <Target size={14} />
                     <span className="text-[10px] font-['Orbitron'] font-bold tracking-widest">GOAL: SUPREME DOMINANCE</span>
