@@ -4,6 +4,7 @@ import { Typewriter } from "react-simple-typewriter";
 import CountdownTimer from "../components/CountdownTimer";
 import TeamRegistrationForm from "../components/TeamRegistrationForm";
 import CodeCrafterWhyJoin from '../components/CodeCrafterWhyJoin';
+import CodeCrafterMentors from '../components/CodeCrafterMentors';
 
 // Mechanical Gear SVG for Transformers-style connectors
 const MechanicalGear = ({ size = 40, className = "" }: { size?: number, className?: string }) => (
@@ -909,6 +910,7 @@ const CodeCrafter = () => {
       </section>
 
       {displayEvent === "cc" && <CodeCrafterWhyJoin />}
+      {displayEvent === "cc" && <CodeCrafterMentors />}
 
       {/* Contact & Community Section */}
       <section className="relative z-20 py-16 px-4 bg-[#010308] border-t border-[#00F0FF]/30 overflow-hidden">

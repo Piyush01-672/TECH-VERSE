@@ -178,14 +178,14 @@ const CodeCrafterWhyJoin = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 gap-4 sm:gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 max-w-4xl mx-auto">
           {/* IBM */}
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }} 
             whileInView={{ opacity: 1, scale: 1 }} 
             viewport={{ once: true }} 
             transition={{ duration: 0.5 }} 
-            className="p-4 sm:p-6 lg:p-8 border border-[#1A5BFF]/40 bg-[#0a0f1a] relative group hover:shadow-[0_0_30px_rgba(26,91,255,0.2)] hover:-translate-y-1 transition-all aspect-[4/5] md:aspect-square flex flex-col justify-center items-center text-center overflow-hidden"
+            className="p-8 sm:p-6 lg:p-8 border border-[#1A5BFF]/40 bg-[#0a0f1a] relative group hover:shadow-[0_0_30px_rgba(26,91,255,0.2)] hover:-translate-y-1 transition-all min-h-[300px] flex flex-col justify-center items-center text-center overflow-hidden"
           >
             <div className="text-5xl font-['Black_Ops_One'] text-[#1F70C1] mb-4">IBM</div>
             {/* <div className="text-white font-['Orbitron'] font-bold tracking-widest uppercase mb-4 text-sm sm:text-base">IBM Corporation</div> */}
@@ -202,7 +202,7 @@ const CodeCrafterWhyJoin = () => {
              whileInView={{ opacity: 1, scale: 1 }} 
              viewport={{ once: true }} 
              transition={{ duration: 0.5, delay: 0.2 }} 
-             className="p-4 sm:p-6 lg:p-8 border border-[#00F0FF]/40 bg-[#0a0f1a] relative group hover:shadow-[0_0_30px_rgba(0,240,255,0.2)] hover:-translate-y-1 transition-all aspect-[4/5] md:aspect-square flex flex-col justify-center items-center text-center overflow-hidden"
+             className="p-8 sm:p-6 lg:p-8 border border-[#00F0FF]/40 bg-[#0a0f1a] relative group hover:shadow-[0_0_30px_rgba(0,240,255,0.2)] hover:-translate-y-1 transition-all min-h-[300px] flex flex-col justify-center items-center text-center overflow-hidden"
           >
             <div className="text-5xl font-['Black_Ops_One'] mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#4285F4] via-[#34A853] to-[#FBBC05]">
               GDG
