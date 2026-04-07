@@ -130,7 +130,6 @@ const TeamRegistrationForm = ({ displayEvent, onDisplayEventChange }: TeamRegist
       formPayload.append("teamName", submissionData.teamName);
       formPayload.append("teamSize", submissionData.teamSize.toString());
       formPayload.append("selectedEvent", submissionData.selectedEvent);
-      formPayload.append("selectedTheme", submissionData.selectedTheme);
       formPayload.append("transactionId", submissionData.transactionId);
       formPayload.append("transactionImage", submissionData.transactionImage);
       formPayload.append("accommodationRequired", submissionData.accommodationRequired);
@@ -139,6 +138,10 @@ const TeamRegistrationForm = ({ displayEvent, onDisplayEventChange }: TeamRegist
       formPayload.append("referralType", submissionData.referralType);
       formPayload.append("referralCommunityName", submissionData.referralCommunityName);
       formPayload.append("participants", JSON.stringify(submissionData.participants));
+
+      if (submissionData.selectedEvent === "Code Crafter 3.0 (Hackathon)") {
+        formPayload.append("selectedTheme", submissionData.selectedTheme);
+      }
 
       if (submissionData.selectedEvent === "Code Crafter 3.0 (Hackathon)") {
         await registerCodeCrafterTeam(formPayload as any);
