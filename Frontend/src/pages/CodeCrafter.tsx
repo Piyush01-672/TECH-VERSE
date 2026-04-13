@@ -850,6 +850,18 @@ const CodeCrafter = () => {
                       <span className="relative z-10">DOWNLOAD RULEBOOK</span>
                     </a>
                   </div>
+                  <div className="flex justify-center mt-6">
+                    <a
+                      href="/problem_statements.pdf"
+                      download="CodeCrafter_3.0_Problem_Statements.pdf" 
+                      className={`relative px-8 py-4 bg-[#0a0f1a] border ${displayEvent === 'cc' ? 'border-[#00F0FF]/50 text-[#00F0FF] hover:border-[#00F0FF] hover:shadow-[0_0_30px_rgba(0,240,255,0.4)]' : 'border-[#1A5BFF]/50 text-[#1A5BFF] hover:border-[#1A5BFF] hover:shadow-[0_0_30px_rgba(26,91,255,0.4)]'} font-['Orbitron'] font-bold uppercase tracking-[0.2em] group overflow-hidden transition-all flex items-center gap-3`}
+                      style={{ clipPath: 'polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)' }}
+                    >
+                      <span className="absolute inset-0 bg-gradient-to-r from-[#00F0FF]/0 via-[#00F0FF]/20 to-[#00F0FF]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></span>
+                      <Download size={20} className="relative z-10 group-hover:-translate-y-1 transition-transform duration-300" />
+                      <span className="relative z-10">DOWNLOAD Problem Statements</span>
+                    </a>
+                </div>
                 </div>
               )}
 
