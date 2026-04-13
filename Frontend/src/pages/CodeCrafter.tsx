@@ -5,6 +5,7 @@ import CountdownTimer from "../components/CountdownTimer";
 import TeamRegistrationForm from "../components/TeamRegistrationForm";
 import CodeCrafterWhyJoin from '../components/CodeCrafterWhyJoin';
 import CodeCrafterMentors from '../components/CodeCrafterMentors';
+import CodeCrafterPartners from '../components/CodeCrafterPartners';
 
 // Mechanical Gear SVG for Transformers-style connectors
 const MechanicalGear = ({ size = 40, className = "" }: { size?: number, className?: string }) => (
@@ -250,6 +251,7 @@ const CodeCrafter = () => {
     { id: 'about', label: 'CORE.INFO', icon: Info },
     { id: 'rules', label: 'RULES.SYS', icon: BookOpen },
     { id: 'schedules', label: 'TIMELINE', icon: CalendarHeart },
+    { id: 'partners', label: 'PARTNERS', icon: Hexagon },
     { id: 'register', label: 'REGISTER', icon: UserPlus }
   ];
 
@@ -905,6 +907,12 @@ const CodeCrafter = () => {
                       )}
                     </div>
                   </div>
+                </div>
+              )}
+
+              {activeTab === 'partners' && (
+                <div className="max-w-6xl mx-auto animate-[fadeIn_0.5s_ease-in-out]">
+                  <CodeCrafterPartners />
                 </div>
               )}
 
