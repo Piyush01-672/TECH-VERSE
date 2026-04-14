@@ -9,6 +9,8 @@ const mentors = [
   { id: 6, name: "Mr. Raghav Sharma", role: "Data Scientist", image: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1775550962/mentor_4_farbeb.jpg" },
   { id: 7, name: "Lokesh Pal Arya", role: "Data Science Expert", image: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1775550962/mentor_7_ynm0ke.jpg" },
   { id: 8, name: "Nikhil Pandey ", role: "Cyber Security Analyst", image: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1775550962/mentor_5_ajcges.jpg" },
+  { id: 9, name: "Keshav bhatt", role: "Web development and Blockchain", image: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776166995/mentor_9_zwzvbg.jpg" },
+  { id: 10, name: "Ankul Kumar", role: "AI, ML and Cloud", image: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776166995/mentor_8_ceri53.jpg" },
 ];
 
 

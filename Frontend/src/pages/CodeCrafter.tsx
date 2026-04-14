@@ -141,7 +141,7 @@ const CodeCrafter = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const gatewayOpenDate = new Date("2026-03-20T00:00:00");
-  const eventCloseDate = new Date("2026-04-15T23:59:59");
+  const eventCloseDate = new Date("2026-04-18T23:59:59");
   const [isGatewayOpen, setIsGatewayOpen] = useState(new Date() >= gatewayOpenDate);
 
   useEffect(() => {

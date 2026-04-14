@@ -242,9 +242,9 @@ const CodeCrafterWhyJoin = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { author: "Lovely Professional University Student", prize:"1st prize in CodeCrafter2.0", text: "\"Best hackathon I've attended in Punjab. The energy was unreal, the mentors were genuinely helpful, and we actually shipped something we're proud of.\"" },
-              { author: "CT University Student", prize:"2nd prize in CodeCrafter 2.0", text: "\"Won second place and got connected with a senior dev from the panel. That one conversation changed my career path. Come for the prize, stay for the network.\"" },
-              { author: "Sant Baba Bhag Singh University Student", prize:"3rd prize in CodeCrafter2.0", text: "\"The organisation was impeccable. Food, Wi-Fi, mentors — everything was sorted so we could just focus on building. Already counting down to 3.0.\"" },
+              { author: "Lovely Professional University Student", prize:"1st Prize in CodeCrafter 2.0", text: "\"Honestly didn't expect much but this blew my mind. The vibe was insane, mentors actually sat with us and helped debug stuff at 3am. We built something real and walked out proud. Hands down the best hackathon in Punjab.\"" },
+              { author: "CT University Student", prize:"2nd Prize in CodeCrafter 2.0", text: "\"Came for the prize money, stayed for the people lol. Got to talk to a senior dev from the judging panel after our demo and that conversation literally changed what I want to do with my career. 10/10 would do again.\"" },
+              { author: "Sant Baba Bhag Singh University Student", prize:"3rd Prize in CodeCrafter 2.0", text: "\"Everything was just sorted — food, wifi, charging points, mentors on call. We didn't have to worry about anything except building. Already hyped for 3.0, gonna come back stronger this time.\"" },
             ].map((testi, i) => (
               <motion.div 
                 key={i} 
@@ -260,11 +260,13 @@ const CodeCrafterWhyJoin = () => {
                 <p className="text-gray-300 font-mono text-sm leading-relaxed mb-6 italic">
                   {testi.text}
                 </p>
-                <div className="text-[#00F0FF]/60 font-['Orbitron'] text-[10px] sm:text-xs tracking-widest uppercase pb-2 border-b border-gray-800">
-                  — {testi.author}
-                </div>
-                <div className="text-[#00F0FF]/60 font-['Orbitron'] text-[10px] sm:text-xs tracking-widest uppercase pb-2 border-b border-gray-800">
-                  — {testi.prize}
+                <div className="pt-4 border-t border-gray-800">
+                  <div className="text-[#00F0FF]/70 font-['Orbitron'] text-[10px] sm:text-xs tracking-widest uppercase">
+                    — {testi.author}
+                  </div>
+                  <div className="text-[#00F0FF]/40 font-['Orbitron'] text-[9px] sm:text-[10px] tracking-widest uppercase mt-1">
+                    — {testi.prize}
+                  </div>
                 </div>
               </motion.div>
             ))}
