@@ -865,31 +865,184 @@ const CodeCrafter = () => {
                 </div>
               )}
 
-              {activeTab === 'schedules' && (
-                <div className="max-w-4xl mx-auto">
-                  <h2 className="text-4xl sm:text-5xl font-['Black_Ops_One'] uppercase text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500 mb-12 border-l-4 border-[#00F0FF] pl-6 py-2">
-                    System Timeline
-                  </h2>
-                  <div className="relative border-l-2 border-[#1A5BFF]/30 ml-4 md:ml-1/2 space-y-12 pb-8">
-                    {[
-                      { t: '09:00 AM', lbl: 'OPERATOR CHECK-IN', desc: 'Arrive and initialize IDs at base terminal.' },
-                      { t: '10:30 AM', lbl: 'ACTIVATION SEQUENCE', desc: 'Protocol briefing and deployment strategy.' },
-                      { t: '11:30 AM', lbl: 'ENGINES START', desc: 'Commence 24HR building cycle. Systems online.' },
-                      { t: '01:00 PM', lbl: 'RECHARGE PHASE', desc: 'Energy replenishment and networking.' },
-                      { t: 'ONGOING', lbl: '24HR EXECUTION', desc: 'Continuous processing and compilation.' },
-                    ].map((step, i) => (
-                      <div key={i} className="relative pl-10 md:pl-16 group">
-                        {/* Node Marker */}
-                        <div className="absolute -left-[11px] top-1 w-5 h-5 bg-[#010308] border-2 border-[#00F0FF] rounded-none rotate-45 group-hover:bg-[#00F0FF] shadow-[0_0_15px_#00F0FF] transition-all duration-300 z-10"></div>
+              {activeTab === 'schedules' && (() => {
+                const categories = {
+                  ceremony: { color: '#FFD54F', label: 'CEREMONY' },
+                  coding: { color: '#00F0FF', label: 'CODING' },
+                  food: { color: '#22C55E', label: 'FOOD' },
+                  fun: { color: '#A855F7', label: 'FUN' },
+                  evaluation: { color: '#FF6B35', label: 'EVALUATION' },
+                };
 
-                        <div className="font-['Orbitron'] text-[#00F0FF] font-bold text-lg mb-1">{step.t}</div>
-                        <h4 className="text-white text-xl font-black uppercase tracking-wider mb-2 font-mono">{step.lbl}</h4>
-                        <p className="text-gray-400 font-mono text-sm">{step.desc}</p>
+                const allEvents = [
+                  // Day 1
+                  { t: '6:30 AM', lbl: 'Registration', desc: 'Check-in & ID verification', cat: 'ceremony' as const, span: '6:30 – 10:00 AM', day: 1 },
+                  { t: '10:00 AM', lbl: 'Inauguration', desc: 'Guest welcoming, lamp lighting & chief guest address', cat: 'ceremony' as const, span: '10:00 – 11:50 AM', day: 1 },
+                  { t: '12:00 PM', lbl: 'Hackathon Starts', desc: '24-hour build cycle begins. Systems go live.', cat: 'coding' as const, highlight: true, day: 1 },
+                  { t: '2:00 PM', lbl: 'Lunch Break', desc: 'Refuel & recharge', cat: 'food' as const, span: '2:00 – 3:00 PM', day: 1 },
+                  { t: '4:00 PM', lbl: 'Snacks', desc: 'Quick energy boost', cat: 'food' as const, day: 1 },
+                  { t: '5:00 PM', lbl: 'Mentor Round', desc: 'Industry mentors review your progress', cat: 'coding' as const, span: '5:00 – 7:00 PM', day: 1 },
+                  { t: '7:00 PM', lbl: 'DJ Party', desc: 'Beats while your code compiles', cat: 'fun' as const, span: '7:00 – 8:00 PM', day: 1 },
+                  { t: '8:00 PM', lbl: 'Dinner', desc: 'Full dinner service', cat: 'food' as const, span: '8:00 – 9:00 PM', day: 1 },
+                  { t: '10:00 PM', lbl: 'Gaming Night', desc: 'Valorant & BGMI tournament', cat: 'fun' as const, span: '10:00 – 11:00 PM', day: 1 },
+                  { t: '11:00 PM', lbl: 'Fun Activities', desc: 'Late-night surprises & bonding', cat: 'fun' as const, span: '11:00 PM – 12:00 AM', day: 1 },
+                  // Day 2
+                  { t: '1:00 AM', lbl: 'Evaluation Round', desc: 'Mid-cycle progress check', cat: 'evaluation' as const, day: 2 },
+                  { t: '4:30 AM', lbl: 'Tea Break', desc: 'Chai to power through', cat: 'food' as const, day: 2 },
+                  { t: '8:00 AM', lbl: 'Breakfast', desc: 'Morning fuel-up', cat: 'food' as const, span: '8:00 – 9:00 AM', day: 2 },
+                  { t: '10:00 AM', lbl: 'Final Evaluation', desc: 'Present your project to the jury', cat: 'evaluation' as const, day: 2 },
+                  { t: '12:00 PM', lbl: 'Hackathon Ends', desc: 'All systems stop. Code freeze.', cat: 'coding' as const, highlight: true, day: 2 },
+                  { t: '1:00 PM', lbl: 'Result Declaration', desc: 'Winners announced live', cat: 'evaluation' as const, span: '1:00 – 2:00 PM', day: 2 },
+                  { t: '2:00 PM', lbl: 'Prize Distribution', desc: 'Felicitation ceremony & awards', cat: 'ceremony' as const, span: '2:00 – 3:00 PM', highlight: true, day: 2 },
+                ];
+
+                return (
+                  <div className="max-w-5xl mx-auto">
+                    <h2 className="text-3xl sm:text-5xl font-['Black_Ops_One'] uppercase text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500 mb-4 border-l-4 border-[#00F0FF] pl-6 py-2">
+                      Mission Timeline
+                    </h2>
+                    <p className="text-gray-500 font-mono text-xs sm:text-sm mb-8 pl-6 border-l border-[#00F0FF]/20">
+                      Full operational flowchart — 24 hours of building, bonding, and battling for victory.
+                    </p>
+
+                    {/* Legend */}
+                    <div className="flex flex-wrap gap-3 sm:gap-5 mb-10 p-3 sm:p-4 bg-[#060a12] border border-white/10" style={{ clipPath: 'polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%)' }}>
+                      {Object.values(categories).map((cat) => (
+                        <div key={cat.label} className="flex items-center gap-1.5">
+                          <div className="w-2.5 h-2.5 rounded-sm" style={{ background: cat.color }}></div>
+                          <span className="text-[9px] sm:text-[10px] font-['Orbitron'] tracking-wider text-gray-400">{cat.label}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* === ZIGZAG FLOWCHART === */}
+                    <div className="relative w-full">
+                      {allEvents.map((event, i) => {
+                        const catInfo = categories[event.cat];
+                        const isLeft = i % 2 === 0;
+                        const isLast = i === allEvents.length - 1;
+                        const prevDay = i > 0 ? allEvents[i - 1].day : event.day;
+                        const showDaySeparator = event.day !== prevDay;
+
+                        return (
+                          <div key={i}>
+                            {/* Day Separator */}
+                            {showDaySeparator && (
+                              <div className="flex items-center justify-center my-6 sm:my-8 relative">
+                                <div className="absolute inset-0 flex items-center">
+                                  <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#1A5BFF]/50 to-transparent"></div>
+                                </div>
+                                <div className="relative px-6 py-2 bg-[#060a12] border border-[#1A5BFF]/60 font-['Black_Ops_One'] text-[#1A5BFF] text-sm sm:text-base tracking-[0.3em] shadow-[0_0_20px_rgba(26,91,255,0.2)]" style={{ clipPath: 'polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%)' }}>
+                                  APRIL 22
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Day 1 Start marker (only for first event) */}
+                            {i === 0 && (
+                              <div className="flex items-center justify-center mb-6 sm:mb-8 relative">
+                                <div className="absolute inset-0 flex items-center">
+                                  <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#00F0FF]/50 to-transparent"></div>
+                                </div>
+                                <div className="relative px-6 py-2 bg-[#060a12] border border-[#00F0FF]/60 font-['Black_Ops_One'] text-[#00F0FF] text-sm sm:text-base tracking-[0.3em] shadow-[0_0_20px_rgba(0,240,255,0.2)]" style={{ clipPath: 'polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%)' }}>
+                                  APRIL 21
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Zigzag Row */}
+                            <div className={`flex items-stretch w-full ${isLeft ? 'flex-row' : 'flex-row-reverse'}`}>
+                              
+                              {/* Event Card - takes ~45% width */}
+                              <div className="w-[46%] sm:w-[44%] group">
+                                <div 
+                                  className={`relative bg-[#0a0f1a] border transition-all duration-500 hover:scale-[1.03] overflow-hidden ${event.highlight ? 'shadow-[0_0_30px_rgba(0,240,255,0.15)]' : 'hover:shadow-[0_0_20px_rgba(0,240,255,0.1)]'}`}
+                                  style={{ 
+                                    borderColor: event.highlight ? catInfo.color : `${catInfo.color}40`,
+                                    clipPath: isLeft 
+                                      ? 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))'
+                                      : 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
+                                  }}
+                                >
+                                  {/* Top color accent */}
+                                  <div className="h-[3px] w-full" style={{ background: `linear-gradient(90deg, ${catInfo.color}, ${catInfo.color}40)` }}></div>
+                                  
+                                  <div className="p-3 sm:p-4">
+                                    {/* Time + Category */}
+                                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                      <div 
+                                        className="px-2 py-0.5 text-[8px] sm:text-[10px] font-['Orbitron'] font-bold tracking-wider shrink-0"
+                                        style={{ background: `${catInfo.color}15`, color: catInfo.color, border: `1px solid ${catInfo.color}30` }}
+                                      >
+                                        {event.span || event.t}
+                                      </div>
+                                      {event.highlight && (
+                                        <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: catInfo.color, boxShadow: `0 0 8px ${catInfo.color}` }}></div>
+                                      )}
+                                    </div>
+                                    
+                                    {/* Title */}
+                                    <h4 className="text-white text-xs sm:text-sm font-black uppercase tracking-wider font-mono group-hover:text-[#00F0FF] transition-colors leading-tight mb-1">
+                                      {event.lbl}
+                                    </h4>
+                                    
+                                    {/* Description */}
+                                    <p className="text-gray-500 font-mono text-[9px] sm:text-[11px] leading-relaxed group-hover:text-gray-400 transition-colors">
+                                      {event.desc}
+                                    </p>
+                                  </div>
+
+                                  {/* Hover scan effect */}
+                                  <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[mechScan_2s_linear_infinite]"></div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Center Connector Column with sequence number */}
+                              <div className="w-[8%] sm:w-[12%] flex flex-col items-center relative">
+                                {/* Horizontal pipe from card to center */}
+                                <div className="flex items-center w-full h-1/2 relative">
+                                  <div className="w-full h-[2px] opacity-50" style={{ background: `linear-gradient(${isLeft ? 'to right' : 'to left'}, ${catInfo.color}60, ${catInfo.color})` }}></div>
+                                </div>
+                                
+                                {/* Center node/dot */}
+                                <div 
+                                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center text-[8px] sm:text-[10px] font-['Orbitron'] font-black text-black z-20 transition-all duration-300 hover:scale-125"
+                                  style={{ background: catInfo.color, clipPath: 'polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)', boxShadow: `0 0 15px ${catInfo.color}60` }}
+                                >
+                                  {String(i + 1).padStart(2, '0')}
+                                </div>
+                              </div>
+
+                              {/* Empty space / opposite side */}
+                              <div className="w-[46%] sm:w-[44%]"></div>
+                            </div>
+
+                            {/* Vertical connector to next node */}
+                            {!isLast && !showDaySeparator && !(i + 1 < allEvents.length && allEvents[i + 1].day !== event.day) && (
+                              <div className="flex items-center justify-center">
+                                <div className="w-[2px] h-6 sm:h-8 opacity-30" style={{ background: `linear-gradient(to bottom, ${catInfo.color}, ${categories[allEvents[i + 1]?.cat || event.cat].color})` }}></div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+
+                      {/* Final Victory Badge */}
+                      <div className="mt-8 p-4 sm:p-6 bg-gradient-to-r from-[#FFD54F]/10 via-[#FFD54F]/5 to-[#FFD54F]/10 border border-[#FFD54F]/50 text-center relative overflow-hidden group" style={{ clipPath: 'polygon(16px 0, calc(100% - 16px) 0, 100% 16px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 16px 100%, 0 calc(100% - 16px), 0 16px)' }}>
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#FFD54F]/0 via-[#FFD54F]/10 to-[#FFD54F]/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
+                        <div className="text-[#FFD54F] font-['Black_Ops_One'] text-lg sm:text-xl tracking-[0.2em] relative z-10">
+                          🏆 MISSION COMPLETE
+                        </div>
+                        <div className="text-gray-400 font-mono text-[10px] sm:text-xs mt-2 relative z-10">
+                          3:10 PM — Vote of Thanks & Farewell
+                        </div>
                       </div>
-                    ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {activeTab === 'register' && (
                 <div className="max-w-4xl mx-auto animate-[fadeIn_0.5s_ease-in-out]">
