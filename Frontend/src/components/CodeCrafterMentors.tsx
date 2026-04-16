@@ -38,30 +38,30 @@ const CodeCrafterMentors = () => {
             {repeatedMentors.map((mentor, index) => (
               <div
                 key={`${mentor.id}-${index}`}
-                className="w-[280px] sm:w-[320px] px-4 shrink-0 group perspective-1000 h-full"
+                className="w-[240px] sm:w-[280px] px-3 shrink-0 group perspective-1000 h-full"
               >
-                <div className="relative bg-[#0a0f1a] border border-[#00F0FF]/20 p-6 transition-all duration-500 hover:border-[#00F0FF]/60 hover:shadow-[0_0_25px_rgba(0,240,255,0.2)] hover:-translate-y-2 h-full flex flex-col"
-                  style={{ clipPath: 'polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)' }}
+                <div className="relative bg-[#0a0f1a] border border-[#00F0FF]/20 p-5 transition-all duration-500 hover:border-[#00F0FF]/60 hover:shadow-[0_0_25px_rgba(0,240,255,0.2)] hover:-translate-y-2 h-full flex flex-col"
+                  style={{ clipPath: 'polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)' }}
                 >
                   {/* Hexagon Placeholder for Image */}
-                  <div className="relative w-full aspect-square bg-[#03050A] mb-6 overflow-hidden border border-[#00F0FF]/10 group-hover:border-[#00F0FF]/40 transition-colors"
+                  <div className="relative w-full aspect-square bg-[#03050A] mb-4 overflow-hidden border border-[#00F0FF]/10 group-hover:border-[#00F0FF]/40 transition-colors"
                     style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
                   >
                     {mentor.image ? (
                       <img src={mentor.image} alt={mentor.name} className="w-full h-full object-cover object-[center_15%] transition-all duration-500" />
                     ) : (
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-[#00F0FF]/30 group-hover:text-[#00F0FF]/60 transition-colors">
-                        <Hexagon size={48} className="mb-2" />
-                        <span className="font-mono text-xs uppercase tracking-widest text-center px-4">Image<br/>Pending</span>
+                        <Hexagon size={40} className="mb-2" />
+                        <span className="font-mono text-[10px] uppercase tracking-widest text-center px-4">Image<br/>Pending</span>
                       </div>
                     )}
                     {/* Scanline overlay */}
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00F0FF]/10 to-transparent w-full h-[200%] animate-[scanLine_2s_linear_infinite] pointer-events-none"></div>
                   </div>
 
-                  <div className="text-center relative z-10 px-1 flex-1 flex flex-col justify-center">
-                    <h3 className="text-base sm:text-lg font-['Black_Ops_One'] text-white tracking-wider group-hover:text-[#00F0FF] transition-colors leading-snug">{mentor.name}</h3>
-                    <p className="text-[10px] sm:text-xs font-mono text-[#00F0FF]/80 mt-1 sm:mt-2 tracking-widest uppercase">{mentor.role}</p>
+                  <div className="text-center relative z-10 flex-1 flex flex-col justify-center">
+                    <h3 className="text-sm sm:text-base font-['Black_Ops_One'] text-white tracking-wider group-hover:text-[#00F0FF] transition-colors leading-snug">{mentor.name}</h3>
+                    <p className="text-[9px] sm:text-[10px] font-mono text-[#00F0FF]/80 mt-1 tracking-widest uppercase">{mentor.role}</p>
                   </div>
 
                   {/* Corner Accents */}

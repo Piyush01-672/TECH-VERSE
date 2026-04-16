@@ -6,6 +6,11 @@ const sponsors = [
   { id: 1, name: "Techcadd", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776080853/Techcad_prwyx1.png" },
   { id: 2, name: "Ansh Infotech", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776080853/AIT_vab0dc.jpg" },
   { id: 3, name: "Future Finders", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776081514/FF_zzgx3k.jpg" },
+  { id: 4, name: "Solitaire Infosys", logo: "https://tse2.mm.bing.net/th/id/OIP.IJP0XT53Cz5N5ECy-0l9mQAAAA?rs=1&pid=ImgDetMain&o=7&rm=3" },
+  { id: 5, name: "IBM", logo: "https://quad9.net/uploads/2880px_IBM_logo_svg_a3627e043e.png" },
+  { id: 6, name: "GDG", logo: "https://th.bing.com/th/id/OIP.aglLZhcy2jBqdlE_odpEcQHaEK?w=298&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" },
+  { id: 7, name: "Ziion Technologies", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776326948/Ziion-technology_flp6os.png" },
+
 ];
 
 const communities = [
@@ -24,6 +29,9 @@ const communities = [
   { id: 13, name: "GDGoC PUSSGRC", role: "Partner", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776082218/GDSC_Logo_1_-_Manish_Kumar_khfoed.png" },
   { id: 14, name: "AlphaAryX ", role: "Partner", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776082218/Screenshot_20251105_165141_-_Aryan_Patel_jeuhn7.jpg" },
   { id: 15, name: "Digital Defense Squad", role: "Partner", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776082218/IMG-20260308-WA0015_-_Atul_Singh_Chandel_mxdwqf.jpg" },
+  { id: 15, name: "Student Innovator Society", role: "Partner", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776326614/comm_hprtno.jpg" },
+
+  
 ];
 
 const CodeCrafterPartners = () => {
