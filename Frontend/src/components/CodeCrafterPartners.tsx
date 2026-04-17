@@ -11,6 +11,8 @@ const sponsors = [
   { id: 6, name: "GDG", logo: "https://th.bing.com/th/id/OIP.aglLZhcy2jBqdlE_odpEcQHaEK?w=298&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" },
   { id: 7, name: "Ziion Technologies", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776326948/Ziion-technology_flp6os.png" },
   { id: 8, name: "Digimantra", logo: "https://media.glassdoor.com/sqll/1788139/digimantra-labs-squareLogo-1659441375575.png" },
+  { id: 9, name: "YHills", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776426424/32bd4f82-b777-4e01-b138-1714e95abc6d.png" },
+  { id: 10, name: "IDP", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776426514/33c2ec6f-b9f7-4825-9182-bfc3586a83a2.png" },
 
 ];
 
