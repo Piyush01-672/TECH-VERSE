@@ -10,6 +10,7 @@ const sponsors = [
   { id: 5, name: "IBM", logo: "https://quad9.net/uploads/2880px_IBM_logo_svg_a3627e043e.png" },
   { id: 6, name: "GDG", logo: "https://th.bing.com/th/id/OIP.aglLZhcy2jBqdlE_odpEcQHaEK?w=298&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" },
   { id: 7, name: "Ziion Technologies", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776326948/Ziion-technology_flp6os.png" },
+  { id: 8, name: "Digimantra", logo: "https://media.glassdoor.com/sqll/1788139/digimantra-labs-squareLogo-1659441375575.png" },
 
 ];
 

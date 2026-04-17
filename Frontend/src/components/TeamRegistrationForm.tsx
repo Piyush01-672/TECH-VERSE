@@ -26,6 +26,7 @@ const TeamRegistrationForm = ({ displayEvent, onDisplayEventChange }: TeamRegist
       { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
       { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
       { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
+      { name: "", email: "", contactNumber: "", gender: "", college: "", program: "" },
     ],
     referralType: "",
     referralCommunityName: "",
