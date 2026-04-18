@@ -12,8 +12,8 @@ const sponsors = [
   { id: 7, name: "Ziion Technologies", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776326948/Ziion-technology_flp6os.png" },
   { id: 8, name: "Digimantra", logo: "https://media.glassdoor.com/sqll/1788139/digimantra-labs-squareLogo-1659441375575.png" },
   { id: 9, name: "Netpro", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776500981/netpro_n68vhv.jpg" },
-  { id: 10, name: "IDP", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776426514/33c2ec6f-b9f7-4825-9182-bfc3586a83a2.png" },
-
+  { id: 10, name: "YHills", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776426424/32bd4f82-b777-4e01-b138-1714e95abc6d.png" },
+  { id: 11, name: "IDP", logo: "https://res.cloudinary.com/diijn4esl/image/upload/q_auto/f_auto/v1776426514/33c2ec6f-b9f7-4825-9182-bfc3586a83a2.png" },
 ];
 
 const communities = [
