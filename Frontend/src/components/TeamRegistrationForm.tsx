@@ -289,7 +289,7 @@ const TeamRegistrationForm = ({ displayEvent, onDisplayEventChange }: TeamRegist
                   onDisplayEventChange(event === "Code Crafter 3.0 (Hackathon)" ? "cc" : "rm");
                 }} required className={inputClass + " appearance-none cursor-pointer"}>
                   <option value="" disabled className="bg-[#060a12]">Select your fight</option>
-                  <option value="Code Crafter 3.0 (Hackathon)" className="bg-[#060a12]">Code Crafter 3.0 (Hackathon)</option>
+                  <option value="Code Crafter 3.0 (Hackathon)" disabled className="bg-[#060a12] text-gray-500">Code Crafter 3.0 (Hackathon) - CLOSED</option>
                   <option value="Robo Mec 2.0" className="bg-[#060a12]">Robo Mec 2.0</option>
                 </select>
               </div>

@@ -1059,7 +1059,19 @@ const CodeCrafter = () => {
 
                     <div className="relative z-10">
                       {isGatewayOpen ? (
-                        <TeamRegistrationForm displayEvent={displayEvent} onDisplayEventChange={setDisplayEvent} />
+                        displayEvent === "cc" ? (
+                          <div className="flex flex-col items-center justify-center py-20 text-center space-y-6">
+                            <h3 className="text-2xl sm:text-4xl font-['Orbitron'] text-[#FF007F] animate-pulse uppercase tracking-widest">
+                              Registration <span className="text-white">Closed</span>
+                            </h3>
+                            <p className="text-gray-400 font-mono text-sm sm:text-base max-w-xl mx-auto">
+                              The network gateway for Code Crafter 3.0 has officially been sealed. <br/>
+                              Thank you to all who registered. Prepare for the ultimate build!
+                            </p>
+                          </div>
+                        ) : (
+                          <TeamRegistrationForm displayEvent={displayEvent} onDisplayEventChange={setDisplayEvent} />
+                        )
                       ) : (
                         <div className="flex flex-col items-center justify-center py-20 text-center space-y-8">
                           <h3 className="text-2xl sm:text-4xl font-['Orbitron'] text-[#00F0FF] animate-pulse uppercase tracking-widest">
