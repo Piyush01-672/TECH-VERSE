@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { BookOpen, CalendarHeart, Info, UserPlus, MapPin, Calendar, Trophy, Cpu, Zap, Target, ShieldAlert, Hexagon, Linkedin, Instagram, MessageCircle, Mail, Phone, Download } from "lucide-react";
 import { Typewriter } from "react-simple-typewriter";
 import CountdownTimer from "../components/CountdownTimer";
-import TeamRegistrationForm from "../components/TeamRegistrationForm";
 import CodeCrafterWhyJoin from '../components/CodeCrafterWhyJoin';
 import CodeCrafterMentors from '../components/CodeCrafterMentors';
 import CodeCrafterPartners from '../components/CodeCrafterPartners';
@@ -1059,19 +1058,15 @@ const CodeCrafter = () => {
 
                     <div className="relative z-10">
                       {isGatewayOpen ? (
-                        displayEvent === "cc" ? (
-                          <div className="flex flex-col items-center justify-center py-20 text-center space-y-6">
-                            <h3 className="text-2xl sm:text-4xl font-['Orbitron'] text-[#FF007F] animate-pulse uppercase tracking-widest">
-                              Registration <span className="text-white">Closed</span>
-                            </h3>
-                            <p className="text-gray-400 font-mono text-sm sm:text-base max-w-xl mx-auto">
-                              The network gateway for Code Crafter 3.0 has officially been sealed. <br/>
-                              Thank you to all who registered. Prepare for the ultimate build!
-                            </p>
-                          </div>
-                        ) : (
-                          <TeamRegistrationForm displayEvent={displayEvent} onDisplayEventChange={setDisplayEvent} />
-                        )
+                        <div className="flex flex-col items-center justify-center py-20 text-center space-y-6">
+                          <h3 className="text-2xl sm:text-4xl font-['Orbitron'] text-[#FF007F] animate-pulse uppercase tracking-widest">
+                            Registration <span className="text-white">Closed</span>
+                          </h3>
+                          <p className="text-gray-400 font-mono text-sm sm:text-base max-w-xl mx-auto">
+                            The network gateway for {displayEvent === "cc" ? "Code Crafter 3.0" : "Robo Mech 2.0"} has officially been sealed. <br/>
+                            Thank you to all who registered. Prepare for the ultimate {displayEvent === "cc" ? "build" : "battle"}!
+                          </p>
+                        </div>
                       ) : (
                         <div className="flex flex-col items-center justify-center py-20 text-center space-y-8">
                           <h3 className="text-2xl sm:text-4xl font-['Orbitron'] text-[#00F0FF] animate-pulse uppercase tracking-widest">
