@@ -213,3 +213,34 @@ export const registerRoboMechTeam = async (submissionData: FormData | any) => {
     throw error;
   }
 };
+
+export const registerEngineersDayParticipant = async (submissionData: any) => {
+  const url = `${API_BASE_URL}/api/engineers-day/register`;
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(submissionData),
+    });
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (e) {
+      data = {};
+    }
+
+    if (!response.ok) {
+      const error: any = new Error(data.message || 'Registration failed. Please try again.');
+      error.response = { data };
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error registering for Engineers Day event:', error);
+    throw error;
+  }
+};

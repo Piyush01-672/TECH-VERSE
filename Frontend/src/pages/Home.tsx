@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
-import ReactDOM from "react-dom";
+import { useState } from "react";
 import {Mail,MapPin, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
@@ -14,98 +13,9 @@ import { FloatingSocials } from "@/components/FloatingSocials";
 import { FeatureCard } from "@/components/FeatureCard";
 import { useNavigate } from "react-router-dom";
 
-
-const CodeCrafterTransition = () => {
-  return (
-    <div className="fixed inset-0 z-[100] bg-[#03060d] flex items-center justify-center overflow-hidden animate-[fadeInGlitch_2s_ease-out_forwards,fadeTransition_1s_ease-in_forwards_2.5s]">
-      {/* Glitch & Fade Layers */}
-      <div className="absolute inset-0 z-10 overflow-hidden">
-        {/* DESKTOP ONLY: Main background with base glitch */}
-        <div className="hidden md:block absolute inset-0 animate-[glitchMain_3s_infinite] opacity-70">
-          <img src="/optimus-megatron.jpg" className="absolute inset-0 w-full h-full object-cover" alt="" />
-        </div>
-
-        {/* MOBILE ONLY: Clean Fade Colours Poster */}
-        <div className="md:hidden absolute inset-0 animate-[pulse_3s_ease-in-out_infinite,hueRotate_6s_linear_infinite] opacity-100">
-          <img src="/codecrafter-poster-fade.png" className="absolute inset-0 w-full h-full object-cover" alt="" />
-        </div>
-
-        {/* DESKTOP ONLY: Faded Red Shift Layer */}
-        <div className="hidden md:block absolute inset-0 mix-blend-screen animate-[glitchRed_0.4s_infinite] opacity-20">
-           <img src="/optimus-megatron.jpg" className="absolute inset-0 w-full h-full object-cover contrast-110 saturate-150 hue-rotate-[-15deg] blur-[1px]" alt="" />
-        </div>
-
-        {/* Faded Blue Shift Layer */}
-        <div className="absolute inset-0 mix-blend-screen animate-[glitchBlue_0.3s_infinite] opacity-20">
-           <img src="/optimus-megatron.jpg" className="hidden md:block absolute inset-0 w-full h-full object-cover contrast-110 saturate-150 hue-rotate-[160deg] blur-[1px]" alt="" />
-           <img src="/codecrafter-poster-final.png" className="block md:hidden absolute inset-0 w-full h-full object-cover contrast-150 saturate-200 hue-rotate-[180deg] blur-[2px]" alt="" />
-        </div>
-
-        {/* Intense Tearing Glitch Layer (Mobile Only) */}
-        <div className="md:hidden absolute inset-0 z-20 mix-blend-difference animate-[intenseGlitch_0.4s_infinite] opacity-30">
-           <img src="/codecrafter-poster-final.png" className="w-full h-full object-cover" alt="" />
-        </div>
-      </div>
-
-      {/* scanLine Overlay */}
-      <div className="absolute inset-0 z-25 pointer-events-none opacity-20 overflow-hidden">
-        <div className="w-full h-1/2 bg-gradient-to-b from-transparent via-[#00F0FF]/40 to-transparent animate-[scanLine_2s_linear_infinite]"></div>
-      </div>
-
-      {/* Noise Overlay */}
-      <div className="absolute inset-0 z-20 opacity-30 pointer-events-none mix-blend-overlay animate-[noiseMove_0.1s_infinite]"
-           style={{ backgroundImage: 'url("https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Net_Noise.png")', backgroundSize: '150px 150px' }}></div>
-
-
-      {/* Slicing Lines Overlay */}
-      <div className="absolute inset-0 z-30 pointer-events-none">
-        {[...Array(12)].map((_, i) => (
-          <div key={i} className="absolute w-full h-[1px] bg-[#00F0FF]/20 animate-[sliceAppear_2.5s_infinite]"
-               style={{ top: `${Math.random() * 100}%`, animationDelay: `${Math.random() * 2}s` }}></div>
-        ))}
-      </div>
-
-      {/* Central Content (Faded & Shaky) */}
-      <div className="hidden md:flex relative z-40 flex-col items-center justify-center pointer-events-none w-full px-4 animate-[contentShake_0.3s_infinite] opacity-80">
-         <div className="inline-flex items-center justify-center px-4 sm:px-8 py-2 sm:py-3 mb-4 sm:mb-8 bg-black/40 backdrop-blur-md border border-[#00F0FF]/20" style={{ clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)' }}>
-            <span className="text-[#00F0FF]/70 font-['Orbitron'] uppercase tracking-[0.2em] sm:tracking-[0.4em] font-bold text-[10px] sm:text-sm">SYSTEMS ENGAGED</span>
-         </div>
-         <h1 className="text-[14vw] sm:text-6xl md:text-[8rem] whitespace-nowrap font-black leading-none tracking-tighter text-white/90 uppercase font-['Black_Ops_One'] text-center w-full">
-            CODE CRAFTER
-         </h1>
-         <div className="mt-2 sm:mt-4 bg-[#00F0FF]/80 px-4 sm:px-6 py-1.5 sm:py-2 transform skew-x-[-15deg]">
-            <span className="block transform skew-x-[15deg] text-black font-['Orbitron'] font-black text-sm sm:text-xl md:text-3xl tracking-[0.1em] sm:tracking-[0.2em]">VERSION 3.0</span>
-         </div>
-      </div>
-    </div>
-  );
-};
-
 const Home = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [isTransitioning, setIsTransitioning] = useState(false);
-    const [hasClosedDialogOnce, setHasClosedDialogOnce] = useState(false);
     const navigate = useNavigate();
-    
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsDialogOpen(true);
-    }, 3000); 
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleDialogClose = (open: boolean) => {
-    setIsDialogOpen(open);
-    if (!open && !hasClosedDialogOnce) {
-      setHasClosedDialogOnce(true);
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setIsTransitioning(false);
-        window.dispatchEvent(new Event('highlightCodeCrafter'));
-      }, 4000); // 4-second transition effect
-    }
-  };
 
   const stats = [
     { label: "Participants", value: "500+", icon: Users },
@@ -142,8 +52,6 @@ const Home = () => {
   ];
   return (
     <div className="min-h-screen relative">
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Black+Ops+One&display=swap');`}</style>
-      {isTransitioning && <CodeCrafterTransition />}
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
   {/* Animated Tech Background */}
   <div className="absolute inset-0 overflow-hidden">
@@ -314,60 +222,6 @@ const Home = () => {
   </div>
 
     <style>{`
-      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Black+Ops+One&display=swap');
-
-      @keyframes fadeInGlitch {
-        0% { opacity: 0; transform: scale(1.1) blur(10px); }
-        100% { opacity: 1; transform: scale(1) blur(0); }
-      }
-
-      @keyframes fadeTransition {
-        0% { opacity: 1; }
-        100% { opacity: 0; }
-      }
-
-      @keyframes glitchMain {
-        0%, 100% { transform: none; filter: none; }
-        33% { transform: translate(-5px, 2px); filter: contrast(1.1); }
-        66% { transform: translate(5px, -2px); filter: brightness(1.05); }
-      }
-
-      @keyframes glitchRed {
-        0% { transform: translate(0); clip-path: inset(44% 0 1% 0); }
-        20% { transform: translate(-5px, 2px); clip-path: inset(10% 0 50% 0); }
-        40% { transform: translate(5px, -2px); clip-path: inset(80% 0 5% 0); }
-        60% { transform: translate(-2px, 0); clip-path: inset(20% 0 60% 0); }
-        80% { transform: translate(2px, 2px); clip-path: inset(50% 0 20% 0); }
-        100% { transform: translate(0); clip-path: inset(44% 0 1% 0); }
-      }
-
-      @keyframes glitchBlue {
-        0% { transform: translate(0); clip-path: inset(10% 0 80% 0); }
-        20% { transform: translate(5px, -2px); clip-path: inset(40% 0 20% 0); }
-        40% { transform: translate(-5px, 2px); clip-path: inset(10% 0 50% 0); }
-        60% { transform: translate(2px, 0); clip-path: inset(70% 0 10% 0); }
-        80% { transform: translate(-2px, -2px); clip-path: inset(20% 0 60% 0); }
-        100% { transform: translate(0); clip-path: inset(10% 0 80% 0); }
-      }
-
-      @keyframes noiseMove {
-        0% { background-position: 0 0; }
-        100% { background-position: 100% 100%; }
-      }
-
-      @keyframes sliceAppear {
-        0%, 100% { opacity: 0; transform: translateX(-100%); }
-        50% { opacity: 1; transform: translateX(100%); }
-      }
-
-      @keyframes contentShake {
-        0% { transform: translate(0); }
-        25% { transform: translate(1px, -1px); }
-        50% { transform: translate(-1px, 1px); }
-        75% { transform: translate(1px, 0px); }
-        100% { transform: translate(0); }
-      }
-      
       @keyframes marquee {
         0% { transform: translateX(0); }
         100% { transform: translateX(-50%); }
@@ -510,9 +364,8 @@ const Home = () => {
         </div>
       </section>
        {/* Enquiry Dialog */}
-      <EnquiryDialog open={isDialogOpen} onOpenChange={handleDialogClose} />
+      <EnquiryDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
       <FloatingSocials />
-      {isTransitioning && ReactDOM.createPortal(<CodeCrafterTransition />, document.body)}
     </div>
   );
 };

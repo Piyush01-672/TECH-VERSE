@@ -78,6 +78,7 @@ app.use('/api/mentors', require('./routes/Mentor'));
 app.use('/api/register', require('./routes/RegistrationServer'));
 app.use('/api/codecrafter-register', require('./routes/CodeCrafterRegistrationServer'));
 app.use('/api/robomech-register', require('./routes/RoboMechRegistrationServer'));
+app.use('/api/engineers-day', require('./routes/EngineersDayRoute'));
 
 // ==========================
 // ✅ Health Check Route

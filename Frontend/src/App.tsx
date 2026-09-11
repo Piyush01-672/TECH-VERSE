@@ -9,6 +9,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Events from "./pages/Events";
+import Gallery from "./pages/Gallery";
 import AboutUs from "./pages/AboutUs";
 import Sponsors from "./pages/Sponsors";
 import Winners from "./pages/Winners";
@@ -56,6 +57,7 @@ const AppContent: React.FC = () => {
       <Routes location={location}>
         <Route path="/" element={<Home />} />
         <Route path="/events" element={<Events />} />
+        <Route path="/gallery" element={<Gallery />} />
         <Route path="/about" element={<AboutUs onLoadComplete={() => setLoading(false)} />} />
         <Route path="/sponsors" element={<Sponsors />} />
         <Route path="/winners" element={<Winners />} />
