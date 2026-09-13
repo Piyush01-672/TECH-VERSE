@@ -53,6 +53,9 @@ export interface ClubMemberItem {
   roleAssignee?: string;
   role?: string;
   status?: string;
+  cardSent?: boolean;
+  screeningEmailSent?: boolean;
+  cardSentAt?: string;
   createdAt?: string;
 }
 
@@ -159,20 +162,35 @@ export default function AdminPortal() {
 
     setSavingId(id);
     try {
-      await updateClubMemberRole(id, {
+      const res = await updateClubMemberRole(id, {
         designation: draft.designation.trim(),
         roleAssignee: draft.roleAssignee.trim(),
       });
+
+      const cardEmailed = Boolean(res?.cardEmailSent);
 
       // Update local members list
       setMembers((prev) =>
         prev.map((m) =>
           m._id === id
-            ? { ...m, designation: draft.designation.trim(), roleAssignee: draft.roleAssignee.trim() }
+            ? { 
+                ...m, 
+                designation: draft.designation.trim(), 
+                roleAssignee: draft.roleAssignee.trim(),
+                status: draft.designation.trim() ? "Active" : "Under Screening",
+                cardSent: cardEmailed || m.cardSent,
+              }
             : m
         )
       );
-      toast.success("Role & Designation updated in MongoDB Atlas successfully!");
+
+      if (cardEmailed) {
+        toast.success(`🎉 Designation assigned & Official Club Card emailed to member!`);
+      } else if (draft.designation.trim()) {
+        toast.success("Role & Designation updated in MongoDB Atlas successfully!");
+      } else {
+        toast.success("Member updated in MongoDB Atlas.");
+      }
     } catch (error: any) {
       console.error("Save error:", error);
       toast.error(error?.message || "Failed to update member role");
@@ -429,13 +447,18 @@ export default function AdminPortal() {
                             </h3>
                             <Badge
                               className={`text-[10px] font-mono uppercase ${
-                                isAssigned
+                                member.status === "Active" || isAssigned
                                   ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
                                   : "bg-amber-500/10 text-amber-300 border-amber-500/30"
                               }`}
                             >
-                              {isAssigned ? "Assigned" : "Pending Role"}
+                              {member.status === "Active" || isAssigned ? "Active Member" : "⏳ Under Screening"}
                             </Badge>
+                            {member.cardSent && (
+                              <Badge className="bg-blue-500/10 text-blue-300 border-blue-500/30 text-[10px] font-mono">
+                                🪪 Card Sent
+                              </Badge>
+                            )}
                           </div>
 
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
@@ -505,11 +528,19 @@ export default function AdminPortal() {
                           onClick={() => handleSaveRole(member._id)}
                           disabled={isSaving}
                           size="sm"
-                          className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white text-xs font-bold rounded-xl px-4 py-2 flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/20"
+                          className={`w-full sm:w-auto text-white text-xs font-bold rounded-xl px-4 py-2 flex items-center justify-center gap-1.5 shadow-md ${
+                            draft.designation.trim()
+                              ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-500/20"
+                              : "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 shadow-blue-500/20"
+                          }`}
                         >
                           {isSaving ? (
                             <>
-                              <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Saving...
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin" /> {draft.designation.trim() ? "Issuing Card..." : "Saving..."}
+                            </>
+                          ) : draft.designation.trim() ? (
+                            <>
+                              <Sparkles className="w-3.5 h-3.5 text-amber-300" /> Assign & Send ID Card 🪪
                             </>
                           ) : (
                             <>

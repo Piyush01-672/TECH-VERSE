@@ -15,7 +15,10 @@ const ClubMemberSchema = new mongoose.Schema({
   designation: { type: String, default: '' }, // empty field to be filled by admin in MongoDB
   roleAssignee: { type: String, default: '' }, // role assignee field to be filled by admin
   role: { type: String, default: 'Member' },
-  status: { type: String, default: 'Active' },
+  status: { type: String, default: 'Under Screening' }, // Under Screening -> Active
+  screeningEmailSent: { type: Boolean, default: false },
+  cardSent: { type: Boolean, default: false },
+  cardSentAt: { type: Date },
   createdAt: { type: Date, default: Date.now },
 }, { strict: false, collection: 'clubmembers' });
 
