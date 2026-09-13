@@ -107,19 +107,15 @@ export const submitClubMember = async (memberData: any) => {
     }
 
     if (!response.ok) {
-      // If /api/club-members is not yet deployed on remote host, fall back to /api/enquiry
-      return await submitEnquiry(memberData);
+      const error: any = new Error(data.message || 'Club membership registration failed. Please try again.');
+      error.response = { data };
+      throw error;
     }
 
     return data;
   } catch (error) {
-    // Attempt fallback to /api/enquiry
-    try {
-      return await submitEnquiry(memberData);
-    } catch (fallbackError) {
-      console.error('Error submitting club member:', error);
-      throw error;
-    }
+    console.error('Error submitting club member:', error);
+    throw error;
   }
 };
 
@@ -302,3 +298,97 @@ export const registerEngineersDayParticipant = async (submissionData: any) => {
     throw error;
   }
 };
+
+// ==================== Admin Portal APIs ====================
+
+export const getClubMembers = async () => {
+  const url = `${API_BASE_URL}/api/club-members`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch club members`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching club members:', error);
+    throw error;
+  }
+};
+
+export const updateClubMemberRole = async (
+  id: string,
+  updateData: { designation?: string; roleAssignee?: string; role?: string; status?: string }
+) => {
+  const url = `${API_BASE_URL}/api/club-members/${id}/role`;
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (e) {
+      data = {};
+    }
+
+    if (!response.ok) {
+      // Retry with PUT /api/club-members/:id
+      const fallbackResponse = await fetch(`${API_BASE_URL}/api/club-members/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+      if (fallbackResponse.ok) {
+        return await fallbackResponse.json();
+      }
+      throw new Error(data.message || 'Failed to update member role');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error updating club member role:', error);
+    throw error;
+  }
+};
+
+export const getEnquiries = async () => {
+  const url = `${API_BASE_URL}/api/enquiry`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch enquiries`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching enquiries:', error);
+    throw error;
+  }
+};
+
+export const getContacts = async () => {
+  const url = `${API_BASE_URL}/api/contact`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch contacts`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching contacts:', error);
+    throw error;
+  }
+};
+
+export const getEngineersDayStats = async () => {
+  const url = `${API_BASE_URL}/api/engineers-day/stats`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch stats`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching event stats:', error);
+    throw error;
+  }
+};
+
