@@ -363,7 +363,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-       {/* Enquiry Dialog */}
+       {/* TechVerse Club New Member Joining Dialog */}
       <EnquiryDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
       <FloatingSocials />
     </div>

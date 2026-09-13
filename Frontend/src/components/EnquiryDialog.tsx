@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { submitEnquiry, submitClubMember } from "@/services/api";
+import { submitClubMember } from "@/services/api";
 import {
   Dialog,
   DialogContent,
@@ -211,7 +211,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
 
     try {
       await submitClubMember(payload);
-      toast.success("Club member registered! Here is your official Club Membership Card.");
+      toast.success("Welcome to TechVerse! Membership registered & ID Card emailed to your inbox.");
     } catch (err) {
       console.warn("Club member registration notice:", err);
       toast.success("Membership registered! Here is your official Club Membership Card.");
@@ -277,15 +277,15 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
           /* ======================================================================= */
           <div className="space-y-6 animate-fade-in">
             <div className="text-center space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold uppercase tracking-wider mb-1">
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold uppercase tracking-wider mb-1">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                Membership Confirmed
+                Official Club Membership Confirmed
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 font-space">
                 Welcome to TechVerse Club! 🎉
               </h2>
               <p className="text-slate-600 text-xs sm:text-sm max-w-lg mx-auto">
-                Your registration has been saved. Below is your official TechVerse Club Member ID Card.
+                Your membership is active! Your official Member ID Card has been generated and dispatched to <strong className="text-blue-600 font-semibold">{submittedMember.email}</strong> from <strong className="text-slate-800 font-semibold">techverse@ctuniversity.in</strong>.
               </p>
             </div>
 
@@ -568,12 +568,15 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
           /* ======================================================================= */
           <>
             <DialogHeader className="text-center">
-              <DialogTitle className="text-2xl md:text-3xl font-extrabold text-gray-800 mb-2">
-                Join Techverse & Elevate Your Skills 🚀
+              <div className="mx-auto inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-[11px] font-bold uppercase tracking-wider mb-1">
+                <IdCard className="w-3.5 h-3.5 text-blue-600" />
+                New Member Joining Portal
+              </div>
+              <DialogTitle className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">
+                TechVerse Club — New Member Application 🚀
               </DialogTitle>
-              <DialogDescription className="text-gray-600 text-sm md:text-base">
-                Fill out the form below to become part of our vibrant tech
-                community. Discover, learn, and grow with us!
+              <DialogDescription className="text-gray-600 text-sm max-w-xl mx-auto">
+                Fill in your details below to become an official member of TechVerse Club. Your verified Club Membership ID Card will be generated and emailed directly from <strong className="text-blue-600 font-medium">techverse@ctuniversity.in</strong>.
               </DialogDescription>
             </DialogHeader>
 
@@ -873,10 +876,10 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
                       <RefreshCw className="w-5 h-5 animate-spin" />
-                      Registering & Generating Card...
+                      Registering Member & Generating Card...
                     </span>
                   ) : (
-                    "Submit & Generate Membership Card 🪪"
+                    "Submit Application & Generate Member Card 🪪"
                   )}
                 </Button>
               </form>

@@ -107,19 +107,15 @@ export const submitClubMember = async (memberData: any) => {
     }
 
     if (!response.ok) {
-      // If /api/club-members is not yet deployed on remote host, fall back to /api/enquiry
-      return await submitEnquiry(memberData);
+      const error: any = new Error(data.message || 'Club membership registration failed. Please try again.');
+      error.response = { data };
+      throw error;
     }
 
     return data;
   } catch (error) {
-    // Attempt fallback to /api/enquiry
-    try {
-      return await submitEnquiry(memberData);
-    } catch (fallbackError) {
-      console.error('Error submitting club member:', error);
-      throw error;
-    }
+    console.error('Error submitting club member:', error);
+    throw error;
   }
 };
 
