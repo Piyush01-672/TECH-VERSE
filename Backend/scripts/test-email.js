@@ -1,19 +1,39 @@
-require('@dotenvx/dotenvx').config({ path: require('path').join(__dirname, '../.env'), silent: true });
+const path = require('path');
+const fs = require('fs');
+
+// Check possible .env locations: Backend/.env, current directory .env, or parent .env
+const possibleEnvPaths = [
+  path.join(__dirname, '../.env'),
+  path.join(process.cwd(), 'Backend/.env'),
+  path.join(process.cwd(), '.env'),
+  path.join(__dirname, '../../.env'),
+];
+
+for (const envPath of possibleEnvPaths) {
+  if (fs.existsSync(envPath)) {
+    require('@dotenvx/dotenvx').config({ path: envPath, silent: true });
+    break;
+  }
+}
+
 const nodemailer = require('nodemailer');
 
-const recipient = process.argv[2] || process.env.EMAIL_USER;
+const recipient = process.argv[2] || process.env.EMAIL_USER || 'techverse@ctuniversity.in';
+const emailPass = process.env.EMAIL_PASS ? String(process.env.EMAIL_PASS).replace(/\s+/g, '').trim() : '';
+const emailUser = (process.env.EMAIL_USER ? String(process.env.EMAIL_USER).trim() : '') || 'techverse@ctuniversity.in';
 
-if (!process.env.EMAIL_PASS) {
+if (!emailPass) {
   console.error("❌ ERROR: EMAIL_PASS is not defined in your Backend/.env file!");
-  console.log("👉 Please add EMAIL_PASS=<your-16-character-app-password> to Backend/.env");
+  console.log("👉 Please open 'c:\\Users\\rajde\\Desktop\\projects\\TECH-VERSE\\Backend\\.env'");
+  console.log("👉 Add your 16-character Google App Password: EMAIL_PASS=your16charpassword");
   process.exit(1);
 }
 
 const transporter = nodemailer.createTransport({
   service: process.env.EMAIL_SERVICE || 'gmail',
   auth: {
-    user: process.env.EMAIL_USER || 'techverse@ctuniversity.in',
-    pass: process.env.EMAIL_PASS,
+    user: emailUser,
+    pass: emailPass,
   },
 });
 

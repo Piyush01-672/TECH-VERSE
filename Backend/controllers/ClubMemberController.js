@@ -43,15 +43,17 @@ const submitClubMember = async (req, res) => {
 
     // Send official Club Membership Card to the member's email from techverse@ctuniversity.in
     try {
-      if (data.email) {
+        const emailPass = process.env.EMAIL_PASS ? String(process.env.EMAIL_PASS).replace(/\s+/g, '').trim() : '';
+        const emailUser = (process.env.EMAIL_USER ? String(process.env.EMAIL_USER).trim() : '') || 'techverse@ctuniversity.in';
+
         const transporter = nodemailer.createTransport({
           service: process.env.EMAIL_SERVICE || 'gmail',
           host: process.env.EMAIL_HOST || 'smtp.gmail.com',
           port: Number(process.env.EMAIL_PORT) || 587,
           secure: process.env.EMAIL_SECURE === 'true',
           auth: {
-            user: process.env.EMAIL_USER || 'techverse@ctuniversity.in',
-            pass: process.env.EMAIL_PASS,
+            user: emailUser,
+            pass: emailPass,
           },
         });
 
@@ -262,7 +264,7 @@ const submitClubMember = async (req, res) => {
           attachments,
         };
 
-        if (process.env.EMAIL_PASS) {
+        if (emailPass) {
           await transporter.sendMail(mailOptions);
           console.log(`✅ Membership Card email sent successfully to ${data.email} from techverse@ctuniversity.in`);
         } else {
