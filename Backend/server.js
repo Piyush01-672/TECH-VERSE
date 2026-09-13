@@ -56,8 +56,8 @@ app.use(rateLimit({
 
 // ==========================
 // ✅ Middleware
-// ==========================
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // ==========================
 // ✅ MongoDB Connection
@@ -74,6 +74,7 @@ app.use('/api/gallery', require('./routes/GalleryServer'));
 app.use('/api/contact', require('./routes/ContactServer'));
 app.use('/api/aboutus', require('./routes/AboutServer'));
 app.use('/api/enquiry', require('./routes/Enquiry'));
+app.use('/api/club-members', require('./routes/ClubMemberRoute'));
 app.use('/api/mentors', require('./routes/Mentor'));
 app.use('/api/register', require('./routes/RegistrationServer'));
 app.use('/api/codecrafter-register', require('./routes/CodeCrafterRegistrationServer'));

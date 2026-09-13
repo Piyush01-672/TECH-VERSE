@@ -88,6 +88,41 @@ export const submitContact = async (contactData: any) => {
   }
 };
 
+export const submitClubMember = async (memberData: any) => {
+  const url = `${API_BASE_URL}/api/club-members`;
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(memberData),
+    });
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (e) {
+      data = {};
+    }
+
+    if (!response.ok) {
+      // If /api/club-members is not yet deployed on remote host, fall back to /api/enquiry
+      return await submitEnquiry(memberData);
+    }
+
+    return data;
+  } catch (error) {
+    // Attempt fallback to /api/enquiry
+    try {
+      return await submitEnquiry(memberData);
+    } catch (fallbackError) {
+      console.error('Error submitting club member:', error);
+      throw error;
+    }
+  }
+};
+
 export const submitEnquiry = async (enquiryData: any) => {
   const url = `${API_BASE_URL}/api/enquiry`;
   try {
@@ -107,6 +142,29 @@ export const submitEnquiry = async (enquiryData: any) => {
     }
 
     if (!response.ok) {
+      // If server rejected due to unknown fields on older backend version, retry with standard fields and embedded metadata
+      if (response.status === 400 && data.message === 'Validation Error') {
+        const metadataString = `[Residence: ${enquiryData.residenceType || 'Day Scholar'}] [Designation: ${enquiryData.designation || 'Pending'}] [RoleAssignee: ${enquiryData.roleAssignee || 'Pending'}] [Photo: ${enquiryData.photo ? 'Uploaded' : 'None'}] ${enquiryData.otherInterest || ''}`.trim();
+        const fallbackPayload = {
+          name: enquiryData.name,
+          regNumber: enquiryData.regNumber,
+          contact: enquiryData.contact,
+          email: enquiryData.email,
+          department: enquiryData.department,
+          batch: enquiryData.batch,
+          interests: enquiryData.interests,
+          otherInterest: metadataString,
+        };
+        const retryResponse = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(fallbackPayload),
+        });
+        if (retryResponse.ok) {
+          return await retryResponse.json();
+        }
+      }
+
       const error: any = new Error(data.message || 'Enquiry submission failed. Please try again.');
       error.response = { data };
       throw error;

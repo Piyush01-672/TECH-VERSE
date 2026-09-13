@@ -170,7 +170,7 @@ const Home = () => {
       size="lg"
       className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-10 py-6 text-lg shadow-lg shadow-secondary/40 hover:shadow-[0_0_25px_rgba(59,130,246,0.7)] transition-all duration-300 rounded-xl"
     >
-      Join now
+      Join Us
     </Button>
     <Button
       size="lg"
