@@ -4,7 +4,14 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
-require('@dotenvx/dotenvx').config({ silent: true });
+const path = require('path');
+const fs = require('fs');
+
+const envPath = fs.existsSync(path.join(__dirname, '.env')) 
+  ? path.join(__dirname, '.env') 
+  : (fs.existsSync(path.join(process.cwd(), '.env')) ? path.join(process.cwd(), '.env') : undefined);
+
+require('@dotenvx/dotenvx').config({ path: envPath, silent: true });
 
 const app = express();
 

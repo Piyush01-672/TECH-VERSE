@@ -29,7 +29,17 @@ const getContactsCSV = async (req, res) => {
   }
 };
 
+const getContacts = async (req, res) => {
+  try {
+    const contacts = await Contact.find().sort({ createdAt: -1 });
+    res.json(contacts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   submitContact,
+  getContacts,
   getContactsCSV
 };
