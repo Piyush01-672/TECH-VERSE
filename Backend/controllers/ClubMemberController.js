@@ -3,6 +3,16 @@ const fs = require('fs');
 const nodemailer = require('nodemailer');
 const ClubMember = require('../models/ClubMember');
 
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 const getClubMembers = async (req, res) => {
   try {
     const members = await ClubMember.find().sort({ createdAt: -1 });
@@ -37,18 +47,25 @@ const submitClubMember = async (req, res) => {
       data.memberId = `TV-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
     }
 
+    const recipientEmail = String(data.email).trim().toLowerCase();
+    data.email = recipientEmail;
+
     // Save exclusively into MongoDB 'clubmembers' collection (No enquiry mirroring)
     const newMember = new ClubMember(data);
     await newMember.save();
 
+    let emailSent = false;
+    let emailError = null;
+
     // Send official Club Membership Card to the member's email from techverse@ctuniversity.in
     try {
-        const emailPass = process.env.EMAIL_PASS ? String(process.env.EMAIL_PASS).replace(/\s+/g, '').trim() : '';
-        const emailUser = (process.env.EMAIL_USER ? String(process.env.EMAIL_USER).trim() : '') || 'techverse@ctuniversity.in';
+      const emailPass = process.env.EMAIL_PASS ? String(process.env.EMAIL_PASS).replace(/\s+/g, '').trim() : '';
+      const emailUser = (process.env.EMAIL_USER ? String(process.env.EMAIL_USER).trim() : '') || 'techverse@ctuniversity.in';
 
-        const transporter = nodemailer.createTransport({
-          service: process.env.EMAIL_SERVICE || 'gmail',
-          host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+      let transporter;
+      if (process.env.EMAIL_HOST) {
+        transporter = nodemailer.createTransport({
+          host: process.env.EMAIL_HOST,
           port: Number(process.env.EMAIL_PORT) || 587,
           secure: process.env.EMAIL_SECURE === 'true',
           auth: {
@@ -56,42 +73,54 @@ const submitClubMember = async (req, res) => {
             pass: emailPass,
           },
         });
+      } else {
+        transporter = nodemailer.createTransport({
+          service: process.env.EMAIL_SERVICE || 'gmail',
+          auth: {
+            user: emailUser,
+            pass: emailPass,
+          },
+        });
+      }
 
-        // Prepare attachments for the 3 logos
-        const attachments = [];
-        const assetsDir = path.join(__dirname, '../assets');
+      // Prepare attachments for the 3 logos
+      const attachments = [];
+      const assetsDir = path.join(__dirname, '../assets');
 
-        const univLogoPath = path.join(assetsDir, 'univeee-logo.png');
-        const techverseLogoPath = path.join(assetsDir, 'techverse-logo.jpg');
-        const soetLogoPath = path.join(assetsDir, 'soet-logo.png');
+      const univLogoPath = path.join(assetsDir, 'univeee-logo.png');
+      const techverseLogoPath = path.join(assetsDir, 'techverse-logo.jpg');
+      const soetLogoPath = path.join(assetsDir, 'soet-logo.png');
 
-        if (fs.existsSync(univLogoPath)) {
-          attachments.push({
-            filename: 'univeee-logo.png',
-            path: univLogoPath,
-            cid: 'univLogo',
-          });
-        }
+      if (fs.existsSync(univLogoPath)) {
+        attachments.push({
+          filename: 'univeee-logo.png',
+          path: univLogoPath,
+          cid: 'univLogo',
+        });
+      }
 
-        if (fs.existsSync(techverseLogoPath)) {
-          attachments.push({
-            filename: 'techverse-logo.jpg',
-            path: techverseLogoPath,
-            cid: 'techverseLogo',
-          });
-        }
+      if (fs.existsSync(techverseLogoPath)) {
+        attachments.push({
+          filename: 'techverse-logo.jpg',
+          path: techverseLogoPath,
+          cid: 'techverseLogo',
+        });
+      }
 
-        if (fs.existsSync(soetLogoPath)) {
-          attachments.push({
-            filename: 'soet-logo.png',
-            path: soetLogoPath,
-            cid: 'soetLogo',
-          });
-        }
+      if (fs.existsSync(soetLogoPath)) {
+        attachments.push({
+          filename: 'soet-logo.png',
+          path: soetLogoPath,
+          cid: 'soetLogo',
+        });
+      }
 
-        // Embed student photo if available
-        let hasPhotoAttachment = false;
-        if (data.photo && typeof data.photo === 'string' && data.photo.startsWith('data:image/')) {
+      // Embed student photo if available
+      let photoHtml = '';
+      let hasPhotoAttachment = false;
+
+      if (data.photo && typeof data.photo === 'string') {
+        if (data.photo.startsWith('data:image/')) {
           const matches = data.photo.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
           if (matches && matches.length === 3) {
             const mimeType = matches[1];
@@ -102,18 +131,26 @@ const submitClubMember = async (req, res) => {
               cid: 'memberPhoto',
               contentType: mimeType,
             });
+            photoHtml = `<img src="cid:memberPhoto" alt="${escapeHtml(data.name)}" style="width: 110px; height: 130px; object-fit: cover; border-radius: 12px; border: 2px solid #2563eb; display: block; margin: auto;" />`;
             hasPhotoAttachment = true;
           }
+        } else if (data.photo.startsWith('http://') || data.photo.startsWith('https://')) {
+          photoHtml = `<img src="${data.photo}" alt="${escapeHtml(data.name)}" style="width: 110px; height: 130px; object-fit: cover; border-radius: 12px; border: 2px solid #2563eb; display: block; margin: auto;" />`;
+          hasPhotoAttachment = true;
         }
+      }
 
-        const departmentDisplay = data.department === 'btech' ? 'B.Tech (School of Engineering & Technology)' : (data.department === 'bca' ? 'BCA (School of Engineering & Technology)' : String(data.department).toUpperCase());
-        const interestsList = Array.isArray(data.interests) ? data.interests.join(', ') : (data.interests || 'Technology & Innovation');
+      if (!hasPhotoAttachment) {
+        const initial = (data.name && data.name.trim().length > 0) ? escapeHtml(data.name.trim().charAt(0).toUpperCase()) : 'M';
+        photoHtml = `<div style="width: 110px; height: 130px; border-radius: 12px; background: #e0e7ff; border: 2px dashed #3b82f6; display: flex; align-items: center; justify-content: center; text-align: center; margin: auto;"><span style="font-size: 32px; color: #1e40af; font-weight: bold; line-height: 130px;">${initial}</span></div>`;
+      }
 
-        const photoHtml = hasPhotoAttachment
-          ? `<img src="cid:memberPhoto" alt="${data.name}" style="width: 110px; height: 130px; object-fit: cover; border-radius: 12px; border: 2px solid #2563eb; display: block; margin: auto;" />`
-          : `<div style="width: 110px; height: 130px; border-radius: 12px; background: #e0e7ff; border: 2px dashed #3b82f6; display: flex; align-items: center; justify-content: center; text-align: center; margin: auto;"><span style="font-size: 32px; color: #1e40af; font-weight: bold; line-height: 130px;">${data.name.charAt(0).toUpperCase()}</span></div>`;
+      const departmentDisplay = data.department === 'btech' 
+        ? 'B.Tech (School of Engineering & Technology)' 
+        : (data.department === 'bca' ? 'BCA (School of Engineering & Technology)' : String(data.department).toUpperCase());
+      const interestsList = Array.isArray(data.interests) ? data.interests.join(', ') : (data.interests || 'Technology & Innovation');
 
-        const emailHtml = `
+      const emailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -175,7 +212,7 @@ const submitClubMember = async (req, res) => {
               ${photoHtml}
               <div style="margin-top: 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 6px 4px;">
                 <span style="display: block; font-size: 9px; font-weight: bold; color: #1e40af; text-transform: uppercase; letter-spacing: 1px;">Member ID</span>
-                <span style="font-size: 12px; font-weight: 800; color: #0f172a; font-family: monospace;">${data.memberId}</span>
+                <span style="font-size: 12px; font-weight: 800; color: #0f172a; font-family: monospace;">${escapeHtml(data.memberId)}</span>
               </div>
               <div style="margin-top: 6px;">
                 <span style="display: inline-block; font-size: 10px; font-weight: 700; color: #059669; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 6px;">Active Member</span>
@@ -187,35 +224,35 @@ const submitClubMember = async (req, res) => {
               <table width="100%" cellspacing="0" cellpadding="4" border="0" style="font-size: 12px;">
                 <tr>
                   <td width="38%" style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Full Name:</td>
-                  <td style="color: #0f172a; font-weight: 800; font-size: 14px;">${data.name}</td>
+                  <td style="color: #0f172a; font-weight: 800; font-size: 14px;">${escapeHtml(data.name)}</td>
                 </tr>
                 <tr>
                   <td style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Reg. Number:</td>
-                  <td style="color: #1e40af; font-weight: 700; font-family: monospace;">${data.regNumber}</td>
+                  <td style="color: #1e40af; font-weight: 700; font-family: monospace;">${escapeHtml(data.regNumber)}</td>
                 </tr>
                 <tr>
                   <td style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Department:</td>
-                  <td style="color: #0f172a; font-weight: 600;">${departmentDisplay}</td>
+                  <td style="color: #0f172a; font-weight: 600;">${escapeHtml(departmentDisplay)}</td>
                 </tr>
                 <tr>
                   <td style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Batch:</td>
-                  <td style="color: #0f172a; font-weight: 600;">${data.batch}</td>
+                  <td style="color: #0f172a; font-weight: 600;">${escapeHtml(data.batch)}</td>
                 </tr>
                 <tr>
                   <td style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Residence:</td>
                   <td style="color: #0f172a; font-weight: 600;">
-                    <span style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: bold;">${data.residenceType}</span>
+                    <span style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: bold;">${escapeHtml(data.residenceType)}</span>
                   </td>
                 </tr>
                 <tr>
                   <td style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Contact No.:</td>
-                  <td style="color: #0f172a; font-weight: 600; font-family: monospace;">${data.contact}</td>
+                  <td style="color: #0f172a; font-weight: 600; font-family: monospace;">${escapeHtml(data.contact)}</td>
                 </tr>
                 <tr>
                   <td style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Club Designation:</td>
                   <td>
                     <span style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-weight: 700; font-size: 10px; padding: 2px 8px; border-radius: 4px;">
-                      ${data.designation || 'Pending Admin Assignment'}
+                      ${escapeHtml(data.designation) || 'Pending Admin Assignment'}
                     </span>
                   </td>
                 </tr>
@@ -223,7 +260,7 @@ const submitClubMember = async (req, res) => {
                   <td style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Role Assignee:</td>
                   <td>
                     <span style="background: #dbeafe; color: #1e3a8a; border: 1px solid #bfdbfe; font-weight: 700; font-size: 10px; padding: 2px 8px; border-radius: 4px;">
-                      ${data.roleAssignee || 'Pending Admin Assignment'}
+                      ${escapeHtml(data.roleAssignee) || 'Pending Admin Assignment'}
                     </span>
                   </td>
                 </tr>
@@ -234,7 +271,7 @@ const submitClubMember = async (req, res) => {
 
         <!-- INTERESTS & NOTE -->
         <div style="margin-top: 18px; padding: 12px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 11px;">
-          <p style="margin: 0 0 6px 0; font-weight: bold; color: #334155;">Interests & Domains: <span style="color: #2563eb; font-weight: 600;">${interestsList}</span></p>
+          <p style="margin: 0 0 6px 0; font-weight: bold; color: #334155;">Interests & Domains: <span style="color: #2563eb; font-weight: 600;">${escapeHtml(interestsList)}</span></p>
           <p style="margin: 0; color: #64748b; font-size: 10px; line-height: 1.4;">
             ℹ️ <strong>Club Protocol:</strong> Stored in MongoDB <code>clubmembers</code> collection. Your official Designation and Role Assignee will be reviewed and assigned by club administrators based on auditions and team selections.
           </p>
@@ -253,31 +290,36 @@ const submitClubMember = async (req, res) => {
   </table>
 </body>
 </html>
-        `;
+      `;
 
-        const mailOptions = {
-          from: `"TechVerse Club • CT University" <techverse@ctuniversity.in>`,
-          to: data.email,
-          replyTo: 'techverse@ctuniversity.in',
-          subject: `🎓 TechVerse Club Membership Card - ${data.name} (${data.memberId})`,
-          html: emailHtml,
-          attachments,
-        };
+      const mailOptions = {
+        from: `"TechVerse Club • CT University" <${emailUser}>`,
+        to: recipientEmail,
+        replyTo: emailUser,
+        subject: `🎓 TechVerse Club Membership Card - ${data.name} (${data.memberId})`,
+        html: emailHtml,
+        attachments,
+      };
 
-        if (emailPass) {
-          await transporter.sendMail(mailOptions);
-          console.log(`✅ Membership Card email sent successfully to ${data.email} from techverse@ctuniversity.in`);
-        } else {
-          console.log(`ℹ️ EMAIL_PASS not set in environment. Registered in MongoDB 'clubmembers'. Ready to email to ${data.email} once credentials are set.`);
-        }
+      if (emailPass) {
+        await transporter.sendMail(mailOptions);
+        emailSent = true;
+        console.log(`✅ Membership Card email sent successfully to ${recipientEmail} from techverse@ctuniversity.in`);
+      } else {
+        console.log(`ℹ️ EMAIL_PASS not set in environment. Saved in MongoDB 'clubmembers'. Ready to email to ${recipientEmail} once credentials are set.`);
       }
     } catch (emailErr) {
+      emailError = emailErr.message;
       console.error('Email Dispatch Warning (non-blocking):', emailErr.message);
     }
 
     res.status(201).json({
       success: true,
-      message: 'Club member registered successfully! Your Club ID card has been issued.',
+      emailSent,
+      emailError,
+      message: emailSent
+        ? 'Club member registered successfully! Your Club ID card has been issued and sent to your email.'
+        : 'Club member registered successfully in MongoDB!',
       member: newMember,
     });
   } catch (err) {

@@ -210,8 +210,12 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
     };
 
     try {
-      await submitClubMember(payload);
-      toast.success("Welcome to TechVerse! Membership registered & ID Card emailed to your inbox.");
+      const res = await submitClubMember(payload);
+      if (res?.emailSent) {
+        toast.success("Welcome to TechVerse! Membership registered & ID Card emailed to your inbox.");
+      } else {
+        toast.success("Welcome to TechVerse! Membership registered. Official Club Card issued.");
+      }
     } catch (err) {
       console.warn("Club member registration notice:", err);
       toast.success("Membership registered! Here is your official Club Membership Card.");
