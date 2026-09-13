@@ -1,0 +1,22 @@
+const mongoose = require('mongoose');
+
+const ClubMemberSchema = new mongoose.Schema({
+  memberId: { type: String, default: '' },
+  name: { type: String, required: true },
+  regNumber: { type: String, required: true },
+  contact: { type: String, required: true },
+  email: { type: String, required: true },
+  department: { type: String, required: true },
+  batch: { type: String, required: true },
+  residenceType: { type: String, enum: ['Hosteller', 'Day Scholar'], default: 'Day Scholar' },
+  photo: { type: String, default: '' },
+  interests: { type: [String], default: [] },
+  otherInterest: { type: String, default: '' },
+  designation: { type: String, default: '' }, // empty field to be filled by admin in MongoDB
+  roleAssignee: { type: String, default: '' }, // role assignee field to be filled by admin
+  role: { type: String, default: 'Member' },
+  status: { type: String, default: 'Active' },
+  createdAt: { type: Date, default: Date.now },
+}, { strict: false, collection: 'clubmembers' });
+
+module.exports = mongoose.model('ClubMember', ClubMemberSchema);
