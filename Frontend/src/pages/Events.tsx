@@ -1,28 +1,28 @@
 import { useState, useRef, useMemo, useEffect } from "react";
 import confetti from "canvas-confetti";
-import { 
-  Calendar, 
-  MapPin, 
-  Trophy, 
-  Users, 
-  Sparkles, 
-  CheckCircle2, 
-  ArrowRight, 
-  Zap, 
-  RotateCcw, 
-  HelpCircle, 
-  Laugh, 
-  Gamepad2, 
-  Swords, 
-  Bot, 
-  Terminal, 
-  Palette, 
-  Building2, 
-  Wrench, 
-  Layers, 
-  Bike, 
-  Recycle, 
-  ExternalLink, 
+import {
+  Calendar,
+  MapPin,
+  Trophy,
+  Users,
+  Sparkles,
+  CheckCircle2,
+  ArrowRight,
+  Zap,
+  RotateCcw,
+  HelpCircle,
+  Laugh,
+  Gamepad2,
+  Swords,
+  Bot,
+  Terminal,
+  Palette,
+  Building2,
+  Wrench,
+  Layers,
+  Bike,
+  Recycle,
+  ExternalLink,
   Mail,
   LayoutGrid,
   Rows,
@@ -71,7 +71,7 @@ export const eventsList: EventItem[] = [
     category: "brain",
     icon: HelpCircle,
     tagline: "High-Voltage Engineering & Brain-Benders",
-    description: "Rapid buzzer rounds, technical mind-benders, engineering history, and logical deduction showdown.",
+    description: "The event aims to encourage students to demonstrate theire technical knowledge, logical thinking, problem-solving ability, awareness of engineering concepts, teamwork, and quick decision-making through a competitive quiz",
     teamSize: 4,
     format: "Squad of 4",
     perk: "🏆 Trophies & Merit Medals",
@@ -90,7 +90,7 @@ export const eventsList: EventItem[] = [
     category: "makers",
     icon: Bike,
     tagline: "Dynamic Handling & Trike Racing Arena",
-    description: "Navigate high-stakes maneuver tracks, obstacle agility, and vehicle stability in a thrill-filled competition.",
+    description: "3-Wheel Ideathon is a Fast-paced innovation challenge where participats spin three wheels to get a domain, target audience, and challenge/constraint, then develop a practical idea based on the given combination.",
     teamSize: 2,
     format: "Duo (2 Members)",
     perk: "⚡ Speed & Agility Shield",
@@ -109,7 +109,7 @@ export const eventsList: EventItem[] = [
     category: "creative",
     icon: Laugh,
     tagline: "Tech Humor & Engineering Satire",
-    description: "Craft hilarious, relatable memes on student life, coding bugs, brutal viva deadlines, and engineering reality.",
+    description: "Meme making is the creative process of combining images, text, captions, graphics, or other visual elements to communicate an idea, situation, joke, or message in a short, humouous, and engaging format. Participants are expected to use their creativity to produce an original meme that communicates the given idea effectively.",
     teamSize: 1,
     format: "Solo (1 Member)",
     perk: "🔥 Viral Crown & Swag Kit",
@@ -128,7 +128,7 @@ export const eventsList: EventItem[] = [
     category: "esports",
     icon: Pickaxe,
     tagline: "Voxel Architecture & Creative Speed-Building",
-    description: "Show off your creative speed-building prowess in Minecraft with on-the-spot architectural and engineering design themes.",
+    description: "Race against time to craft and place aDiamond Block first in this thrilling Minecraft survival challenge",
     teamSize: 1,
     format: "Solo (1 Member)",
     perk: "🎮 Master Architect Certificate & Prizes",
@@ -147,7 +147,7 @@ export const eventsList: EventItem[] = [
     category: "esports",
     icon: Crosshair,
     tagline: "5v5 Tactical Multiplayer & Search & Destroy",
-    description: "Assemble your 5-operator squad for high-octane 5v5 tactical gunplay, objective control, and competitive combat in Call of Duty: Mobile.",
+    description: "Format: Initial rounds will use Frontline, TDM, or Hardpoint. The mode will be decided by the organizers",
     teamSize: 5,
     format: "Squad of 5",
     perk: "🎖️ Tactical Champion Certificate & Prizes",
@@ -180,12 +180,12 @@ export const eventsList: EventItem[] = [
     ],
   },
   {
-    id: "ai-imposter",
-    name: "AI Imposter Spotter",
+    id: "tech-imposter",
+    name: "Tech Imposter",
     category: "brain",
     icon: Bot,
     tagline: "Spot The Synthetic Intruder Challenge",
-    description: "Can you distinguish between human craftsmanship and AI generation? Test your discernment against tricky bots.",
+    description: "Tech Imposter is a fun game designed for all-year university students. The goal fo the game is to test basic tech awareness, communication skills, quick thinking, and bluffing. In this game, human teams are given a specific tech term(Canva), while one secret team (The AI Imposter) is given a highly similar tech term(e.g, Adobe Illustrator)",
     teamSize: 2,
     format: "Duo (2 Members)",
     perk: "🧠 AI Mastermind Badge",
@@ -204,7 +204,7 @@ export const eventsList: EventItem[] = [
     category: "brain",
     icon: Terminal,
     tagline: "LLM Orchestration & Generative Masterclass",
-    description: "Engineer precise prompts to jailbreak challenges, solve complex algorithmic riddles, and generate exact outputs.",
+    description: "The Prompt Engineering Competition is an AI-Based challenge where paarticipants are given reference images and must create similar images using Google Gemini. Participants need to write effective prompts themselves and use different prompting techniques across three rounds: zero-Shot, Few-Shot, and Role-Based Prompting",
     teamSize: 1,
     format: "Solo (1 Member)",
     perk: "🚀 TechVerse AI Fellow Cup",
@@ -242,7 +242,7 @@ export const eventsList: EventItem[] = [
     category: "creative",
     icon: Building2,
     tagline: "Architectural Drafting & Structural Plans",
-    description: "Draft 2D floor plans, elevations, and structural drawings with precision dimensioning under time constraints.",
+    description: "An AutoCAD design competition to create an accurate, and technically sound drawing based on a given problem statement",
     teamSize: 1,
     format: "Solo (1 Member)",
     perk: "📐 Blueprint Excellence Award",
@@ -261,7 +261,7 @@ export const eventsList: EventItem[] = [
     category: "creative",
     icon: Wrench,
     tagline: "Machine Components & 2D/3D Modeling",
-    description: "Draft mechanical assemblies, machine parts, sectional projections, and detailed orthographic tolerances.",
+    description: "The objective of the competition is to provide students with an opportunity to demonstrate their technical drawing skills, AutoCAD proficiency, accuracy, creativity and engineering design knowledge, irrespective of their department",
     teamSize: 1,
     format: "Solo (1 Member)",
     perk: "⚙️ Precision Draftsman Cup",
@@ -280,14 +280,14 @@ export const eventsList: EventItem[] = [
     category: "makers",
     icon: Layers,
     tagline: "Truss Strength & Structural Load Challenge",
-    description: "Construct an efficient load-bearing bridge using standard sticks and adhesives, tested to maximum physical failure weight.",
-    teamSize: 4,
-    format: "Squad of 4",
+    description: "A bridge-making competition to design and construct a strong stable, and creative bridge using ice-cream stick within the given time and design requirements",
+    teamSize: 2,
+    format: "Squad of 2",
     perk: "🏗️ Heavy-Load Titan Trophy",
     accent: "from-teal-400 via-emerald-600 to-green-500",
     border: "border-teal-500/40",
     rules: [
-      "Fixed team size: Exactly 4 participants per bridge build.",
+      "Fixed team size: Exactly 2 participants per bridge build.",
       "Popsicle sticks and glue provided on spot.",
       "Standard clear span minimum: 45 cm.",
       "Tested until structural collapse with calibrated weights."
@@ -299,7 +299,7 @@ export const eventsList: EventItem[] = [
     category: "makers",
     icon: Recycle,
     tagline: "Upcycling & Sustainable Mechanical Engineering",
-    description: "Transform industrial scrap, discarded components, and waste materials into creative working mechanisms or structural prototypes.",
+    description: "The event aims to encourage students to demonstrate creativity, innovation, engineering thinking, teamwork,and environmental awareness by converting waste or discardedmaterials into useful and innovative products.",
     teamSize: 1,
     format: "Solo (1 Member)",
     perk: "🌱 Eco-Innovator Shield",
@@ -455,7 +455,7 @@ const Events = () => {
         origin: { y: 0.7 },
         colors: ["#06b6d4", "#3b82f6", "#a855f7", "#ec4899", "#eab308"],
       });
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const handlePickEvent = (eventId: string) => {
@@ -590,7 +590,7 @@ const Events = () => {
           origin: { y: 0.5 },
           colors: ["#06b6d4", "#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b"],
         });
-      } catch (e) {}
+      } catch (e) { }
 
       toast.success(`🎉 Congratulations! Registered team for ${currentSelectedEvent.name}!`);
       formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -616,10 +616,10 @@ const Events = () => {
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         {/* Deep Cosmic Dark Base with Radial Depth */}
         <div className="absolute inset-0 bg-[#020510]" />
-        
+
         {/* Layer 1: Vibrant Electric Top Nebula */}
         <div className="absolute -top-[20%] left-1/2 -translate-x-1/2 w-[1000px] h-[700px] bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.25)_0%,rgba(59,130,246,0.18)_35%,rgba(147,51,234,0.1)_60%,transparent_80%)] blur-[90px]" />
-        
+
         {/* Layer 2: Mid Right Neon Rose/Violet Aurora */}
         <div className="absolute top-[32%] -right-[15%] w-[800px] h-[650px] bg-[radial-gradient(circle_at_center,rgba(236,72,153,0.18)_0%,rgba(168,85,247,0.14)_40%,transparent_75%)] blur-[100px]" />
 
@@ -630,7 +630,7 @@ const Events = () => {
         <div className="absolute -bottom-[20%] left-1/3 w-[900px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.15)_0%,rgba(6,182,212,0.12)_40%,transparent_75%)] blur-[100px]" />
 
         {/* Layer 5: Cyber Matrix Perspective Grid with Soft Edge Fade */}
-        <div 
+        <div
           className="absolute inset-0 opacity-25"
           style={{
             backgroundImage: `
@@ -742,6 +742,13 @@ const Events = () => {
           >
             <Dices className="w-5 h-5 text-purple-400 animate-spin-slow" /> Surprise Me (Spin Arena)
           </Button>
+          <Button
+            size="lg"
+            onClick={() => window.open("/public/Engineers_Day_2026_Professional_Formatted.pdf", "_blank")}
+            className="bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold px-8 py-6 rounded-2xl shadow-xl shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:scale-[1.02] transition-all duration-300 text-base"
+          >
+            Rule Book <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
         </div>
       </section>
 
@@ -795,11 +802,10 @@ const Events = () => {
               <button
                 type="button"
                 onClick={() => setViewMode("grid")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
-                  viewMode === "grid"
-                    ? "bg-cyan-500 text-black font-bold shadow"
-                    : "text-slate-400 hover:text-white"
-                }`}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${viewMode === "grid"
+                  ? "bg-cyan-500 text-black font-bold shadow"
+                  : "text-slate-400 hover:text-white"
+                  }`}
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
                 <span>Cards</span>
@@ -807,11 +813,10 @@ const Events = () => {
               <button
                 type="button"
                 onClick={() => setViewMode("list")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
-                  viewMode === "list"
-                    ? "bg-cyan-500 text-black font-bold shadow"
-                    : "text-slate-400 hover:text-white"
-                }`}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${viewMode === "list"
+                  ? "bg-cyan-500 text-black font-bold shadow"
+                  : "text-slate-400 hover:text-white"
+                  }`}
               >
                 <Rows className="w-3.5 h-3.5" />
                 <span>List</span>
@@ -829,17 +834,15 @@ const Events = () => {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveCategory(tab.id as EventCategory)}
-                className={`px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 border ${
-                  isActive
-                    ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.4)] scale-[1.02]"
-                    : "bg-white/[0.04] text-slate-300 border-white/10 hover:bg-white/[0.08] hover:text-white"
-                }`}
+                className={`px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 border ${isActive
+                  ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.4)] scale-[1.02]"
+                  : "bg-white/[0.04] text-slate-300 border-white/10 hover:bg-white/[0.08] hover:text-white"
+                  }`}
               >
                 <span>{tab.label}</span>
                 <span
-                  className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md ${
-                    isActive ? "bg-black/30 text-white" : "bg-white/10 text-slate-400"
-                  }`}
+                  className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md ${isActive ? "bg-black/30 text-white" : "bg-white/10 text-slate-400"
+                    }`}
                 >
                   {tab.count}
                 </span>
@@ -857,11 +860,10 @@ const Events = () => {
               return (
                 <div
                   key={item.id}
-                  className={`group relative rounded-2xl border p-5 transition-all duration-300 flex flex-col justify-between overflow-hidden backdrop-blur-xl ${
-                    isSelected
-                      ? "bg-cyan-950/40 border-cyan-400 shadow-[0_0_30px_rgba(6,182,212,0.35)] ring-1 ring-cyan-400 -translate-y-1"
-                      : "bg-[#090d1f]/80 border-white/10 hover:border-cyan-500/40 hover:bg-white/[0.05] hover:-translate-y-1"
-                  }`}
+                  className={`group relative rounded-2xl border p-5 transition-all duration-300 flex flex-col justify-between overflow-hidden backdrop-blur-xl ${isSelected
+                    ? "bg-cyan-950/40 border-cyan-400 shadow-[0_0_30px_rgba(6,182,212,0.35)] ring-1 ring-cyan-400 -translate-y-1"
+                    : "bg-[#090d1f]/80 border-white/10 hover:border-cyan-500/40 hover:bg-white/[0.05] hover:-translate-y-1"
+                    }`}
                 >
                   <div
                     className={`absolute -top-16 -right-16 w-32 h-32 bg-gradient-to-br ${item.accent} rounded-full blur-[50px] opacity-20 pointer-events-none`}
@@ -881,11 +883,10 @@ const Events = () => {
                     {/* Icon & Title */}
                     <div className="flex items-start gap-3.5 mb-2.5">
                       <div
-                        className={`p-3 rounded-xl border flex-shrink-0 transition-transform group-hover:scale-105 ${
-                          isSelected
-                            ? "bg-gradient-to-br from-cyan-500 to-blue-600 text-white border-cyan-400 shadow-md shadow-cyan-500/30"
-                            : "bg-white/5 border-white/10 text-cyan-400 group-hover:bg-cyan-500/20"
-                        }`}
+                        className={`p-3 rounded-xl border flex-shrink-0 transition-transform group-hover:scale-105 ${isSelected
+                          ? "bg-gradient-to-br from-cyan-500 to-blue-600 text-white border-cyan-400 shadow-md shadow-cyan-500/30"
+                          : "bg-white/5 border-white/10 text-cyan-400 group-hover:bg-cyan-500/20"
+                          }`}
                       >
                         <IconComponent className="w-5 h-5" />
                       </div>
@@ -918,11 +919,10 @@ const Events = () => {
                       type="button"
                       size="sm"
                       onClick={() => handlePickEvent(item.id)}
-                      className={`flex-1 rounded-xl text-xs font-bold transition-all py-2 ${
-                        isSelected
-                          ? "bg-cyan-500 hover:bg-cyan-400 text-black shadow-md shadow-cyan-500/30"
-                          : "bg-white/10 hover:bg-white/20 text-white border border-white/10"
-                      }`}
+                      className={`flex-1 rounded-xl text-xs font-bold transition-all py-2 ${isSelected
+                        ? "bg-cyan-500 hover:bg-cyan-400 text-black shadow-md shadow-cyan-500/30"
+                        : "bg-white/10 hover:bg-white/20 text-white border border-white/10"
+                        }`}
                     >
                       {isSelected ? (
                         <span className="flex items-center gap-1.5">
@@ -955,11 +955,10 @@ const Events = () => {
               return (
                 <div
                   key={item.id}
-                  className={`p-4 rounded-2xl border transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-4 ${
-                    isSelected
-                      ? "bg-cyan-950/40 border-cyan-400 shadow-[0_0_25px_rgba(6,182,212,0.3)] ring-1 ring-cyan-400"
-                      : "bg-[#090d1f]/80 border-white/10 hover:border-cyan-500/30 hover:bg-white/[0.04]"
-                  }`}
+                  className={`p-4 rounded-2xl border transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-4 ${isSelected
+                    ? "bg-cyan-950/40 border-cyan-400 shadow-[0_0_25px_rgba(6,182,212,0.3)] ring-1 ring-cyan-400"
+                    : "bg-[#090d1f]/80 border-white/10 hover:border-cyan-500/30 hover:bg-white/[0.04]"
+                    }`}
                 >
                   <div className="flex items-center gap-4 min-w-0">
                     <span className="text-xs font-mono font-bold text-cyan-400 flex-shrink-0">
@@ -967,11 +966,10 @@ const Events = () => {
                     </span>
 
                     <div
-                      className={`p-3 rounded-xl border flex-shrink-0 ${
-                        isSelected
-                          ? "bg-cyan-500 text-black border-cyan-400"
-                          : "bg-white/5 border-white/10 text-cyan-400"
-                      }`}
+                      className={`p-3 rounded-xl border flex-shrink-0 ${isSelected
+                        ? "bg-cyan-500 text-black border-cyan-400"
+                        : "bg-white/5 border-white/10 text-cyan-400"
+                        }`}
                     >
                       <IconComponent className="w-5 h-5" />
                     </div>
@@ -1006,11 +1004,10 @@ const Events = () => {
                       type="button"
                       size="sm"
                       onClick={() => handlePickEvent(item.id)}
-                      className={`rounded-xl text-xs font-bold px-4 py-2 ${
-                        isSelected
-                          ? "bg-cyan-500 text-black font-bold shadow"
-                          : "bg-white/10 hover:bg-white/20 text-white"
-                      }`}
+                      className={`rounded-xl text-xs font-bold px-4 py-2 ${isSelected
+                        ? "bg-cyan-500 text-black font-bold shadow"
+                        : "bg-white/10 hover:bg-white/20 text-white"
+                        }`}
                     >
                       {isSelected ? "✓ Equipped" : "Select"}
                     </Button>
@@ -1155,11 +1152,10 @@ const Events = () => {
                             key={size}
                             type="button"
                             onClick={() => setBgmiSquadSize(size)}
-                            className={`py-2.5 px-3 rounded-xl font-mono text-xs font-bold transition-all border ${
-                              bgmiSquadSize === size
-                                ? "bg-purple-600 text-white border-purple-400 shadow-[0_0_15px_rgba(147,51,234,0.4)]"
-                                : "bg-white/5 text-slate-300 border-white/10 hover:bg-white/10 hover:text-white"
-                            }`}
+                            className={`py-2.5 px-3 rounded-xl font-mono text-xs font-bold transition-all border ${bgmiSquadSize === size
+                              ? "bg-purple-600 text-white border-purple-400 shadow-[0_0_15px_rgba(147,51,234,0.4)]"
+                              : "bg-white/5 text-slate-300 border-white/10 hover:bg-white/10 hover:text-white"
+                              }`}
                           >
                             {size === 2 ? "Duo (2)" : size === 3 ? "Trio (3)" : "Full Squad (4)"}
                           </button>
