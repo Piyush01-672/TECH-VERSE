@@ -44,6 +44,8 @@ import {
   Sparkles,
   IdCard,
   UserCog,
+  Clock,
+  Mail,
 } from "lucide-react";
 
 import UniversityLogo from "@/assets/univeee-logo.png";
@@ -141,8 +143,8 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
     reader.onload = (event) => {
       const img = new Image();
       img.onload = () => {
-        // Optimize to max 600px dimension
-        const maxDim = 600;
+        // Optimize to max 400px dimension and 0.75 quality for fast upload
+        const maxDim = 400;
         let width = img.width;
         let height = img.height;
         if (width > height && width > maxDim) {
@@ -159,7 +161,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
         const ctx = canvas.getContext("2d");
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
           form.setValue("photo", dataUrl);
           setPhotoPreview(dataUrl);
         }
@@ -205,20 +207,16 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
     const payload = {
       ...data,
       memberId,
-      designation: "", // Empty field to be filled by admin in MongoDB
-      roleAssignee: "", // Empty field for admin role assignee in MongoDB
+      designation: "", // Assigned by President/VP in /admin
+      roleAssignee: "",
     };
 
     try {
-      const res = await submitClubMember(payload);
-      if (res?.emailSent) {
-        toast.success("Welcome to TechVerse! Membership registered & ID Card emailed to your inbox.");
-      } else {
-        toast.success("Welcome to TechVerse! Membership registered. Official Club Card issued.");
-      }
-    } catch (err) {
+      await submitClubMember(payload);
+      toast.success("Application submitted! Screening acknowledgment emailed to your inbox.");
+    } catch (err: any) {
       console.warn("Club member registration notice:", err);
-      toast.success("Membership registered! Here is your official Club Membership Card.");
+      toast.info("Application received! You are now in the screening process.");
     } finally {
       setSubmittedMember({
         ...payload,
@@ -277,259 +275,80 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
 
         {submittedMember ? (
           /* ======================================================================= */
-          /* ✅ GENERATED CLUB MEMBERSHIP CARD VIEW (POST SUBMISSION) */
+          /* ✅ SCREENING CONFIRMATION VIEW (POST SUBMISSION)                        */
           /* ======================================================================= */
-          <div className="space-y-6 animate-fade-in">
-            <div className="text-center space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold uppercase tracking-wider mb-1">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                Official Club Membership Confirmed
+          <div className="space-y-6 py-4 px-2 sm:px-4 animate-fade-in text-center">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-100 border-2 border-emerald-400 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/20">
+              <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 text-emerald-600" />
+            </div>
+
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-amber-100 text-amber-900 border border-amber-300 rounded-full text-xs font-black uppercase tracking-wider">
+                <Clock className="w-3.5 h-3.5 text-amber-700 animate-pulse" />
+                Screening Process Underway
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 font-space">
-                Welcome to TechVerse Club! 🎉
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 font-space tracking-tight">
+                Application Submitted Successfully! 🎉
               </h2>
-              <p className="text-slate-600 text-xs sm:text-sm max-w-lg mx-auto">
-                Your membership is active! Your official Member ID Card has been generated and dispatched to <strong className="text-blue-600 font-semibold">{submittedMember.email}</strong> from <strong className="text-slate-800 font-semibold">techverse@ctuniversity.in</strong>.
+              <p className="text-slate-600 text-xs sm:text-sm max-w-lg mx-auto leading-relaxed">
+                Thank you, <strong className="text-slate-900 font-bold">{submittedMember.name}</strong>, for showing interest in <strong className="text-blue-700 font-bold">TechVerse Club</strong>. Your application has been registered and is now under official review.
               </p>
             </div>
 
-            {/* ✅ THE CARD (PRINTABLE CONTAINER) */}
-            <div
-              id="techverse-membership-card"
-              className="relative overflow-hidden rounded-2xl border-2 border-blue-400/80 bg-gradient-to-b from-slate-50 via-white to-blue-50/40 shadow-xl transition-all"
-            >
-              {/* Subtle holographic accent watermark */}
-              <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-blue-500/5 rounded-full pointer-events-none blur-2xl"></div>
-
-              {/* 3 LOGOS HEADER BAR (Exact motif from screenshot 2) */}
-              <div className="bg-gradient-to-r from-blue-50 via-slate-100/90 to-blue-50 border-b border-blue-200/80 px-4 py-4 sm:px-6">
-                <div className="flex items-center justify-between max-w-xl mx-auto">
-                  {/* Left: CT University Logo */}
-                  <div className="flex flex-col items-center">
-                    <img
-                      src={UniversityLogo}
-                      alt="CT University"
-                      className="h-14 w-14 sm:h-20 sm:w-20 object-contain drop-shadow-sm hover:scale-105 transition-transform"
-                    />
-                  </div>
-
-                  {/* Center: TechVerse Club Logo */}
-                  <div className="flex flex-col items-center">
-                    <img
-                      src={TechverseLogo}
-                      alt="TechVerse Club"
-                      className="h-16 w-16 sm:h-22 sm:w-22 rounded-full border-2 border-blue-600 shadow-md object-cover hover:scale-105 transition-transform"
-                    />
-                  </div>
-
-                  {/* Right: School of Engineering and Technology Logo */}
-                  <div className="flex flex-col items-center">
-                    <img
-                      src={SoetLogo}
-                      alt="School of Engineering and Technology"
-                      className="h-14 w-14 sm:h-20 sm:w-20 object-contain drop-shadow-sm hover:scale-105 transition-transform"
-                    />
-                  </div>
+            {/* CURATED SCREENING SUMMARY CARD */}
+            <div className="bg-gradient-to-b from-slate-50 to-blue-50/50 border-2 border-blue-200 rounded-2xl p-5 sm:p-6 text-left max-w-lg mx-auto shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-blue-100 pb-3">
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold block">Application ID</span>
+                  <span className="text-sm font-black font-mono text-blue-800">{submittedMember.memberId}</span>
                 </div>
-
-                {/* Decorative Diamond Connector (Screenshot 2 motif) */}
-                <div className="flex items-center justify-center gap-2 max-w-md mx-auto mt-2">
-                  <div className="flex items-center gap-1 text-emerald-600 text-xs select-none">
-                    <span>◆</span>
-                    <span>◆</span>
-                  </div>
-                  <div className="h-[2px] flex-1 bg-gradient-to-r from-emerald-500 via-blue-500 to-emerald-500 rounded-full"></div>
-                  <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-slate-700">
-                    TechVerse Club • CT University
-                  </span>
-                  <div className="h-[2px] flex-1 bg-gradient-to-r from-emerald-500 via-blue-500 to-emerald-500 rounded-full"></div>
-                  <div className="flex items-center gap-1 text-emerald-600 text-xs select-none">
-                    <span>◆</span>
-                    <span>◆</span>
-                  </div>
-                </div>
-
-                <div className="text-center mt-1">
-                  <span className="text-[11px] font-semibold text-blue-800 tracking-wider uppercase">
-                    School of Engineering & Technology
-                  </span>
+                <div className="text-right">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold block">Submission Date</span>
+                  <span className="text-xs font-semibold text-slate-700">{submittedMember.issuedAt}</span>
                 </div>
               </div>
 
-              {/* CARD TITLE STRIP */}
-              <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white text-center py-2 px-4 shadow-sm flex items-center justify-between">
-                <span className="text-[11px] sm:text-xs font-mono tracking-wider font-bold">
-                  {submittedMember.memberId}
-                </span>
-                <span className="text-xs sm:text-sm font-extrabold tracking-wider uppercase flex items-center gap-1.5 mx-auto">
-                  <IdCard className="w-4 h-4 text-cyan-300" />
-                  Official Club Membership Card
-                </span>
-                <span className="text-[10px] sm:text-xs text-blue-200 hidden sm:inline">
-                  Issued: {submittedMember.issuedAt}
-                </span>
-              </div>
-
-              {/* CARD DETAILS BODY */}
-              <div className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-                {/* Photo & Member Status */}
-                <div className="md:col-span-4 flex flex-col items-center justify-center space-y-2.5">
-                  <div className="relative group">
-                    <div className="w-32 h-36 sm:w-36 sm:h-44 rounded-xl border-2 border-blue-500 overflow-hidden shadow-lg bg-slate-100 flex items-center justify-center">
-                      {submittedMember.photo ? (
-                        <img
-                          src={submittedMember.photo}
-                          alt={submittedMember.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex flex-col items-center justify-center text-slate-400 p-2 text-center">
-                          <UserCheck className="w-12 h-12 text-slate-300 mb-1" />
-                          <span className="text-[11px]">No Photo Uploaded</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-600 text-white text-[10px] font-bold rounded-full shadow-md uppercase tracking-wide">
-                        <CheckCircle2 className="w-3 h-3 text-white" />
-                        Verified
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="text-center pt-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-100 text-blue-900 rounded-full text-xs font-semibold">
-                      {submittedMember.residenceType === "Hosteller" ? (
-                        <>
-                          <Building2 className="w-3.5 h-3.5 text-blue-700" />
-                          Hosteller
-                        </>
-                      ) : (
-                        <>
-                          <HomeIcon className="w-3.5 h-3.5 text-blue-700" />
-                          Day Scholar
-                        </>
-                      )}
-                    </span>
-                  </div>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Registration No.</span>
+                  <span className="font-bold text-slate-800 font-mono">{submittedMember.regNumber}</span>
                 </div>
-
-                {/* Member Details */}
-                <div className="md:col-span-8 space-y-3 sm:space-y-4">
-                  <div>
-                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                      {submittedMember.name}
-                    </h3>
-                    <p className="text-xs sm:text-sm font-semibold text-blue-700 font-mono mt-0.5">
-                      Reg No: {submittedMember.regNumber}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 text-xs sm:text-sm">
-                    <div className="bg-slate-100/80 p-2.5 rounded-lg border border-slate-200">
-                      <span className="block text-[10px] uppercase font-bold text-slate-500">
-                        Course / Program
-                      </span>
-                      <span className="font-bold text-slate-800 uppercase">
-                        {submittedMember.department === "btech" ? "B.Tech" : "BCA"}
-                      </span>
-                    </div>
-
-                    <div className="bg-slate-100/80 p-2.5 rounded-lg border border-slate-200">
-                      <span className="block text-[10px] uppercase font-bold text-slate-500">
-                        Batch Session
-                      </span>
-                      <span className="font-bold text-slate-800">
-                        {submittedMember.batch}
-                      </span>
-                    </div>
-
-                    <div className="bg-slate-100/80 p-2.5 rounded-lg border border-slate-200">
-                      <span className="block text-[10px] uppercase font-bold text-slate-500">
-                        Contact
-                      </span>
-                      <span className="font-semibold text-slate-700 flex items-center gap-1">
-                        <Phone className="w-3 h-3 text-slate-400" />
-                        {submittedMember.contact}
-                      </span>
-                    </div>
-
-                    <div className="bg-slate-100/80 p-2.5 rounded-lg border border-slate-200">
-                      <span className="block text-[10px] uppercase font-bold text-slate-500">
-                        Email Address
-                      </span>
-                      <span className="font-semibold text-slate-700 truncate block">
-                        {submittedMember.email}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Interests */}
-                  {submittedMember.interests && submittedMember.interests.length > 0 && (
-                    <div>
-                      <span className="block text-[10px] uppercase font-bold text-slate-500 mb-1">
-                        Specialized Interests
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {submittedMember.interests.map((interest, idx) => (
-                          <span
-                            key={idx}
-                            className="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200/80 rounded-md text-[11px] font-medium"
-                          >
-                            {interest}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* CLUB DESIGNATION & ROLE ASSIGNEE (Pending Admin Assignment in MongoDB) */}
-                  <div className="mt-3 p-3.5 bg-gradient-to-r from-amber-50/90 via-blue-50/60 to-amber-50/90 border-2 border-dashed border-blue-400/90 rounded-xl shadow-sm space-y-2.5">
-                    {/* Club Designation */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
-                      <div className="flex items-center gap-2">
-                        <ShieldCheck className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                        <span className="text-xs font-black uppercase tracking-wider text-slate-800">
-                          Club Designation:
-                        </span>
-                      </div>
-                      <div className="inline-block flex-shrink-0">
-                        <span className="whitespace-nowrap px-2.5 py-0.5 bg-amber-200 text-amber-950 font-black text-xs rounded-md shadow-sm border border-amber-300">
-                          {submittedMember.designation || "Pending Admin Assignment"}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Role Assignee */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pt-1.5 border-t border-blue-200/60">
-                      <div className="flex items-center gap-2">
-                        <UserCog className="w-4 h-4 text-indigo-600 flex-shrink-0" />
-                        <span className="text-xs font-black uppercase tracking-wider text-slate-800">
-                          Role Assignee:
-                        </span>
-                      </div>
-                      <div className="inline-block flex-shrink-0">
-                        <span className="whitespace-nowrap px-2.5 py-0.5 bg-blue-100 text-blue-950 font-bold text-xs rounded-md shadow-sm border border-blue-200">
-                          {submittedMember.roleAssignee || "Pending Admin Assignment"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <p className="text-[10px] sm:text-[11px] text-slate-600 mt-1.5 italic bg-white/80 p-1.5 rounded border border-slate-200 leading-relaxed">
-                      ℹ️ Note: Stored in MongoDB "clubmembers" collection. Both "designation" and "roleAssignee" fields are initialized empty for administrators to review and assign based on club auditions and activities.
-                    </p>
-                  </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Program & Batch</span>
+                  <span className="font-bold text-slate-800 uppercase">{submittedMember.department} ({submittedMember.batch})</span>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Residence Status</span>
+                  <span className="font-semibold text-slate-700">{submittedMember.residenceType}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Contact</span>
+                  <span className="font-semibold text-slate-700">{submittedMember.contact}</span>
                 </div>
               </div>
 
-              {/* CARD FOOTER */}
-              <div className="bg-slate-100/90 px-6 py-2.5 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-500">
-                <span className="font-semibold text-slate-600">
-                  TechVerse • CT University, Ludhiana, Punjab
-                </span>
-                <span className="font-mono text-slate-400 text-[10px]">
-                  ID: {submittedMember.memberId}
-                </span>
+              {/* NEXT STEPS CALLOUT */}
+              <div className="bg-white p-4 rounded-xl border border-blue-100 space-y-2">
+                <div className="flex items-center gap-2 text-blue-900 font-bold text-xs">
+                  <Mail className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  <span>Acknowledgment Email Dispatched</span>
+                </div>
+                <p className="text-slate-600 text-[11px] leading-relaxed">
+                  A screening confirmation email has been dispatched to <strong className="text-blue-700 font-semibold">{submittedMember.email}</strong> from <strong className="text-slate-800">techverse@ctuniversity.in</strong>.
+                </p>
+              </div>
+
+              <div className="bg-amber-50 p-4 rounded-xl border border-amber-200 space-y-2">
+                <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
+                  <ShieldCheck className="w-4 h-4 text-amber-700 flex-shrink-0" />
+                  <span>President / Vice President Review</span>
+                </div>
+                <p className="text-slate-600 text-[11px] leading-relaxed">
+                  The President & Vice President of TechVerse Club will review your profile and audition responses to assign your official <strong>Club Designation</strong> and <strong>Role Assignee</strong> soon.
+                </p>
+                <p className="text-emerald-700 font-semibold text-[11px] leading-relaxed">
+                  🪪 Once your designation is assigned in the Admin Portal, your official verified <strong>TechVerse Club Membership Card</strong> will be automatically generated and delivered directly to your email inbox.
+                </p>
               </div>
             </div>
 
@@ -537,11 +356,10 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <Button
                 type="button"
-                onClick={handlePrintCard}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-md flex items-center gap-2"
+                onClick={handleResetAndClose}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-2.5 rounded-xl shadow-md text-sm"
               >
-                <Printer className="w-4 h-4" />
-                Print / Save ID Card
+                Got It, Thank You!
               </Button>
               <Button
                 type="button"
@@ -551,18 +369,9 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                   form.reset();
                   setPhotoPreview(null);
                 }}
-                className="font-semibold px-5 py-2.5 rounded-xl flex items-center gap-2"
+                className="font-semibold px-5 py-2.5 rounded-xl text-xs"
               >
-                <RefreshCw className="w-4 h-4" />
-                Register Another Member
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleResetAndClose}
-                className="font-semibold px-6 py-2.5 rounded-xl"
-              >
-                Done / Close
+                Submit Another Application
               </Button>
             </div>
           </div>
@@ -880,10 +689,10 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
                       <RefreshCw className="w-5 h-5 animate-spin" />
-                      Registering Member & Generating Card...
+                      Submitting Application...
                     </span>
                   ) : (
-                    "Submit Application & Generate Member Card 🪪"
+                    "Submit Application & Enter Screening 🚀"
                   )}
                 </Button>
               </form>

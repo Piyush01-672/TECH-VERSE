@@ -90,6 +90,9 @@ export const submitContact = async (contactData: any) => {
 
 export const submitClubMember = async (memberData: any) => {
   const url = `${API_BASE_URL}/api/club-members`;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 28000);
+
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -97,7 +100,9 @@ export const submitClubMember = async (memberData: any) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(memberData),
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
 
     let data;
     try {
@@ -113,7 +118,12 @@ export const submitClubMember = async (memberData: any) => {
     }
 
     return data;
-  } catch (error) {
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      console.warn('Backend server took longer than expected to respond (Render cold-start).');
+      throw new Error('Server is taking time to wake up. Please click submit once more.');
+    }
     console.error('Error submitting club member:', error);
     throw error;
   }
