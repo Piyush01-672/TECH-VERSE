@@ -86,21 +86,21 @@ export const eventsList: EventItem[] = [
   },
   {
     id: "3-wheel",
-    name: "3-Wheel Challenge",
+    name: "3-Wheel Ideathon",
     category: "makers",
-    icon: Bike,
-    tagline: "Dynamic Handling & Trike Racing Arena",
-    description: "3-Wheel Ideathon is a Fast-paced innovation challenge where participats spin three wheels to get a domain, target audience, and challenge/constraint, then develop a practical idea based on the given combination.",
+    icon: Dices,
+    tagline: "Spin, Ideate & Solve Innovation Challenge",
+    description: "3-Wheel Ideathon is a Fast-paced innovation challenge where participants spin three wheels to get a domain, target audience, and challenge/constraint, then develop a practical idea based on the given combination.",
     teamSize: 2,
     format: "Duo (2 Members)",
-    perk: "⚡ Speed & Agility Shield",
+    perk: "💡 Best Innovation Trophy & Medals",
     accent: "from-amber-500 via-orange-500 to-red-500",
     border: "border-amber-500/40",
     rules: [
-      "Fixed team size: Exactly 2 participants per vehicle.",
-      "Custom trike or provided obstacle course vehicle.",
-      "Timed track completion with penalty cones.",
-      "Safety gear mandatory during the race."
+      "Fixed team size: Exactly 2 participants per team.",
+      "Spin three wheels to get a Domain, Target Audience, and Challenge / Constraint.",
+      "Develop a practical, innovative idea based on the generated combination.",
+      "Pitch your concept and solution to the judging panel within the time limit."
     ],
   },
   {
@@ -109,7 +109,7 @@ export const eventsList: EventItem[] = [
     category: "creative",
     icon: Laugh,
     tagline: "Tech Humor & Engineering Satire",
-    description: "Meme making is the creative process of combining images, text, captions, graphics, or other visual elements to communicate an idea, situation, joke, or message in a short, humouous, and engaging format. Participants are expected to use their creativity to produce an original meme that communicates the given idea effectively.",
+    description: "Meme making is the creative process of combining images, text, captions, graphics, or other visual elements to communicate an idea, situation, joke, or message in a short, humorous, and engaging format. Participants are expected to use their creativity to produce an original meme that communicates the given idea effectively.",
     teamSize: 1,
     format: "Solo (1 Member)",
     perk: "🔥 Viral Crown & Swag Kit",
@@ -124,21 +124,21 @@ export const eventsList: EventItem[] = [
   },
   {
     id: "minecraft",
-    name: "Minecraft (Speed-Building)",
+    name: "Minecraft (Diamond Rush)",
     category: "esports",
     icon: Pickaxe,
-    tagline: "Voxel Architecture & Creative Speed-Building",
-    description: "Race against time to craft and place aDiamond Block first in this thrilling Minecraft survival challenge",
+    tagline: "Diamond Block Craft & Place Survival Challenge",
+    description: "Race against time to craft and place a Diamond Block first in this thrilling Minecraft survival challenge",
     teamSize: 1,
     format: "Solo (1 Member)",
-    perk: "🎮 Master Architect Certificate & Prizes",
+    perk: "💎 Master Survivalist Trophy & Prizes",
     accent: "from-emerald-500 via-teal-500 to-green-600",
     border: "border-emerald-500/40",
     rules: [
       "Solo competition: Exactly 1 participant only.",
-      "Vanilla Minecraft creative mode speed-building (45 mins).",
-      "Architectural design themes announced live at the venue.",
-      "No external blueprints, mods, or schematics allowed."
+      "Vanilla Minecraft survival mode speed challenge on a fresh seed.",
+      "Race against time: First player to craft and place a Diamond Block wins.",
+      "Strictly no external blueprints, mods, texture packs with x-ray, or cheats allowed."
     ],
   },
   {
@@ -181,21 +181,21 @@ export const eventsList: EventItem[] = [
   },
   {
     id: "tech-imposter",
-    name: "Tech Imposter",
+    name: "TECH IMPOSTER",
     category: "brain",
     icon: Bot,
-    tagline: "Spot The Synthetic Intruder Challenge",
-    description: "Tech Imposter is a fun game designed for all-year university students. The goal fo the game is to test basic tech awareness, communication skills, quick thinking, and bluffing. In this game, human teams are given a specific tech term(Canva), while one secret team (The AI Imposter) is given a highly similar tech term(e.g, Adobe Illustrator)",
+    tagline: "Clues, Bluffing & AI Imposter Guessing Arena",
+    description: "TECH IMPOSTER is a fun and engaging guessing game that tests quick thinking, communication, and bluffing skills. Participants compete in pairs, with one hidden AI Imposter receiving a closely related word. Teams give clever clues, analyze responses, and vote to identify the Imposter. With Tech, Everyday, and Gaming themes, every round brings a new challenge and excitement. No coding skills are required—just creativity, confidence, and smart thinking!",
     teamSize: 2,
     format: "Duo (2 Members)",
-    perk: "🧠 AI Mastermind Badge",
+    perk: "🎭 Master Detective Trophy & Prizes",
     accent: "from-violet-500 via-purple-600 to-indigo-500",
     border: "border-violet-500/40",
     rules: [
       "Fixed team size: Exactly 2 participants per team.",
-      "Identify AI-generated images, code, and writings.",
-      "Points based on accuracy and deduction speed.",
-      "Live interactive buzzer interface."
+      "Teams give clever clues and analyze responses each round.",
+      "Vote to identify the hidden AI Imposter who received the closely related word.",
+      "Themes across Tech, Everyday, and Gaming (No coding skills required)."
     ],
   },
   {
@@ -203,18 +203,18 @@ export const eventsList: EventItem[] = [
     name: "Prompt Engineering",
     category: "brain",
     icon: Terminal,
-    tagline: "LLM Orchestration & Generative Masterclass",
-    description: "The Prompt Engineering Competition is an AI-Based challenge where paarticipants are given reference images and must create similar images using Google Gemini. Participants need to write effective prompts themselves and use different prompting techniques across three rounds: zero-Shot, Few-Shot, and Role-Based Prompting",
+    tagline: "Google Gemini AI Image Generation Challenge",
+    description: "The Prompt Engineering Competition is an AI-based challenge where participants are given reference images and must create similar images using Google Gemini. Participants need to write effective prompts themselves and use different prompting techniques across three rounds: Zero-Shot, Few-Shot, and Role-Based Prompting.",
     teamSize: 1,
     format: "Solo (1 Member)",
-    perk: "🚀 TechVerse AI Fellow Cup",
+    perk: "🚀 TechVerse AI Fellow Cup & Trophies",
     accent: "from-cyan-400 via-blue-600 to-teal-500",
     border: "border-cyan-500/40",
     rules: [
-      "Solo challenge: 1 participant only.",
-      "Constrained prompt limits per test puzzle.",
-      "Target outputs must match test benchmark exactly.",
-      "Evaluation on prompt token efficiency."
+      "Solo challenge: Exactly 1 participant only.",
+      "Participants are given reference images and must create similar images using Google Gemini.",
+      "Participants need to write effective prompts themselves without external aid.",
+      "Three competition rounds: Zero-Shot, Few-Shot, and Role-Based Prompting."
     ],
   },
   {

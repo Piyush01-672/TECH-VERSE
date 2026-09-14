@@ -189,13 +189,17 @@ const getRegistrations = async (req, res) => {
   }
 };
 
-// Get stats for all 12 events
+// Get stats for all events
 const getEventStats = async (req, res) => {
   try {
     const breakdown = [];
     let total = 0;
+    const seenCollections = new Set();
 
     for (const [slug, collectionName] of Object.entries(EVENT_COLLECTION_MAP)) {
+      if (seenCollections.has(collectionName)) continue;
+      seenCollections.add(collectionName);
+
       const DedicatedModel = getEventModel(slug);
       const count = await DedicatedModel.countDocuments();
       total += count;
