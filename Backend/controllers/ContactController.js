@@ -38,8 +38,20 @@ const getContacts = async (req, res) => {
   }
 };
 
+const deleteContact = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Contact.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ success: false, message: 'Contact not found' });
+    res.json({ success: true, message: 'Contact message deleted successfully', id });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 module.exports = {
   submitContact,
   getContacts,
-  getContactsCSV
+  getContactsCSV,
+  deleteContact,
 };

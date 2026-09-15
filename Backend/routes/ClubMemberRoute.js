@@ -10,5 +10,6 @@ router.patch('/:id/role', clubMemberController.updateMemberRole);
 router.put('/:id/role', clubMemberController.updateMemberRole);
 router.put('/:id', clubMemberController.updateMemberRole);
 router.patch('/:id', clubMemberController.updateMemberRole);
+router.delete('/:id', clubMemberController.deleteClubMember);
 
 module.exports = router;

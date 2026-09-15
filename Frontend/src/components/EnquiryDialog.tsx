@@ -54,7 +54,10 @@ import SoetLogo from "@/assets/soet-logo.png";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  regNumber: z.string().min(1, { message: "Registration number is required" }),
+  regNumber: z
+    .string()
+    .min(1, { message: "Registration number is required" })
+    .regex(/^\d+$/, { message: "Registration number must contain only numbers (digits 0-9)" }),
   contact: z
     .string()
     .regex(/^\d{10}$/, { message: "Enter a valid 10-digit contact number" }),
@@ -225,13 +228,12 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
         issuedAt,
       });
     } catch (err: any) {
-      console.warn("Club member registration notice:", err);
-      toast.info("Application received! You are now in the screening process.");
-      setSubmittedMember({
-        ...payload,
-        memberId: tempMemberId,
-        issuedAt,
-      });
+      console.error("Club member registration error:", err);
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to submit application. Please check your details and try again.";
+      toast.error(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -493,9 +495,29 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                   name="regNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Registration Number</FormLabel>
+                      <FormLabel>Registration Number (Numbers Only)</FormLabel>
                       <FormControl>
-                        <Input placeholder="2024BTCS001" {...field} />
+                        <Input
+                          placeholder="e.g. 2024101001"
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          value={field.value}
+                          onChange={(e) => {
+                            const numericVal = e.target.value.replace(/\D/g, "");
+                            field.onChange(numericVal);
+                          }}
+                          onKeyDown={(e) => {
+                            if (
+                              !/^\d$/.test(e.key) &&
+                              !["Backspace", "Tab", "Enter", "Delete", "ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key) &&
+                              !e.ctrlKey &&
+                              !e.metaKey
+                            ) {
+                              e.preventDefault();
+                            }
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

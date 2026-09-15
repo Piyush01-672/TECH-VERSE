@@ -26,7 +26,8 @@ import {
   Lock,
   LogOut,
   KeyRound,
-  ShieldAlert
+  ShieldAlert,
+  Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,7 +40,10 @@ import {
   getContacts, 
   getEngineersDayStats,
   adminLogin,
-  verifyAdminToken
+  verifyAdminToken,
+  deleteClubMember,
+  deleteEnquiry,
+  deleteContact
 } from "@/services/api";
 
 export interface ClubMemberItem {
@@ -277,6 +281,41 @@ export default function AdminPortal() {
       toast.error(error?.message || "Failed to update member role");
     } finally {
       setSavingId(null);
+    }
+  };
+
+  const handleDeleteMember = async (id: string, name: string) => {
+    if (!window.confirm(`Are you sure you want to reject and delete the application for "${name}"? This action cannot be undone.`)) {
+      return;
+    }
+    try {
+      await deleteClubMember(id);
+      setMembers((prev) => prev.filter((m) => m._id !== id));
+      toast.success(`Application for "${name}" deleted from MongoDB Atlas.`);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to delete member application");
+    }
+  };
+
+  const handleDeleteEnquiry = async (id: string, name: string) => {
+    if (!window.confirm(`Delete enquiry from "${name}"?`)) return;
+    try {
+      await deleteEnquiry(id);
+      setEnquiries((prev) => prev.filter((e) => e._id !== id));
+      toast.success("Enquiry deleted successfully.");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to delete enquiry");
+    }
+  };
+
+  const handleDeleteContact = async (id: string, name: string) => {
+    if (!window.confirm(`Delete message from "${name}"?`)) return;
+    try {
+      await deleteContact(id);
+      setContacts((prev) => prev.filter((c) => c._id !== id));
+      toast.success("Contact message deleted successfully.");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to delete contact message");
     }
   };
 
@@ -807,6 +846,19 @@ export default function AdminPortal() {
                           )}
                         </Button>
 
+                        <Button
+                          id={`delete-member-btn-${member._id}`}
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteMember(member._id, member.name)}
+                          className="w-full sm:w-auto bg-red-500/10 hover:bg-red-500/20 text-red-300 border-red-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3"
+                          title="Reject and delete this application from MongoDB Atlas"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                          <span>Reject / Delete</span>
+                        </Button>
+
                         <span className="text-[10px] font-mono text-slate-500 block text-center">
                           ID: {member.memberId || "TV-2026"}
                         </span>
@@ -850,9 +902,21 @@ export default function AdminPortal() {
                   >
                     <div className="flex items-center justify-between pb-2 border-b border-white/10">
                       <span className="text-xs font-mono font-bold text-cyan-300">Club Enquiry</span>
-                      <span className="text-[10px] font-mono text-slate-500">
-                        {enq.createdAt ? new Date(enq.createdAt).toLocaleDateString() : "Recent"}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono text-slate-500">
+                          {enq.createdAt ? new Date(enq.createdAt).toLocaleDateString() : "Recent"}
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteEnquiry(enq._id, enq.name)}
+                          className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-md"
+                          title="Delete enquiry from MongoDB"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
                     </div>
 
                     <div>
@@ -885,9 +949,21 @@ export default function AdminPortal() {
                   >
                     <div className="flex items-center justify-between pb-2 border-b border-white/10">
                       <span className="text-xs font-mono font-bold text-purple-300">Contact Message</span>
-                      <span className="text-[10px] font-mono text-slate-500">
-                        {c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "Recent"}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono text-slate-500">
+                          {c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "Recent"}
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteContact(c._id, c.name)}
+                          className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-md"
+                          title="Delete contact message from MongoDB"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
                     </div>
 
                     <div>

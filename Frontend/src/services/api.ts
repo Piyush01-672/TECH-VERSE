@@ -462,4 +462,56 @@ export const verifyAdminToken = async (token: string) => {
   }
 };
 
+export const deleteClubMember = async (id: string) => {
+  const url = `${API_BASE_URL}/api/club-members/${id}`;
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.message || 'Failed to delete member application');
+    }
+    return await response.json().catch(() => ({ success: true }));
+  } catch (error) {
+    console.error('Error deleting club member:', error);
+    throw error;
+  }
+};
+
+export const deleteEnquiry = async (id: string) => {
+  const url = `${API_BASE_URL}/api/enquiry/${id}`;
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.message || 'Failed to delete enquiry');
+    }
+    return await response.json().catch(() => ({ success: true }));
+  } catch (error) {
+    console.error('Error deleting enquiry:', error);
+    throw error;
+  }
+};
+
+export const deleteContact = async (id: string) => {
+  const url = `${API_BASE_URL}/api/contact/${id}`;
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.message || 'Failed to delete contact message');
+    }
+    return await response.json().catch(() => ({ success: true }));
+  } catch (error) {
+    console.error('Error deleting contact message:', error);
+    throw error;
+  }
+};
+
+
 

@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const dns = require('dns');
 const nodemailer = require('nodemailer');
 const ClubMember = require('../models/ClubMember');
 
@@ -30,7 +31,11 @@ function getTransporter() {
       host,
       port,
       secure,
-      family: 4, // CRITICAL: Forces IPv4 connection, eliminating ENETUNREACH on Render Linux cloud containers
+      family: 4,
+      // Socket-level DNS resolver enforcing IPv4 resolution on Render cloud containers
+      lookup: (hostname, options, callback) => {
+        return dns.lookup(hostname, Object.assign({}, options, { family: 4 }), callback);
+      },
       auth: {
         user: emailUser,
         pass: emailPass,
@@ -223,6 +228,9 @@ async function sendScreeningEmail(member) {
         port: 587,
         secure: false,
         family: 4,
+        lookup: (hostname, options, callback) => {
+          return dns.lookup(hostname, Object.assign({}, options, { family: 4 }), callback);
+        },
         auth: { user: emailUser, pass: emailPass },
         connectionTimeout: 15000,
         greetingTimeout: 15000,
@@ -462,6 +470,9 @@ async function sendMembershipCardEmail(member) {
         port: 587,
         secure: false,
         family: 4,
+        lookup: (hostname, options, callback) => {
+          return dns.lookup(hostname, Object.assign({}, options, { family: 4 }), callback);
+        },
         auth: { user: emailUser, pass: emailPass },
         connectionTimeout: 15000,
         greetingTimeout: 15000,
@@ -511,6 +522,27 @@ const submitClubMember = async (req, res) => {
 
     if (!data.name || !data.regNumber || !data.contact || !data.email || !data.department || !data.batch) {
       return res.status(400).json({ message: 'All required fields must be filled.' });
+    }
+
+    const cleanEmail = String(data.email || '').trim().toLowerCase();
+    const cleanContact = String(data.contact || '').trim().replace(/\D/g, '');
+
+    // Check duplicate email or phone number in club members
+    const existingMember = await ClubMember.findOne({
+      $or: [
+        { email: cleanEmail },
+        { contact: cleanContact }
+      ]
+    });
+
+    if (existingMember) {
+      const isEmailMatch = existingMember.email === cleanEmail;
+      return res.status(409).json({
+        success: false,
+        message: isEmailMatch
+          ? `An application with this email (${cleanEmail}) has already been registered with TechVerse Club.`
+          : `An application with this phone number (${cleanContact}) has already been registered with TechVerse Club.`
+      });
     }
 
     // Default designation and roleAssignee to empty strings (to be assigned by President/VP)
@@ -632,8 +664,25 @@ const updateMemberRole = async (req, res) => {
   }
 };
 
+// DELETE /api/club-members/:id
+const deleteClubMember = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await ClubMember.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: 'Member not found' });
+    }
+    return res.status(200).json({ success: true, message: 'Member application deleted successfully', id });
+  } catch (err) {
+    console.error('Delete member error:', err);
+    return res.status(500).json({ success: false, message: 'Failed to delete member' });
+  }
+};
+
 module.exports = {
   getClubMembers,
   submitClubMember,
   updateMemberRole,
+  deleteClubMember,
 };
+
