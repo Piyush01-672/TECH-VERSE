@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const ClubMemberSchema = new mongoose.Schema({
+  serialNumber: { type: Number, index: true },
   memberId: { type: String, default: '' },
   name: { type: String, required: true },
   regNumber: { type: String, required: true },

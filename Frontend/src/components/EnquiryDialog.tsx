@@ -79,6 +79,7 @@ interface SubmittedMemberData extends FormData {
   designation?: string;
   roleAssignee?: string;
   memberId?: string;
+  serialNumber?: number;
   issuedAt?: string;
 }
 
@@ -197,7 +198,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
       ];
     }
 
-    const memberId = `TV-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+    const tempMemberId = `TV-${new Date().getFullYear()}-0000`;
     const issuedAt = new Date().toLocaleDateString("en-IN", {
       day: "numeric",
       month: "short",
@@ -206,23 +207,32 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
 
     const payload = {
       ...data,
-      memberId,
       designation: "", // Assigned by President/VP in /admin
       roleAssignee: "",
     };
 
     try {
-      await submitClubMember(payload);
+      const res = await submitClubMember(payload);
+      const savedMember = res?.member || {};
+      const actualSerial = savedMember.serialNumber;
+      const actualMemberId = savedMember.memberId || tempMemberId;
+
       toast.success("Application submitted! Screening acknowledgment emailed to your inbox.");
+      setSubmittedMember({
+        ...payload,
+        serialNumber: actualSerial,
+        memberId: actualMemberId,
+        issuedAt,
+      });
     } catch (err: any) {
       console.warn("Club member registration notice:", err);
       toast.info("Application received! You are now in the screening process.");
-    } finally {
       setSubmittedMember({
         ...payload,
-        memberId,
+        memberId: tempMemberId,
         issuedAt,
       });
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -299,8 +309,15 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
             <div className="bg-gradient-to-b from-slate-50 to-blue-50/50 border-2 border-blue-200 rounded-2xl p-5 sm:p-6 text-left max-w-lg mx-auto shadow-sm space-y-4">
               <div className="flex items-center justify-between border-b border-blue-100 pb-3">
                 <div>
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold block">Application ID</span>
-                  <span className="text-sm font-black font-mono text-blue-800">{submittedMember.memberId}</span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold block">Application & Serial No.</span>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    {submittedMember.serialNumber && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 text-blue-900 font-black font-mono text-xs border border-blue-300">
+                        #{submittedMember.serialNumber}
+                      </span>
+                    )}
+                    <span className="text-sm font-black font-mono text-blue-800">{submittedMember.memberId}</span>
+                  </div>
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold block">Submission Date</span>

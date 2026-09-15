@@ -21,30 +21,25 @@ function getTransporter() {
     return null;
   }
 
-  if (process.env.EMAIL_HOST) {
-    return {
-      transporter: nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: Number(process.env.EMAIL_PORT) || 587,
-        secure: process.env.EMAIL_SECURE === 'true',
-        auth: {
-          user: emailUser,
-          pass: emailPass,
-        },
-      }),
-      emailUser,
-    };
-  }
+  const host = process.env.EMAIL_HOST || 'smtp.gmail.com';
+  const port = Number(process.env.EMAIL_PORT) || 465;
+  const secure = port === 465 || process.env.EMAIL_SECURE === 'true';
 
   return {
     transporter: nodemailer.createTransport({
-      service: process.env.EMAIL_SERVICE || 'gmail',
+      host,
+      port,
+      secure,
+      family: 4, // CRITICAL: Forces IPv4 connection, eliminating ENETUNREACH on Render Linux cloud containers
       auth: {
         user: emailUser,
         pass: emailPass,
       },
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
     }),
     emailUser,
+    emailPass,
   };
 }
 
@@ -59,7 +54,7 @@ async function sendScreeningEmail(member) {
     return false;
   }
 
-  const { transporter, emailUser } = transportConfig;
+  const { transporter, emailUser, emailPass } = transportConfig;
   const recipientEmail = String(member.email).trim().toLowerCase();
 
   const departmentDisplay = member.department === 'btech'
@@ -124,7 +119,7 @@ async function sendScreeningEmail(member) {
         </p>
 
         <p style="font-size: 14px; margin: 0 0 16px 0; color: #334155; line-height: 1.6;">
-          Thank you for showing interest in joining <strong>TechVerse Club</strong>! Your membership application has been received successfully and is currently under our official <strong>Screening & Audition Process</strong>.
+          Thank you for showing interest in joining <strong>TechVerse Club</strong>! Your membership application has been registered successfully and is currently under our official <strong>Screening & Audition Process</strong>.
         </p>
 
         <!-- APPLICATION SUMMARY CARD -->
@@ -134,8 +129,12 @@ async function sendScreeningEmail(member) {
           </h3>
           <table width="100%" cellspacing="0" cellpadding="4" border="0" style="font-size: 13px;">
             <tr>
-              <td width="40%" style="color: #64748b; font-weight: 600;">Application ID:</td>
+              <td width="42%" style="color: #64748b; font-weight: 600;">Application / Member ID:</td>
               <td style="color: #0f172a; font-weight: 800; font-family: monospace;">${escapeHtml(member.memberId)}</td>
+            </tr>
+            <tr>
+              <td style="color: #64748b; font-weight: 600;">MongoDB Serial No.:</td>
+              <td style="color: #1e40af; font-weight: 800; font-family: monospace;">#${member.serialNumber || '1'}</td>
             </tr>
             <tr>
               <td style="color: #64748b; font-weight: 600;">Registration No.:</td>
@@ -168,7 +167,7 @@ async function sendScreeningEmail(member) {
         <div style="background: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 0 10px 10px 0; padding: 14px 16px; margin: 20px 0;">
           <h4 style="margin: 0 0 6px 0; font-size: 13px; color: #1e40af; font-weight: 700;">🔍 What Happens Next?</h4>
           <p style="margin: 0; font-size: 13px; color: #1e3a8a; line-height: 1.5;">
-            The <strong>President & Vice President</strong> along with the core technical panel of TechVerse will review your skills and preferences. You will soon be assigned your official <strong>Club Designation</strong> and <strong>Role Assignee</strong>.
+            The <strong>President & Vice President</strong> along with the core technical panel of TechVerse are reviewing applicant profiles. You will soon be assigned your official <strong>Club Designation</strong> and <strong>Role Assignee</strong>.
           </p>
         </div>
 
@@ -176,7 +175,7 @@ async function sendScreeningEmail(member) {
         <div style="background: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 0 10px 10px 0; padding: 14px 16px; margin: 20px 0;">
           <h4 style="margin: 0 0 6px 0; font-size: 13px; color: #15803d; font-weight: 700;">🪪 Official Membership Card Dispatch</h4>
           <p style="margin: 0; font-size: 13px; color: #166534; line-height: 1.5;">
-            As soon as your club designation is assigned by the administration, your official verified <strong>TechVerse Club Membership Card</strong> will be generated and delivered directly to this email address.
+            As soon as your club designation is assigned by the administration in the portal, your official verified <strong>TechVerse Club Membership Card</strong> will be automatically generated and delivered directly to this email address.
           </p>
         </div>
 
@@ -201,17 +200,41 @@ async function sendScreeningEmail(member) {
 </html>
   `;
 
-  await transporter.sendMail({
+  const mailOptions = {
     from: `"TechVerse Club • CT University" <${emailUser}>`,
     to: recipientEmail,
     replyTo: emailUser,
-    subject: `🚀 TechVerse Club Application Received - Welcome to Screening, ${member.name}!`,
+    subject: `🚀 TechVerse Club Application Received - Welcome to Screening, ${member.name}! (App #${member.serialNumber || '1'})`,
     html: htmlContent,
     attachments,
-  });
+  };
 
-  console.log(`✅ Screening acknowledgment email dispatched to ${recipientEmail}`);
-  return true;
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Screening acknowledgment email dispatched to ${recipientEmail}`);
+    return true;
+  } catch (err) {
+    console.error('Primary transporter error (port 465):', err.message);
+    // Fallback to Port 587 IPv4
+    try {
+      console.log('🔄 Attempting fallback transporter via port 587 IPv4...');
+      const fallbackTransporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        family: 4,
+        auth: { user: emailUser, pass: emailPass },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+      });
+      await fallbackTransporter.sendMail(mailOptions);
+      console.log(`✅ Screening email dispatched via port 587 fallback to ${recipientEmail}`);
+      return true;
+    } catch (fallbackErr) {
+      console.error('❌ Fallback transporter also failed:', fallbackErr.message);
+      throw fallbackErr;
+    }
+  }
 }
 
 /**
@@ -225,7 +248,7 @@ async function sendMembershipCardEmail(member) {
     return false;
   }
 
-  const { transporter, emailUser } = transportConfig;
+  const { transporter, emailUser, emailPass } = transportConfig;
   const recipientEmail = String(member.email).trim().toLowerCase();
 
   const departmentDisplay = member.department === 'btech'
@@ -337,6 +360,7 @@ async function sendMembershipCardEmail(member) {
               <div style="margin-top: 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 6px 4px;">
                 <span style="display: block; font-size: 9px; font-weight: bold; color: #1e40af; text-transform: uppercase; letter-spacing: 1px;">Member ID</span>
                 <span style="font-size: 12px; font-weight: 800; color: #0f172a; font-family: monospace;">${escapeHtml(member.memberId)}</span>
+                <span style="display: block; font-size: 10px; font-weight: 700; color: #2563eb; font-family: monospace; margin-top: 2px;">Serial #${member.serialNumber || '1'}</span>
               </div>
               <div style="margin-top: 6px;">
                 <span style="display: inline-block; font-size: 10px; font-weight: 700; color: #059669; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 6px;">Verified Member</span>
@@ -416,23 +440,64 @@ async function sendMembershipCardEmail(member) {
 </html>
   `;
 
-  await transporter.sendMail({
+  const mailOptions = {
     from: `"TechVerse Club • CT University" <${emailUser}>`,
     to: recipientEmail,
     replyTo: emailUser,
     subject: `🎉 Official TechVerse Club Membership Card Issued - ${member.name} (${member.designation || 'Active Member'})`,
     html: emailHtml,
     attachments,
-  });
+  };
 
-  console.log(`✅ Official Membership Card email dispatched successfully to ${recipientEmail}`);
-  return true;
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Official Membership Card email dispatched successfully to ${recipientEmail}`);
+    return true;
+  } catch (err) {
+    console.error('Primary card sendMail error (port 465):', err.message);
+    try {
+      console.log('🔄 Attempting fallback card email transporter via port 587 IPv4...');
+      const fallbackTransporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        family: 4,
+        auth: { user: emailUser, pass: emailPass },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+      });
+      await fallbackTransporter.sendMail(mailOptions);
+      console.log(`✅ Official Membership Card dispatched via port 587 fallback to ${recipientEmail}`);
+      return true;
+    } catch (fallbackErr) {
+      console.error('❌ Fallback card transporter failed:', fallbackErr.message);
+      throw fallbackErr;
+    }
+  }
 }
 
-// GET all club members
+// GET all club members (with auto-backfill for serialNumber if any missing)
 const getClubMembers = async (req, res) => {
   try {
-    const members = await ClubMember.find().sort({ createdAt: -1 });
+    // Backfill any unindexed members
+    const unindexed = await ClubMember.find({
+      $or: [{ serialNumber: { $exists: false } }, { serialNumber: null }]
+    }).sort({ createdAt: 1 });
+
+    if (unindexed.length > 0) {
+      const highest = await ClubMember.findOne({ serialNumber: { $exists: true, $ne: null } }).sort({ serialNumber: -1 });
+      let currentSerial = (highest && typeof highest.serialNumber === 'number') ? highest.serialNumber : 0;
+      for (const m of unindexed) {
+        currentSerial += 1;
+        m.serialNumber = currentSerial;
+        if (!m.memberId || (m.memberId.startsWith('TV-2026-') && m.memberId.length === 15)) {
+          m.memberId = `TV-${new Date(m.createdAt || Date.now()).getFullYear()}-${String(currentSerial).padStart(4, '0')}`;
+        }
+        await m.save();
+      }
+    }
+
+    const members = await ClubMember.find().sort({ serialNumber: -1, createdAt: -1 });
     res.json(members);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -454,9 +519,20 @@ const submitClubMember = async (req, res) => {
     data.status = 'Under Screening';
     if (!data.residenceType) data.residenceType = 'Day Scholar';
     if (!data.photo) data.photo = '';
-    if (!data.memberId) {
-      data.memberId = `TV-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    // Calculate sequential serialNumber and format memberId to match MongoDB serial number
+    let nextSerial = 1;
+    const highestSerialMember = await ClubMember.findOne({ serialNumber: { $exists: true, $ne: null } }).sort({ serialNumber: -1 });
+    if (highestSerialMember && typeof highestSerialMember.serialNumber === 'number' && highestSerialMember.serialNumber > 0) {
+      nextSerial = highestSerialMember.serialNumber + 1;
+    } else {
+      const count = await ClubMember.countDocuments();
+      nextSerial = count + 1;
     }
+
+    data.serialNumber = nextSerial;
+    const serialStr = String(nextSerial).padStart(4, '0');
+    data.memberId = `TV-${new Date().getFullYear()}-${serialStr}`;
 
     const recipientEmail = String(data.email).trim().toLowerCase();
     data.email = recipientEmail;
@@ -513,6 +589,13 @@ const updateMemberRole = async (req, res) => {
       member.status = status;
     } else if (hasDesignationAssigned) {
       member.status = 'Active';
+    }
+
+    // Ensure serialNumber is present
+    if (!member.serialNumber) {
+      const highest = await ClubMember.findOne({ serialNumber: { $exists: true, $ne: null } }).sort({ serialNumber: -1 });
+      member.serialNumber = (highest && typeof highest.serialNumber === 'number') ? highest.serialNumber + 1 : 1;
+      member.memberId = `TV-${new Date(member.createdAt || Date.now()).getFullYear()}-${String(member.serialNumber).padStart(4, '0')}`;
     }
 
     await member.save();

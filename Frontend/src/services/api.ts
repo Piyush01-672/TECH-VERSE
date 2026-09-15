@@ -402,3 +402,64 @@ export const getEngineersDayStats = async () => {
   }
 };
 
+export const adminLogin = async (credentials: { email: string; password: string }) => {
+  const url = `${API_BASE_URL}/api/admin/login`;
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(credentials),
+    });
+
+    let data: any = {};
+    try {
+      data = await response.json();
+    } catch (e) {
+      data = {};
+    }
+
+    if (!response.ok) {
+      const error: any = new Error(data.message || 'Admin login failed');
+      error.status = response.status;
+      error.response = { data };
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error during admin login:', error);
+    throw error;
+  }
+};
+
+export const verifyAdminToken = async (token: string) => {
+  const url = `${API_BASE_URL}/api/admin/verify`;
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    let data: any = {};
+    try {
+      data = await response.json();
+    } catch (e) {
+      data = {};
+    }
+
+    if (!response.ok) {
+      return { valid: false };
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error verifying admin token:', error);
+    return { valid: false };
+  }
+};
+
+

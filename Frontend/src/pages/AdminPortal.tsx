@@ -22,7 +22,11 @@ import {
   ExternalLink,
   ChevronRight,
   UserCheck,
-  AlertCircle
+  AlertCircle,
+  Lock,
+  LogOut,
+  KeyRound,
+  ShieldAlert
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,11 +37,14 @@ import {
   updateClubMemberRole, 
   getEnquiries, 
   getContacts, 
-  getEngineersDayStats 
+  getEngineersDayStats,
+  adminLogin,
+  verifyAdminToken
 } from "@/services/api";
 
 export interface ClubMemberItem {
   _id: string;
+  serialNumber?: number;
   memberId?: string;
   name: string;
   regNumber: string;
@@ -82,8 +89,17 @@ export interface ContactItem {
 }
 
 export default function AdminPortal() {
+  // Admin Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [authChecking, setAuthChecking] = useState<boolean>(true);
+  const [loginEmail, setLoginEmail] = useState<string>("techverse@ctuniversity.in");
+  const [loginPassword, setLoginPassword] = useState<string>("");
+  const [loginError, setLoginError] = useState<string>("");
+  const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
   const [activeTab, setActiveTab] = useState<"members" | "queries" | "arenas">("members");
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [savingId, setSavingId] = useState<string | null>(null);
 
   // Data states
@@ -142,9 +158,74 @@ export default function AdminPortal() {
     }
   };
 
+  // Check admin session on mount
   useEffect(() => {
-    loadData();
+    const token = localStorage.getItem("techverse_admin_token");
+    if (!token) {
+      setIsAuthenticated(false);
+      setAuthChecking(false);
+      return;
+    }
+
+    verifyAdminToken(token)
+      .then((res) => {
+        if (res && res.valid) {
+          setIsAuthenticated(true);
+          loadData();
+        } else {
+          localStorage.removeItem("techverse_admin_token");
+          setIsAuthenticated(false);
+        }
+      })
+      .catch(() => {
+        setIsAuthenticated(false);
+      })
+      .finally(() => {
+        setAuthChecking(false);
+      });
   }, []);
+
+  const handleAdminLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError("");
+
+    const cleanEmail = loginEmail.trim().toLowerCase();
+    if (cleanEmail !== "techverse@ctuniversity.in") {
+      setLoginError("Unauthorized: Only techverse@ctuniversity.in is authorized to access the Admin Portal.");
+      toast.error("Access Denied: Only techverse@ctuniversity.in is authorized.");
+      return;
+    }
+
+    if (!loginPassword) {
+      setLoginError("Please enter the administrator password.");
+      return;
+    }
+
+    setIsLoggingIn(true);
+    try {
+      const res = await adminLogin({ email: cleanEmail, password: loginPassword });
+      if (res && res.token) {
+        localStorage.setItem("techverse_admin_token", res.token);
+        localStorage.setItem("techverse_admin_email", cleanEmail);
+        setIsAuthenticated(true);
+        toast.success("Welcome back, TechVerse Administrator!");
+        loadData();
+      }
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || "Invalid administrative credentials.";
+      setLoginError(msg);
+      toast.error(msg);
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("techverse_admin_token");
+    localStorage.removeItem("techverse_admin_email");
+    setIsAuthenticated(false);
+    toast.info("Logged out of TechVerse Admin Portal.");
+  };
 
   const handleDraftChange = (id: string, field: "designation" | "roleAssignee", value: string) => {
     setEditDrafts((prev) => ({
@@ -207,7 +288,8 @@ export default function AdminPortal() {
         m.name?.toLowerCase().includes(q) ||
         m.regNumber?.toLowerCase().includes(q) ||
         m.email?.toLowerCase().includes(q) ||
-        m.memberId?.toLowerCase().includes(q);
+        m.memberId?.toLowerCase().includes(q) ||
+        String(m.serialNumber || "").includes(q);
 
       const matchesDept = deptFilter === "all" || m.department?.toLowerCase() === deptFilter.toLowerCase();
 
@@ -226,6 +308,154 @@ export default function AdminPortal() {
   const assignedCount = members.filter((m) => m.designation?.trim() || m.roleAssignee?.trim()).length;
   const pendingCount = totalMembers - assignedCount;
   const totalQueries = enquiries.length + contacts.length;
+
+  // 1. Loading State while checking authentication token
+  if (authChecking) {
+    return (
+      <div className="min-h-screen bg-[#060a17] text-slate-100 flex items-center justify-center pt-20 px-4">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin shadow-lg shadow-cyan-500/20" />
+          <div>
+            <h3 className="text-base font-bold text-white font-space">Verifying Administrator Access</h3>
+            <p className="text-xs text-slate-400 mt-1 font-mono">Securing connection to TechVerse SuperAdmin Gateway...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Strict Email Login Wall (techverse@ctuniversity.in only)
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#060a17] text-slate-100 pt-28 pb-20 px-4 flex items-center justify-center relative overflow-hidden">
+        {/* Futuristic Ambience */}
+        <div className="fixed inset-0 pointer-events-none -z-10">
+          <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[140px]" />
+          <div className="absolute bottom-1/4 right-1/3 w-[450px] h-[450px] bg-cyan-500/10 rounded-full blur-[140px]" />
+        </div>
+
+        <div className="w-full max-w-md animate-fade-in space-y-6">
+          {/* Card Container */}
+          <div className="relative rounded-3xl bg-[#090e21]/95 border border-white/10 p-7 sm:p-9 shadow-2xl backdrop-blur-2xl overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-600 via-cyan-500 to-indigo-600" />
+
+            <div className="text-center space-y-3 mb-6">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600/20 to-cyan-500/20 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mx-auto shadow-lg shadow-cyan-500/10">
+                <ShieldCheck className="w-8 h-8 text-cyan-400" />
+              </div>
+
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-[10px] font-mono tracking-widest text-blue-300 uppercase">
+                  <Lock className="w-3 h-3 text-blue-400" />
+                  Guarded Admin Gateway
+                </div>
+                <h2 className="text-2xl font-black font-space text-white tracking-tight">
+                  Admin Sign In
+                </h2>
+                <p className="text-xs text-slate-400 max-w-xs mx-auto">
+                  Strictly restricted to official TechVerse administration credentials.
+                </p>
+              </div>
+            </div>
+
+            {/* Guard Notice Callout */}
+            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200/90 text-xs flex items-start gap-2.5 mb-6">
+              <ShieldAlert className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+              <div className="text-[11px] leading-relaxed">
+                <strong>Strict Access Policy:</strong> Only the official club admin email (<code className="text-cyan-300 font-mono font-bold">techverse@ctuniversity.in</code>) is authorized to log into this portal.
+              </div>
+            </div>
+
+            <form onSubmit={handleAdminLogin} className="space-y-4">
+              <div>
+                <label className="block text-xs font-mono text-slate-300 font-bold mb-1.5 uppercase tracking-wider">
+                  Admin Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Input
+                    id="admin-email-input"
+                    type="email"
+                    required
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    placeholder="techverse@ctuniversity.in"
+                    className="pl-10 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:border-cyan-400"
+                  />
+                </div>
+                {loginEmail.trim().toLowerCase() !== "techverse@ctuniversity.in" && loginEmail.length > 0 && (
+                  <p className="text-[11px] text-red-400 mt-1.5 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                    Access restricted: Only techverse@ctuniversity.in can log in.
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono text-slate-300 font-bold mb-1.5 uppercase tracking-wider">
+                  Admin Password
+                </label>
+                <div className="relative">
+                  <KeyRound className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Input
+                    id="admin-password-input"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    placeholder="Enter Admin Password..."
+                    className="pl-10 pr-14 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:border-cyan-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs font-mono"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
+              </div>
+
+              {loginError && (
+                <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                  <span>{loginError}</span>
+                </div>
+              )}
+
+              <Button
+                id="admin-login-btn"
+                type="submit"
+                disabled={isLoggingIn || loginEmail.trim().toLowerCase() !== "techverse@ctuniversity.in"}
+                className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-500/25 transition-all text-xs font-mono tracking-wider uppercase flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isLoggingIn ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Verifying Credentials...
+                  </>
+                ) : (
+                  <>
+                    <Lock className="w-4 h-4" />
+                    Authorize Admin Access
+                  </>
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-6 pt-5 border-t border-white/10 text-center">
+              <a
+                href="/"
+                className="text-xs text-slate-400 hover:text-cyan-400 transition-colors inline-flex items-center gap-1 font-mono"
+              >
+                ← Return to TechVerse Public Portal
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#060a17] text-slate-100 pt-24 pb-20 px-4 sm:px-6 lg:px-8">
@@ -253,7 +483,14 @@ export default function AdminPortal() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="font-mono text-slate-300 text-[11px]">techverse@ctuniversity.in</span>
+              <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[9px] font-mono">
+                SuperAdmin
+              </Badge>
+            </div>
             <Button
               id="refresh-admin-data-btn"
               type="button"
@@ -265,6 +502,17 @@ export default function AdminPortal() {
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
               Refresh Data
+            </Button>
+            <Button
+              id="logout-admin-btn"
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              className="bg-red-500/10 hover:bg-red-500/20 text-red-300 border-red-500/30 text-xs font-semibold rounded-xl flex items-center gap-2"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              Log Out
             </Button>
           </div>
         </div>
@@ -462,6 +710,16 @@ export default function AdminPortal() {
                           </div>
 
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
+                            {member.serialNumber && (
+                              <span className="font-mono text-amber-300 font-black bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/30 text-[11px]">
+                                #{member.serialNumber}
+                              </span>
+                            )}
+                            {member.memberId && (
+                              <span className="font-mono text-blue-300 font-semibold bg-blue-500/10 px-1.5 py-0.5 rounded text-[11px]">
+                                {member.memberId}
+                              </span>
+                            )}
                             <span className="font-mono text-cyan-300 font-semibold">{member.regNumber}</span>
                             <span>•</span>
                             <span className="capitalize">{member.department.toUpperCase()} ({member.batch})</span>

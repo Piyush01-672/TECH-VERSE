@@ -69,9 +69,13 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // ==========================
 // ✅ MongoDB Connection
 // ==========================
-mongoose.connect(process.env.MongoDB_url)
-  .then(() => console.log('✅ MongoDB Connected'))
-  .catch(err => console.error('❌ MongoDB Error:', err));
+if (process.env.MongoDB_url) {
+  mongoose.connect(process.env.MongoDB_url)
+    .then(() => console.log('✅ MongoDB Connected'))
+    .catch(err => console.error('❌ MongoDB Error:', err));
+} else {
+  console.warn('⚠️ MongoDB_url not set in local environment. Set MongoDB_url in .env to connect to MongoDB Atlas.');
+}
 
 // ==========================
 // ✅ Routes
@@ -82,6 +86,7 @@ app.use('/api/contact', require('./routes/ContactServer'));
 app.use('/api/aboutus', require('./routes/AboutServer'));
 app.use('/api/enquiry', require('./routes/Enquiry'));
 app.use('/api/club-members', require('./routes/ClubMemberRoute'));
+app.use('/api/admin', require('./routes/AdminRoute'));
 app.use('/api/mentors', require('./routes/Mentor'));
 app.use('/api/register', require('./routes/RegistrationServer'));
 app.use('/api/codecrafter-register', require('./routes/CodeCrafterRegistrationServer'));
