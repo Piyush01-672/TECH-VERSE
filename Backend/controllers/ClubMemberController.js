@@ -308,9 +308,9 @@ async function sendMembershipCardEmail(member) {
     <!-- CONGRATULATIONS HERO BANNER -->
     <tr>
       <td style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); padding: 26px 24px; text-align: center; color: #ffffff;">
-        <span style="display: inline-block; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #38bdf8; font-size: 11px; font-weight: bold; padding: 4px 14px; border-radius: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Designation Approved • Screening Completed</span>
-        <h1 style="margin: 6px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Welcome to the TechVerse Core Family! 🎉</h1>
-        <p style="margin: 4px 0 0 0; font-size: 13px; color: #cbd5e1;">Your screening is complete. The President & Vice President have confirmed your official designation below.</p>
+        <span style="display: inline-block; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #38bdf8; font-size: 11px; font-weight: bold; padding: 4px 14px; border-radius: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Official Selection Confirmed • Screening Approved</span>
+        <h1 style="margin: 6px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Congratulations ${escapeHtml(member.name)}, You're Selected! 🎉</h1>
+        <p style="margin: 4px 0 0 0; font-size: 13px; color: #cbd5e1;">Your screening is complete. The President &amp; Vice President have confirmed your official designation as <strong>${escapeHtml(member.designation)}</strong> (${escapeHtml(member.roleAssignee || 'Core Team Member')}). Welcome to the TechVerse family!</p>
       </td>
     </tr>
 
@@ -616,7 +616,9 @@ const updateMemberRole = async (req, res) => {
     if (status !== undefined) {
       member.status = status;
     } else if (hasDesignationAssigned) {
-      member.status = 'Active';
+      member.status = 'Official Member';
+    } else {
+      member.status = 'Under Screening';
     }
 
     // Ensure serialNumber is present

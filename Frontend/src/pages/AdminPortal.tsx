@@ -27,7 +27,8 @@ import {
   LogOut,
   KeyRound,
   ShieldAlert,
-  Trash2
+  Trash2,
+  Edit3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -102,7 +103,8 @@ export default function AdminPortal() {
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  const [activeTab, setActiveTab] = useState<"members" | "queries" | "arenas">("members");
+  const [activeTab, setActiveTab] = useState<"screening" | "official-members" | "queries" | "arenas">("screening");
+  const [editingOfficialId, setEditingOfficialId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -249,11 +251,17 @@ export default function AdminPortal() {
     const draft = editDrafts[id];
     if (!draft) return;
 
+    if (!draft.designation.trim()) {
+      toast.error("Please specify a Club Designation before issuing the ID card.");
+      return;
+    }
+
     setSavingId(id);
     try {
       const res = await updateClubMemberRole(id, {
         designation: draft.designation.trim(),
         roleAssignee: draft.roleAssignee.trim(),
+        status: "Official Member",
       });
 
       const cardEmailed = Boolean(res?.cardEmailSent);
@@ -266,20 +274,23 @@ export default function AdminPortal() {
                 ...m, 
                 designation: draft.designation.trim(), 
                 roleAssignee: draft.roleAssignee.trim(),
-                status: draft.designation.trim() ? "Active" : "Under Screening",
+                status: "Official Member",
                 cardSent: cardEmailed || m.cardSent,
               }
             : m
         )
       );
 
+      const targetMember = members.find((m) => m._id === id);
+      const memberName = targetMember?.name || "Member";
+
       if (cardEmailed) {
-        toast.success(`🎉 Designation assigned & Official Club Card emailed to member!`);
-      } else if (draft.designation.trim()) {
-        toast.success("Role & Designation updated in MongoDB Atlas successfully!");
+        toast.success(`🎉 ${memberName} appointed as ${draft.designation.trim()}! Official Membership Card emailed & shifted to Official Members list!`);
       } else {
-        toast.success("Member updated in MongoDB Atlas.");
+        toast.success(`🎉 ${memberName} appointed as ${draft.designation.trim()}! Saved to MongoDB Atlas & shifted to Official Members list!`);
       }
+
+      setEditingOfficialId(null);
     } catch (error: any) {
       console.error("Save error:", error);
       toast.error(error?.message || "Failed to update member role");
@@ -325,11 +336,28 @@ export default function AdminPortal() {
     }
   };
 
-  // Filtered members
-  const filteredMembers = useMemo(() => {
-    return members.filter((m) => {
+  // Roster Segmentation: Official Members vs Screening Applicants
+  const officialMembers = useMemo(
+    () => members.filter((m) => Boolean(m.designation?.trim() && m.status !== "Under Screening")),
+    [members]
+  );
+  const screeningMembers = useMemo(
+    () => members.filter((m) => !m.designation?.trim() || m.status === "Under Screening"),
+    [members]
+  );
+
+  // Statistics
+  const totalMembers = members.length;
+  const assignedCount = officialMembers.length;
+  const pendingCount = screeningMembers.length;
+  const totalQueries = enquiries.length + contacts.length;
+
+  // Filtered Screening Applications
+  const filteredScreeningMembers = useMemo(() => {
+    return screeningMembers.filter((m) => {
       const q = searchQuery.toLowerCase();
       const matchesSearch =
+        !q ||
         m.name?.toLowerCase().includes(q) ||
         m.regNumber?.toLowerCase().includes(q) ||
         m.email?.toLowerCase().includes(q) ||
@@ -337,22 +365,28 @@ export default function AdminPortal() {
         String(m.serialNumber || "").includes(q);
 
       const matchesDept = deptFilter === "all" || m.department?.toLowerCase() === deptFilter.toLowerCase();
-
-      const hasAssignment = Boolean(m.designation?.trim() || m.roleAssignee?.trim());
-      const matchesRole =
-        roleFilter === "all" ||
-        (roleFilter === "assigned" && hasAssignment) ||
-        (roleFilter === "pending" && !hasAssignment);
-
-      return matchesSearch && matchesDept && matchesRole;
+      return matchesSearch && matchesDept;
     });
-  }, [members, searchQuery, deptFilter, roleFilter]);
+  }, [screeningMembers, searchQuery, deptFilter]);
 
-  // Statistics
-  const totalMembers = members.length;
-  const assignedCount = members.filter((m) => m.designation?.trim() || m.roleAssignee?.trim()).length;
-  const pendingCount = totalMembers - assignedCount;
-  const totalQueries = enquiries.length + contacts.length;
+  // Filtered Official Club Members
+  const filteredOfficialMembers = useMemo(() => {
+    return officialMembers.filter((m) => {
+      const q = searchQuery.toLowerCase();
+      const matchesSearch =
+        !q ||
+        m.name?.toLowerCase().includes(q) ||
+        m.regNumber?.toLowerCase().includes(q) ||
+        m.email?.toLowerCase().includes(q) ||
+        m.memberId?.toLowerCase().includes(q) ||
+        m.designation?.toLowerCase().includes(q) ||
+        m.roleAssignee?.toLowerCase().includes(q) ||
+        String(m.serialNumber || "").includes(q);
+
+      const matchesDept = deptFilter === "all" || m.department?.toLowerCase() === deptFilter.toLowerCase();
+      return matchesSearch && matchesDept;
+    });
+  }, [officialMembers, searchQuery, deptFilter]);
 
   // 1. Loading State while checking authentication token
   if (authChecking) {
@@ -564,59 +598,98 @@ export default function AdminPortal() {
 
         {/* METRICS OVERVIEW CARDS */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-5 rounded-2xl bg-[#0b1126]/80 border border-white/10 shadow-lg backdrop-blur-xl">
+          <div 
+            onClick={() => setActiveTab("official-members")}
+            className="p-5 rounded-2xl bg-[#0b1126]/80 border border-white/10 shadow-lg backdrop-blur-xl cursor-pointer hover:border-blue-500/40 transition-all group"
+            title="Click to view all registered members"
+          >
             <div className="flex items-center justify-between text-xs font-mono text-slate-400 mb-2">
               <span>TOTAL MEMBERS</span>
-              <Users className="w-4 h-4 text-blue-400" />
+              <Users className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
             </div>
             <div className="text-3xl font-black font-space text-white">{totalMembers}</div>
-            <span className="text-[11px] text-emerald-400 font-medium mt-1 block">Registered in MongoDB</span>
+            <span className="text-[11px] text-blue-400 font-medium mt-1 block">Registered in MongoDB</span>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#0b1126]/80 border border-white/10 shadow-lg backdrop-blur-xl">
+          <div 
+            onClick={() => setActiveTab("official-members")}
+            className={`p-5 rounded-2xl bg-[#0b1126]/80 border shadow-lg backdrop-blur-xl cursor-pointer transition-all group ${
+              activeTab === "official-members" ? "border-emerald-500/60 ring-1 ring-emerald-500/40" : "border-white/10 hover:border-emerald-500/40"
+            }`}
+            title="Click to view Official Club Members"
+          >
             <div className="flex items-center justify-between text-xs font-mono text-slate-400 mb-2">
-              <span>ROLES ASSIGNED</span>
-              <UserCheck className="w-4 h-4 text-emerald-400" />
+              <span>OFFICIAL MEMBERS</span>
+              <UserCheck className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
             </div>
             <div className="text-3xl font-black font-space text-emerald-400">{assignedCount}</div>
-            <span className="text-[11px] text-slate-400 mt-1 block">Designation Active</span>
+            <span className="text-[11px] text-emerald-400/80 mt-1 block">Designation &amp; Card Active</span>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#0b1126]/80 border border-white/10 shadow-lg backdrop-blur-xl">
+          <div 
+            onClick={() => setActiveTab("screening")}
+            className={`p-5 rounded-2xl bg-[#0b1126]/80 border shadow-lg backdrop-blur-xl cursor-pointer transition-all group ${
+              activeTab === "screening" ? "border-amber-500/60 ring-1 ring-amber-500/40" : "border-white/10 hover:border-amber-500/40"
+            }`}
+            title="Click to view Applications Under Screening"
+          >
             <div className="flex items-center justify-between text-xs font-mono text-slate-400 mb-2">
-              <span>PENDING REVIEW</span>
-              <Clock className="w-4 h-4 text-amber-400" />
+              <span>UNDER SCREENING</span>
+              <Clock className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
             </div>
             <div className="text-3xl font-black font-space text-amber-400">{pendingCount}</div>
-            <span className="text-[11px] text-slate-400 mt-1 block">Awaiting Role Assignment</span>
+            <span className="text-[11px] text-amber-400/80 mt-1 block">Awaiting Role &amp; ID Card</span>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#0b1126]/80 border border-white/10 shadow-lg backdrop-blur-xl">
+          <div 
+            onClick={() => setActiveTab("queries")}
+            className={`p-5 rounded-2xl bg-[#0b1126]/80 border shadow-lg backdrop-blur-xl cursor-pointer transition-all group ${
+              activeTab === "queries" ? "border-purple-500/60 ring-1 ring-purple-500/40" : "border-white/10 hover:border-purple-500/40"
+            }`}
+            title="Click to view Student Queries"
+          >
             <div className="flex items-center justify-between text-xs font-mono text-slate-400 mb-2">
               <span>TOTAL QUERIES</span>
-              <MessageSquare className="w-4 h-4 text-purple-400" />
+              <MessageSquare className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
             </div>
             <div className="text-3xl font-black font-space text-purple-400">{totalQueries}</div>
-            <span className="text-[11px] text-slate-400 mt-1 block">Enquiries & Contact</span>
+            <span className="text-[11px] text-slate-400 mt-1 block">Enquiries &amp; Messages</span>
           </div>
         </div>
 
         {/* NAVIGATION TABS */}
         <div className="flex items-center gap-2 border-b border-white/10 pb-2 overflow-x-auto">
           <button
-            id="tab-members-btn"
+            id="tab-screening-btn"
             type="button"
-            onClick={() => setActiveTab("members")}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 ${
-              activeTab === "members"
-                ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/25"
+            onClick={() => setActiveTab("screening")}
+            className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 flex-shrink-0 ${
+              activeTab === "screening"
+                ? "bg-gradient-to-r from-amber-600 to-yellow-600 text-white shadow-lg shadow-amber-500/25"
                 : "bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
             }`}
           >
-            <Users className="w-4 h-4" />
-            <span>Club Members & Role Assignment</span>
-            <span className="ml-1.5 px-2 py-0.5 rounded-full bg-black/30 text-[10px] font-mono">
-              {members.length}
+            <Clock className="w-4 h-4" />
+            <span>Screening Applications</span>
+            <span className="ml-1 px-2 py-0.5 rounded-full bg-black/40 text-[10px] font-mono text-amber-200">
+              {pendingCount} Pending
+            </span>
+          </button>
+
+          <button
+            id="tab-official-members-btn"
+            type="button"
+            onClick={() => setActiveTab("official-members")}
+            className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 flex-shrink-0 ${
+              activeTab === "official-members"
+                ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/25"
+                : "bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Official Club Members</span>
+            <span className="ml-1 px-2 py-0.5 rounded-full bg-black/40 text-[10px] font-mono text-emerald-200">
+              {assignedCount} Members
             </span>
           </button>
 
@@ -624,15 +697,15 @@ export default function AdminPortal() {
             id="tab-queries-btn"
             type="button"
             onClick={() => setActiveTab("queries")}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 ${
+            className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 flex-shrink-0 ${
               activeTab === "queries"
                 ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/25"
                 : "bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
             }`}
           >
             <MessageSquare className="w-4 h-4" />
-            <span>Student Queries & Enquiries</span>
-            <span className="ml-1.5 px-2 py-0.5 rounded-full bg-black/30 text-[10px] font-mono">
+            <span>Student Queries &amp; Enquiries</span>
+            <span className="ml-1 px-2 py-0.5 rounded-full bg-black/40 text-[10px] font-mono">
               {totalQueries}
             </span>
           </button>
@@ -641,7 +714,7 @@ export default function AdminPortal() {
             id="tab-arenas-btn"
             type="button"
             onClick={() => setActiveTab("arenas")}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 ${
+            className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 flex-shrink-0 ${
               activeTab === "arenas"
                 ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/25"
                 : "bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
@@ -649,28 +722,46 @@ export default function AdminPortal() {
           >
             <Trophy className="w-4 h-4" />
             <span>Engineers' Day Arenas</span>
-            <span className="ml-1.5 px-2 py-0.5 rounded-full bg-black/30 text-[10px] font-mono">
+            <span className="ml-1 px-2 py-0.5 rounded-full bg-black/40 text-[10px] font-mono">
               {eventStats?.totalRegistrations ?? 13}
             </span>
           </button>
         </div>
 
         {/* ================================================================= */}
-        {/* TAB 1: CLUB MEMBERS & ROLE ASSIGNMENT                             */}
+        {/* TAB 1: SCREENING APPLICATIONS (PENDING REVIEW)                    */}
         {/* ================================================================= */}
-        {activeTab === "members" && (
+        {activeTab === "screening" && (
           <div className="space-y-6">
+            {/* Header Callout */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+                  <h2 className="text-lg sm:text-xl font-black font-space text-white flex items-center gap-2">
+                    New Member Applications Under Screening
+                  </h2>
+                </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  Review applicant details, assign their official Designation &amp; Role Assignee, then click <strong>"Assign &amp; Send ID Card"</strong> to officially admit them to the club roster and shift them to the Official Members list.
+                </p>
+              </div>
+              <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/40 text-xs font-mono px-3 py-1 flex-shrink-0">
+                {filteredScreeningMembers.length} Applications Waiting
+              </Badge>
+            </div>
+
             {/* Search & Filter Bar */}
             <div className="p-4 rounded-2xl bg-[#0b1126]/80 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="relative w-full md:w-96">
                 <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <Input
-                  id="admin-search-input"
+                  id="admin-screening-search-input"
                   type="text"
-                  placeholder="Search by Name, Reg No, or Email..."
+                  placeholder="Search applicants by Name, Reg No, or Email..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:border-cyan-400"
+                  className="pl-10 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:border-amber-400"
                 />
               </div>
 
@@ -678,57 +769,62 @@ export default function AdminPortal() {
                 <select
                   value={deptFilter}
                   onChange={(e) => setDeptFilter(e.target.value)}
-                  className="bg-white/5 border border-white/10 text-slate-300 text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-cyan-400"
+                  className="bg-white/5 border border-white/10 text-slate-300 text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-amber-400"
                 >
                   <option value="all" className="bg-[#0b1126] text-white">All Departments</option>
                   <option value="btech" className="bg-[#0b1126] text-white">B.Tech</option>
                   <option value="bca" className="bg-[#0b1126] text-white">BCA</option>
                 </select>
-
-                <select
-                  value={roleFilter}
-                  onChange={(e) => setRoleFilter(e.target.value)}
-                  className="bg-white/5 border border-white/10 text-slate-300 text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-cyan-400"
-                >
-                  <option value="all" className="bg-[#0b1126] text-white">All Statuses</option>
-                  <option value="pending" className="bg-[#0b1126] text-white">Pending Role Assignment</option>
-                  <option value="assigned" className="bg-[#0b1126] text-white">Role Assigned</option>
-                </select>
               </div>
             </div>
 
-            {/* Members Cards / Table */}
-            {filteredMembers.length === 0 ? (
-              <div className="text-center py-16 p-8 rounded-3xl bg-white/[0.02] border border-white/10">
-                <Users className="w-12 h-12 text-slate-500 mx-auto mb-3" />
-                <h3 className="text-lg font-bold text-white">No Club Members Found</h3>
-                <p className="text-sm text-slate-400 mt-1">Try adjusting your search terms or filters.</p>
+            {/* Screening Cards */}
+            {filteredScreeningMembers.length === 0 ? (
+              <div className="text-center py-16 p-8 rounded-3xl bg-white/[0.02] border border-white/10 space-y-3">
+                <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+                  <CheckCircle2 className="w-7 h-7" />
+                </div>
+                <h3 className="text-lg font-bold text-white">No Applications Awaiting Screening</h3>
+                <p className="text-sm text-slate-400 max-w-md mx-auto">
+                  {searchQuery || deptFilter !== "all"
+                    ? "No applicants match your current search filters."
+                    : "All submitted applications have been screened and assigned official club designations!"}
+                </p>
+                <div className="pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setActiveTab("official-members")}
+                    className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-xs font-bold rounded-xl"
+                  >
+                    View Official Club Members ({assignedCount}) →
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4">
-                {filteredMembers.map((member) => {
+                {filteredScreeningMembers.map((member) => {
                   const draft = editDrafts[member._id] || {
                     designation: member.designation || "",
                     roleAssignee: member.roleAssignee || "",
                   };
                   const isSaving = savingId === member._id;
-                  const isAssigned = Boolean(member.designation?.trim() || member.roleAssignee?.trim());
 
                   return (
                     <div
                       key={member._id}
-                      className="p-5 sm:p-6 rounded-2xl bg-[#090e21]/90 border border-white/10 hover:border-cyan-500/40 transition-all shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6"
+                      className="p-5 sm:p-6 rounded-2xl bg-[#090e21]/90 border border-amber-500/20 hover:border-amber-500/40 transition-all shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6"
                     >
-                      {/* Left: Avatar + Basic Info */}
+                      {/* Left: Avatar + Candidate Info */}
                       <div className="flex items-start gap-4 min-w-[280px]">
                         {member.photo ? (
                           <img
                             src={member.photo}
                             alt={member.name}
-                            className="w-16 h-20 rounded-xl object-cover border border-cyan-400/40 shadow flex-shrink-0"
+                            className="w-16 h-20 rounded-xl object-cover border border-amber-400/40 shadow flex-shrink-0"
                           />
                         ) : (
-                          <div className="w-16 h-20 rounded-xl bg-blue-900/30 border border-blue-500/30 flex items-center justify-center text-blue-400 text-xl font-bold flex-shrink-0">
+                          <div className="w-16 h-20 rounded-xl bg-amber-900/20 border border-amber-500/30 flex items-center justify-center text-amber-300 text-xl font-bold flex-shrink-0">
                             {member.name.charAt(0).toUpperCase()}
                           </div>
                         )}
@@ -738,20 +834,9 @@ export default function AdminPortal() {
                             <h3 className="text-base sm:text-lg font-bold text-white font-space">
                               {member.name}
                             </h3>
-                            <Badge
-                              className={`text-[10px] font-mono uppercase ${
-                                member.status === "Active" || isAssigned
-                                  ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
-                                  : "bg-amber-500/10 text-amber-300 border-amber-500/30"
-                              }`}
-                            >
-                              {member.status === "Active" || isAssigned ? "Active Member" : "⏳ Under Screening"}
+                            <Badge className="bg-amber-500/10 text-amber-300 border-amber-500/30 text-[10px] font-mono uppercase">
+                              ⏳ Under Screening
                             </Badge>
-                            {member.cardSent && (
-                              <Badge className="bg-blue-500/10 text-blue-300 border-blue-500/30 text-[10px] font-mono">
-                                🪪 Card Sent
-                              </Badge>
-                            )}
                           </div>
 
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
@@ -797,7 +882,7 @@ export default function AdminPortal() {
                       </div>
 
                       {/* Middle: Role & Designation Inputs for Admin Assignment */}
-                      <div className="w-full lg:w-auto flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                      <div className="w-full lg:w-auto flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl bg-white/[0.02] border border-amber-500/10">
                         <div>
                           <label className="block text-[11px] font-mono uppercase tracking-wider text-amber-300 font-bold mb-1">
                             Club Designation
@@ -823,31 +908,24 @@ export default function AdminPortal() {
                         </div>
                       </div>
 
-                      {/* Right: Save Action */}
+                      {/* Right: Save & Shift Action */}
                       <div className="flex sm:flex-col items-center gap-2 w-full lg:w-auto justify-end">
                         <Button
-                          id={`save-role-btn-${member._id}`}
+                          id={`assign-role-btn-${member._id}`}
                           type="button"
                           onClick={() => handleSaveRole(member._id)}
                           disabled={isSaving}
                           size="sm"
-                          className={`w-full sm:w-auto text-white text-xs font-bold rounded-xl px-4 py-2 flex items-center justify-center gap-1.5 shadow-md ${
-                            draft.designation.trim()
-                              ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-500/20"
-                              : "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 shadow-blue-500/20"
-                          }`}
+                          className="w-full sm:w-auto text-white text-xs font-bold rounded-xl px-4 py-2 flex items-center justify-center gap-1.5 shadow-md bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-500/20"
+                          title="Save designation, send official membership card email, and shift to Official Members"
                         >
                           {isSaving ? (
                             <>
-                              <RefreshCw className="w-3.5 h-3.5 animate-spin" /> {draft.designation.trim() ? "Issuing Card..." : "Saving..."}
-                            </>
-                          ) : draft.designation.trim() ? (
-                            <>
-                              <Sparkles className="w-3.5 h-3.5 text-amber-300" /> Assign & Send ID Card 🪪
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Issuing Card...
                             </>
                           ) : (
                             <>
-                              <Save className="w-3.5 h-3.5" /> Save Role
+                              <Sparkles className="w-3.5 h-3.5 text-amber-300" /> Assign &amp; Send ID Card 🪪
                             </>
                           )}
                         </Button>
@@ -903,6 +981,311 @@ export default function AdminPortal() {
                           ID: {member.memberId || "TV-2026"}
                         </span>
                       </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ================================================================= */}
+        {/* TAB 2: OFFICIAL CLUB MEMBERS (VERIFIED ROSTER)                    */}
+        {/* ================================================================= */}
+        {activeTab === "official-members" && (
+          <div className="space-y-6">
+            {/* Header Callout */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-transparent border border-emerald-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <h2 className="text-lg sm:text-xl font-black font-space text-white flex items-center gap-2">
+                    Official TechVerse Club Members <Sparkles className="w-5 h-5 text-amber-300" />
+                  </h2>
+                </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  Verified roster of students who have completed screening, been appointed a club designation, and received their official digital membership ID card.
+                </p>
+              </div>
+              <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-xs font-mono px-3 py-1 flex-shrink-0">
+                {filteredOfficialMembers.length} Appointed Members
+              </Badge>
+            </div>
+
+            {/* Search & Filter Bar */}
+            <div className="p-4 rounded-2xl bg-[#0b1126]/80 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="relative w-full md:w-96">
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Input
+                  id="admin-official-search-input"
+                  type="text"
+                  placeholder="Search members by Name, Designation, or ID..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:border-emerald-400"
+                />
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                <select
+                  value={deptFilter}
+                  onChange={(e) => setDeptFilter(e.target.value)}
+                  className="bg-white/5 border border-white/10 text-slate-300 text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-emerald-400"
+                >
+                  <option value="all" className="bg-[#0b1126] text-white">All Departments</option>
+                  <option value="btech" className="bg-[#0b1126] text-white">B.Tech</option>
+                  <option value="bca" className="bg-[#0b1126] text-white">BCA</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Official Members Cards */}
+            {filteredOfficialMembers.length === 0 ? (
+              <div className="text-center py-16 p-8 rounded-3xl bg-white/[0.02] border border-white/10 space-y-3">
+                <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mx-auto">
+                  <Users className="w-7 h-7" />
+                </div>
+                <h3 className="text-lg font-bold text-white">No Official Members Found</h3>
+                <p className="text-sm text-slate-400 max-w-md mx-auto">
+                  {searchQuery || deptFilter !== "all"
+                    ? "No members match your search criteria."
+                    : "No official club members assigned yet. Go to Screening Applications to assign roles and issue ID cards."}
+                </p>
+                <div className="pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setActiveTab("screening")}
+                    className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30 text-xs font-bold rounded-xl"
+                  >
+                    Go to Screening Applications ({pendingCount}) →
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {filteredOfficialMembers.map((member) => {
+                  const draft = editDrafts[member._id] || {
+                    designation: member.designation || "",
+                    roleAssignee: member.roleAssignee || "",
+                  };
+                  const isEditing = editingOfficialId === member._id;
+                  const isSaving = savingId === member._id;
+
+                  return (
+                    <div
+                      key={member._id}
+                      className="p-5 sm:p-6 rounded-2xl bg-[#090e21]/90 border border-emerald-500/25 hover:border-emerald-500/45 transition-all shadow-xl space-y-4"
+                    >
+                      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                        {/* Left: Avatar + Details */}
+                        <div className="flex items-start gap-4 min-w-[280px]">
+                          {member.photo ? (
+                            <img
+                              src={member.photo}
+                              alt={member.name}
+                              className="w-16 h-20 rounded-xl object-cover border-2 border-emerald-400/50 shadow-lg flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-16 h-20 rounded-xl bg-gradient-to-br from-emerald-900/40 to-teal-900/40 border-2 border-emerald-500/40 flex items-center justify-center text-emerald-300 text-xl font-bold flex-shrink-0">
+                              {member.name.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+
+                          <div className="space-y-1.5">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="text-base sm:text-lg font-bold text-white font-space">
+                                {member.name}
+                              </h3>
+                              <Badge className="bg-emerald-500/15 text-emerald-300 border-emerald-500/40 text-[10px] font-mono">
+                                ✓ Official Member
+                              </Badge>
+                              {member.cardSent && (
+                                <Badge className="bg-blue-500/15 text-blue-300 border-blue-500/40 text-[10px] font-mono">
+                                  🪪 ID Card Sent
+                                </Badge>
+                              )}
+                            </div>
+
+                            {/* PROMINENT DESIGNATION & ROLE ASSIGNEE BADGES */}
+                            <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                              <span className="inline-flex items-center gap-1 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-300 border border-amber-500/40 font-bold text-xs px-2.5 py-1 rounded-lg shadow-sm">
+                                🌟 {member.designation}
+                              </span>
+                              <span className="inline-flex items-center gap-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold text-xs px-2.5 py-1 rounded-lg shadow-sm">
+                                ⚡ {member.roleAssignee || "Core Team"}
+                              </span>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400 pt-1">
+                              {member.serialNumber && (
+                                <span className="font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30 text-[11px]">
+                                  #{member.serialNumber}
+                                </span>
+                              )}
+                              {member.memberId && (
+                                <span className="font-mono text-blue-300 font-bold bg-blue-500/10 px-2 py-0.5 rounded text-[11px]">
+                                  {member.memberId}
+                                </span>
+                              )}
+                              <span className="font-mono text-cyan-300 font-semibold">{member.regNumber}</span>
+                              <span>•</span>
+                              <span className="capitalize">{member.department.toUpperCase()} ({member.batch})</span>
+                              <span>•</span>
+                              <span className="text-slate-300">{member.residenceType || "Day Scholar"}</span>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400 pt-0.5">
+                              <span className="flex items-center gap-1">
+                                <Phone className="w-3 h-3 text-slate-500" /> {member.contact}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Mail className="w-3 h-3 text-slate-500" /> {member.email}
+                              </span>
+                            </div>
+
+                            {member.interests && member.interests.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5 pt-1">
+                                {member.interests.map((interest, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="text-[10px] px-2 py-0.5 rounded-md bg-white/5 text-slate-300 border border-white/10"
+                                  >
+                                    {interest}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Right: Actions */}
+                        <div className="flex sm:flex-col items-center gap-2 w-full lg:w-auto justify-end">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEditingOfficialId(isEditing ? null : member._id)}
+                            className="w-full sm:w-auto bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3"
+                          >
+                            <Edit3 className="w-3.5 h-3.5 text-blue-400" />
+                            <span>{isEditing ? "Close Editor" : "Edit Role / Re-issue Card"}</span>
+                          </Button>
+
+                          {confirmDeleteId === member._id ? (
+                            <div className="flex items-center gap-1.5 w-full sm:w-auto animate-fade-in">
+                              <Button
+                                id={`confirm-delete-btn-${member._id}`}
+                                type="button"
+                                size="sm"
+                                disabled={isDeletingId === member._id}
+                                onClick={() => handleDeleteMember(member._id, member.name)}
+                                className="bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-xl px-3 py-1.5 flex items-center gap-1 shadow-lg shadow-red-500/30"
+                                title="Permanently delete this member from MongoDB"
+                              >
+                                {isDeletingId === member._id ? (
+                                  <>
+                                    <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Deleting...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Trash2 className="w-3.5 h-3.5" /> Confirm Delete
+                                  </>
+                                )}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                disabled={isDeletingId === member._id}
+                                onClick={() => setConfirmDeleteId(null)}
+                                className="text-slate-400 hover:text-white text-xs py-1.5 px-2"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button
+                              id={`delete-official-member-btn-${member._id}`}
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setConfirmDeleteId(member._id)}
+                              className="w-full sm:w-auto bg-red-500/10 hover:bg-red-500/20 text-red-300 border-red-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3 transition-colors"
+                              title="Delete this member from MongoDB Atlas"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                              <span>Reject / Delete</span>
+                            </Button>
+                          )}
+
+                          <span className="text-[10px] font-mono text-slate-500 block text-center">
+                            ID: {member.memberId || "TV-2026"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Inline Expansion Editor for Official Member */}
+                      {isEditing && (
+                        <div className="p-4 rounded-xl bg-white/[0.03] border border-blue-500/20 space-y-3 animate-fade-in">
+                          <div className="text-xs font-mono font-bold text-blue-300 flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-amber-400" />
+                            Update Official Designation &amp; Re-dispatch ID Card
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-[11px] font-mono uppercase tracking-wider text-amber-300 font-bold mb-1">
+                                Club Designation
+                              </label>
+                              <Input
+                                placeholder="e.g. Technical Lead, President..."
+                                value={draft.designation}
+                                onChange={(e) => handleDraftChange(member._id, "designation", e.target.value)}
+                                className="bg-white/5 border-white/10 text-white text-xs rounded-lg focus:border-amber-400"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-mono uppercase tracking-wider text-blue-300 font-bold mb-1">
+                                Role Assignee
+                              </label>
+                              <Input
+                                placeholder="e.g. Core Team, Coordinator..."
+                                value={draft.roleAssignee}
+                                onChange={(e) => handleDraftChange(member._id, "roleAssignee", e.target.value)}
+                                className="bg-white/5 border-white/10 text-white text-xs rounded-lg focus:border-blue-400"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-end gap-2 pt-1">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingOfficialId(null)}
+                              className="text-xs text-slate-400 hover:text-white"
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              disabled={isSaving}
+                              onClick={() => handleSaveRole(member._id)}
+                              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold rounded-xl px-4 py-1.5 flex items-center gap-1.5 shadow-md shadow-emerald-500/20"
+                            >
+                              {isSaving ? (
+                                <>
+                                  <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Updating &amp; Sending...
+                                </>
+                              ) : (
+                                <>
+                                  <Sparkles className="w-3.5 h-3.5 text-amber-300" /> Save &amp; Re-send ID Card 🪪
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
