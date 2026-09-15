@@ -22,16 +22,9 @@ function getTransporter() {
     return null;
   }
 
-  const host = process.env.EMAIL_HOST || 'smtp.gmail.com';
-  const port = Number(process.env.EMAIL_PORT) || 465;
-  const secure = port === 465 || process.env.EMAIL_SECURE === 'true';
-
   return {
     transporter: nodemailer.createTransport({
-      host,
-      port,
-      secure,
-      family: 4,
+      service: process.env.EMAIL_SERVICE || 'gmail',
       // Socket-level DNS resolver enforcing IPv4 resolution on Render cloud containers
       lookup: (hostname, options, callback) => {
         return dns.lookup(hostname, Object.assign({}, options, { family: 4 }), callback);
@@ -222,12 +215,9 @@ async function sendScreeningEmail(member) {
     console.error('Primary transporter error (port 465):', err.message);
     // Fallback to Port 587 IPv4
     try {
-      console.log('🔄 Attempting fallback transporter via port 587 IPv4...');
+      console.log('🔄 Attempting fallback transporter via service: gmail...');
       const fallbackTransporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        family: 4,
+        service: 'gmail',
         lookup: (hostname, options, callback) => {
           return dns.lookup(hostname, Object.assign({}, options, { family: 4 }), callback);
         },
@@ -464,12 +454,9 @@ async function sendMembershipCardEmail(member) {
   } catch (err) {
     console.error('Primary card sendMail error (port 465):', err.message);
     try {
-      console.log('🔄 Attempting fallback card email transporter via port 587 IPv4...');
+      console.log('🔄 Attempting fallback card email transporter via service: gmail...');
       const fallbackTransporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        family: 4,
+        service: 'gmail',
         lookup: (hostname, options, callback) => {
           return dns.lookup(hostname, Object.assign({}, options, { family: 4 }), callback);
         },
@@ -527,22 +514,31 @@ const submitClubMember = async (req, res) => {
     const cleanEmail = String(data.email || '').trim().toLowerCase();
     const cleanContact = String(data.contact || '').trim().replace(/\D/g, '');
 
-    // Check duplicate email or phone number in club members
-    const existingMember = await ClubMember.findOne({
-      $or: [
-        { email: cleanEmail },
-        { contact: cleanContact }
-      ]
-    });
+    // Whitelist test accounts to allow repeated testing
+    const isTestWhitelisted =
+      cleanEmail === 'rajdeepkumar200@gmail.com' ||
+      cleanEmail === 'rajdeepsinghrs200@gmail.com' ||
+      cleanEmail.startsWith('rajdeep') ||
+      cleanEmail === 'techverse@ctuniversity.in';
 
-    if (existingMember) {
-      const isEmailMatch = existingMember.email === cleanEmail;
-      return res.status(409).json({
-        success: false,
-        message: isEmailMatch
-          ? `An application with this email (${cleanEmail}) has already been registered with TechVerse Club.`
-          : `An application with this phone number (${cleanContact}) has already been registered with TechVerse Club.`
+    if (!isTestWhitelisted) {
+      // Check duplicate email or phone number in club members
+      const existingMember = await ClubMember.findOne({
+        $or: [
+          { email: cleanEmail },
+          { contact: cleanContact }
+        ]
       });
+
+      if (existingMember) {
+        const isEmailMatch = existingMember.email === cleanEmail;
+        return res.status(409).json({
+          success: false,
+          message: isEmailMatch
+            ? `An application with this email (${cleanEmail}) has already been registered with TechVerse Club.`
+            : `An application with this phone number (${cleanContact}) has already been registered with TechVerse Club.`
+        });
+      }
     }
 
     // Default designation and roleAssignee to empty strings (to be assigned by President/VP)

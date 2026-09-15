@@ -105,6 +105,10 @@ export default function AdminPortal() {
   const [activeTab, setActiveTab] = useState<"members" | "queries" | "arenas">("members");
   const [loading, setLoading] = useState<boolean>(false);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [confirmDeleteEnquiryId, setConfirmDeleteEnquiryId] = useState<string | null>(null);
+  const [confirmDeleteContactId, setConfirmDeleteContactId] = useState<string | null>(null);
+  const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
 
   // Data states
   const [members, setMembers] = useState<ClubMemberItem[]>([]);
@@ -285,35 +289,37 @@ export default function AdminPortal() {
   };
 
   const handleDeleteMember = async (id: string, name: string) => {
-    if (!window.confirm(`Are you sure you want to reject and delete the application for "${name}"? This action cannot be undone.`)) {
-      return;
-    }
+    setIsDeletingId(id);
     try {
       await deleteClubMember(id);
       setMembers((prev) => prev.filter((m) => m._id !== id));
+      setConfirmDeleteId(null);
       toast.success(`Application for "${name}" deleted from MongoDB Atlas.`);
     } catch (err: any) {
+      console.error("Delete error:", err);
       toast.error(err?.message || "Failed to delete member application");
+    } finally {
+      setIsDeletingId(null);
     }
   };
 
   const handleDeleteEnquiry = async (id: string, name: string) => {
-    if (!window.confirm(`Delete enquiry from "${name}"?`)) return;
     try {
       await deleteEnquiry(id);
       setEnquiries((prev) => prev.filter((e) => e._id !== id));
-      toast.success("Enquiry deleted successfully.");
+      setConfirmDeleteEnquiryId(null);
+      toast.success(`Enquiry from "${name}" deleted successfully.`);
     } catch (err: any) {
       toast.error(err?.message || "Failed to delete enquiry");
     }
   };
 
   const handleDeleteContact = async (id: string, name: string) => {
-    if (!window.confirm(`Delete message from "${name}"?`)) return;
     try {
       await deleteContact(id);
       setContacts((prev) => prev.filter((c) => c._id !== id));
-      toast.success("Contact message deleted successfully.");
+      setConfirmDeleteContactId(null);
+      toast.success(`Contact message from "${name}" deleted successfully.`);
     } catch (err: any) {
       toast.error(err?.message || "Failed to delete contact message");
     }
@@ -846,18 +852,52 @@ export default function AdminPortal() {
                           )}
                         </Button>
 
-                        <Button
-                          id={`delete-member-btn-${member._id}`}
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDeleteMember(member._id, member.name)}
-                          className="w-full sm:w-auto bg-red-500/10 hover:bg-red-500/20 text-red-300 border-red-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3"
-                          title="Reject and delete this application from MongoDB Atlas"
-                        >
-                          <Trash2 className="w-3.5 h-3.5 text-red-400" />
-                          <span>Reject / Delete</span>
-                        </Button>
+                        {confirmDeleteId === member._id ? (
+                          <div className="flex items-center gap-1.5 w-full sm:w-auto animate-fade-in">
+                            <Button
+                              id={`confirm-delete-btn-${member._id}`}
+                              type="button"
+                              size="sm"
+                              disabled={isDeletingId === member._id}
+                              onClick={() => handleDeleteMember(member._id, member.name)}
+                              className="bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-xl px-3 py-1.5 flex items-center gap-1 shadow-lg shadow-red-500/30"
+                              title="Click again to permanently delete from MongoDB"
+                            >
+                              {isDeletingId === member._id ? (
+                                <>
+                                  <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Deleting...
+                                </>
+                              ) : (
+                                <>
+                                  <Trash2 className="w-3.5 h-3.5" /> Confirm Delete
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              disabled={isDeletingId === member._id}
+                              onClick={() => setConfirmDeleteId(null)}
+                              className="text-slate-400 hover:text-white text-xs py-1.5 px-2"
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            id={`delete-member-btn-${member._id}`}
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setConfirmDeleteId(member._id)}
+                            className="w-full sm:w-auto bg-red-500/10 hover:bg-red-500/20 text-red-300 border-red-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3 transition-colors"
+                            title="Reject and delete this application from MongoDB Atlas"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                            <span>Reject / Delete</span>
+                          </Button>
+                        )}
 
                         <span className="text-[10px] font-mono text-slate-500 block text-center">
                           ID: {member.memberId || "TV-2026"}
@@ -906,16 +946,39 @@ export default function AdminPortal() {
                         <span className="text-[10px] font-mono text-slate-500">
                           {enq.createdAt ? new Date(enq.createdAt).toLocaleDateString() : "Recent"}
                         </span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteEnquiry(enq._id, enq.name)}
-                          className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-md"
-                          title="Delete enquiry from MongoDB"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
+                        {confirmDeleteEnquiryId === enq._id ? (
+                          <div className="flex items-center gap-1 animate-fade-in">
+                            <Button
+                              type="button"
+                              size="sm"
+                              onClick={() => handleDeleteEnquiry(enq._id, enq.name)}
+                              className="h-6 px-2 text-[10px] bg-red-600 hover:bg-red-500 text-white rounded font-bold"
+                              title="Confirm delete"
+                            >
+                              Delete?
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setConfirmDeleteEnquiryId(null)}
+                              className="h-6 px-1.5 text-[10px] text-slate-400 hover:text-white"
+                            >
+                              ✕
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setConfirmDeleteEnquiryId(enq._id)}
+                            className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-md"
+                            title="Delete enquiry from MongoDB"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        )}
                       </div>
                     </div>
 
@@ -953,16 +1016,39 @@ export default function AdminPortal() {
                         <span className="text-[10px] font-mono text-slate-500">
                           {c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "Recent"}
                         </span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteContact(c._id, c.name)}
-                          className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-md"
-                          title="Delete contact message from MongoDB"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
+                        {confirmDeleteContactId === c._id ? (
+                          <div className="flex items-center gap-1 animate-fade-in">
+                            <Button
+                              type="button"
+                              size="sm"
+                              onClick={() => handleDeleteContact(c._id, c.name)}
+                              className="h-6 px-2 text-[10px] bg-red-600 hover:bg-red-500 text-white rounded font-bold"
+                              title="Confirm delete"
+                            >
+                              Delete?
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setConfirmDeleteContactId(null)}
+                              className="h-6 px-1.5 text-[10px] text-slate-400 hover:text-white"
+                            >
+                              ✕
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setConfirmDeleteContactId(c._id)}
+                            className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-md"
+                            title="Delete contact message from MongoDB"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        )}
                       </div>
                     </div>
 
