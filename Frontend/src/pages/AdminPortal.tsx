@@ -2163,7 +2163,7 @@ export default function AdminPortal() {
                   className="mt-0.5 rounded border-amber-400 text-amber-600 focus:ring-amber-500"
                 />
                 <label htmlFor="send-resignation-email-check" className="text-xs text-amber-200 cursor-pointer">
-                  <strong>Dispatch Formal Resignation Acceptance Email:</strong> Sends an official letter from <code className="text-amber-300">techverse@ctuniversity.in</code> thanking the member for their past tenure and confirming acceptance.
+                  <strong>Dispatch Soft-Toned Resignation Acceptance Email:</strong> Sends a warm appreciation &amp; farewell letter from <code className="text-amber-300">techverse@ctuniversity.in</code> thanking the member for their contributions and wishing them future success.
                 </label>
               </div>
 
@@ -2220,10 +2220,10 @@ export default function AdminPortal() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-white font-space">
-                    Disciplinary Termination &amp; Revocation
+                    Conclude Membership &amp; Revoke Credentials
                   </h3>
                   <p className="text-xs text-red-300">
-                    Immediate revocation of club credentials and privileges
+                    Polite notification &amp; deactivation of official club privileges
                   </p>
                 </div>
               </div>
@@ -2244,7 +2244,7 @@ export default function AdminPortal() {
               {/* Punishable Offense Reason Select */}
               <div className="space-y-2">
                 <label className="block text-xs font-mono uppercase tracking-wider text-red-300 font-bold">
-                  Violation / Punishable Offense <span className="text-red-400">*</span>
+                  Reason for Membership Conclusion <span className="text-red-400">*</span>
                 </label>
                 <select
                   id="termination-reason-select"
@@ -2255,14 +2255,14 @@ export default function AdminPortal() {
                   <option value="Sharing club IDs for bunking classes (Strict Disciplinary Violation)" className="bg-[#0b1126] text-white">
                     Sharing club IDs for bunking classes (Strict Disciplinary Violation)
                   </option>
-                  <option value="Taking club tasks and responsibilities casually" className="bg-[#0b1126] text-white">
-                    Taking club tasks and responsibilities casually
+                  <option value="Casual approach towards assigned tasks & deliverables" className="bg-[#0b1126] text-white">
+                    Casual approach towards assigned tasks &amp; deliverables
                   </option>
-                  <option value="Inactivity in community & unexcused meeting absence" className="bg-[#0b1126] text-white">
-                    Inactivity in community &amp; unexcused meeting absence
+                  <option value="Prolonged inactivity in community & unexcused meeting absence" className="bg-[#0b1126] text-white">
+                    Prolonged inactivity in community &amp; unexcused meeting absence
                   </option>
-                  <option value="Violation of Club Code of Conduct & Departmental Misconduct" className="bg-[#0b1126] text-white">
-                    Violation of Club Code of Conduct &amp; Departmental Misconduct
+                  <option value="Non-alignment with Club Code of Conduct & guidelines" className="bg-[#0b1126] text-white">
+                    Non-alignment with Club Code of Conduct &amp; guidelines
                   </option>
                   <option value="Other" className="bg-[#0b1126] text-white">
                     Other Reason (Specify below)
@@ -2283,7 +2283,7 @@ export default function AdminPortal() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-mono uppercase tracking-wider text-red-300 font-bold mb-1">
-                    Imposed Fine (₹)
+                    Administrative Clearance Fine (₹)
                   </label>
                   <Input
                     id="termination-fine-input"
@@ -2318,7 +2318,7 @@ export default function AdminPortal() {
                   className="mt-0.5 rounded border-red-400 text-red-600 focus:ring-red-500"
                 />
                 <label htmlFor="send-termination-email-check" className="text-xs text-red-200 cursor-pointer">
-                  <strong>Dispatch Disciplinary Notice &amp; Revocation Email:</strong> Serves formal termination notice to <code className="text-red-300 font-mono">{terminatingMember.email}</code> referencing the consented Code of Conduct, ₹{fineAmount || 1000} fine, and immediate ID card cancellation.
+                  <strong>Dispatch Curated Soft-Toned Notice Email:</strong> Sends a polite, respectful message to <code className="text-red-300 font-mono">{terminatingMember.email}</code> gently explaining the status update, referencing clearance formalities (₹{fineAmount || 1000}), and wishing them well academically.
                 </label>
               </div>
 
@@ -2343,12 +2343,12 @@ export default function AdminPortal() {
                   {isSubmittingTermination ? (
                     <>
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                      <span>Terminating &amp; Revoking...</span>
+                      <span>Concluding Membership...</span>
                     </>
                   ) : (
                     <>
                       <UserX className="w-3.5 h-3.5" />
-                      <span>Confirm Immediate Termination</span>
+                      <span>Conclude Membership &amp; Notify</span>
                     </>
                   )}
                 </Button>
