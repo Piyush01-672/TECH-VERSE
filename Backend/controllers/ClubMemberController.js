@@ -520,6 +520,26 @@ async function sendMembershipCardEmail(member) {
   }
 }
 
+/**
+ * Stage 3: Send Curated Leadership Promotion Email
+ * Triggered when Admin promotes an official club member to an elevated role/designation.
+ */
+async function sendPromotionEmail(member, previousDesignation) {
+  const memberData = member.toObject ? member.toObject() : Object.assign({}, member);
+  memberData.previousDesignation = previousDesignation || 'Active Member';
+
+  // First attempt: Vercel serverless relay over HTTPS
+  try {
+    const relayOk = await callVercelRelay('promotion', memberData);
+    if (relayOk) return true;
+  } catch (relayErr) {
+    console.warn('Promotion relay attempt failed:', relayErr.message);
+  }
+
+  // Fallback: sendMembershipCardEmail with updated data
+  return await sendMembershipCardEmail(memberData);
+}
+
 // Auto-migration helper to separate legacy records into 2 collections in MongoDB Atlas
 let hasMigrated = false;
 async function autoMigrateCollections() {
@@ -790,11 +810,71 @@ const deleteClubMember = async (req, res) => {
   }
 };
 
+// POST / PATCH promote club member to a higher designation & dispatch promotion email
+const promoteMember = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { designation, roleAssignee, role } = req.body;
+
+    if (!designation || !designation.trim()) {
+      return res.status(400).json({ success: false, message: 'New Club Designation is required for promotion.' });
+    }
+
+    let member = await ClubMember.findById(id);
+    if (!member) {
+      member = await UnderScreeningMember.findById(id);
+      if (!member) {
+        return res.status(404).json({ success: false, message: 'Official member not found.' });
+      }
+    }
+
+    const previousDesignation = member.designation || 'Active Member';
+    member.designation = designation.trim();
+    if (roleAssignee !== undefined) member.roleAssignee = (roleAssignee || '').trim();
+    if (role !== undefined) member.role = role;
+    member.status = 'Official Member';
+    member.promotedAt = new Date();
+    await member.save();
+
+    let promoEmailSent = false;
+    let promoEmailError = null;
+
+    try {
+      promoEmailSent = await sendPromotionEmail(member, previousDesignation);
+      if (promoEmailSent) {
+        member.cardSent = true;
+        member.cardSentAt = new Date();
+        await member.save();
+      }
+    } catch (err) {
+      promoEmailError = err.message;
+      console.error('Promotion Email Dispatch Warning:', err.message);
+    }
+
+    res.json({
+      success: true,
+      cardEmailSent: promoEmailSent,
+      promoEmailSent,
+      promoEmailError,
+      previousDesignation,
+      newDesignation: member.designation,
+      message: promoEmailSent
+        ? `🎉 ${member.name} promoted to ${member.designation}! Updated Leadership ID Card sent to ${member.email}.`
+        : `Member promoted to ${member.designation} in MongoDB Atlas.`,
+      member,
+    });
+  } catch (err) {
+    console.error('promoteMember error:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
 module.exports = {
   getClubMembers,
   getScreeningMembers,
   submitClubMember,
   updateMemberRole,
+  promoteMember,
   deleteClubMember,
   deleteScreeningMember,
 };

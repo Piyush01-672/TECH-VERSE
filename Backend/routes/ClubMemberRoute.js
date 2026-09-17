@@ -9,6 +9,8 @@ router.get('/screening', clubMemberController.getScreeningMembers);
 router.post('/', validate(EnquiryValidationSchema), clubMemberController.submitClubMember);
 router.patch('/:id/role', clubMemberController.updateMemberRole);
 router.put('/:id/role', clubMemberController.updateMemberRole);
+router.patch('/:id/promote', clubMemberController.promoteMember);
+router.put('/:id/promote', clubMemberController.promoteMember);
 router.put('/:id', clubMemberController.updateMemberRole);
 router.patch('/:id', clubMemberController.updateMemberRole);
 router.delete('/screening/:id', clubMemberController.deleteScreeningMember);

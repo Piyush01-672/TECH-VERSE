@@ -346,7 +346,7 @@ export const getClubMembers = async () => {
   }
 };
 
-export const sendEmailDirect = async (payload: { type: 'screening' | 'card' | 'test'; member?: any; recipient?: string }) => {
+export const sendEmailDirect = async (payload: { type: 'screening' | 'card' | 'promotion' | 'test'; member?: any; recipient?: string }) => {
   // Try local/same-origin serverless endpoint first, or production Vercel relay
   const relayUrls = [
     '/api/send-email',
@@ -368,6 +368,53 @@ export const sendEmailDirect = async (payload: { type: 'screening' | 'card' | 't
     }
   }
   return { success: false, message: 'All email relays failed' };
+};
+
+export const promoteClubMember = async (
+  id: string,
+  promoteData: { designation: string; roleAssignee?: string; role?: string; previousDesignation?: string }
+) => {
+  const url = `${API_BASE_URL}/api/club-members/${id}/promote`;
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(promoteData),
+    });
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (e) {
+      data = {};
+    }
+
+    if (!response.ok) {
+      // Fallback to PUT /api/club-members/:id/promote or /role
+      const fallback = await fetch(`${API_BASE_URL}/api/club-members/${id}/promote`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(promoteData),
+      });
+      if (fallback.ok) return await fallback.json();
+
+      const fallbackRole = await fetch(`${API_BASE_URL}/api/club-members/${id}/role`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...promoteData, status: 'Official Member' }),
+      });
+      if (fallbackRole.ok) return await fallbackRole.json();
+
+      throw new Error(data.message || 'Failed to promote member');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error promoting club member:', error);
+    throw error;
+  }
 };
 
 export const updateClubMemberRole = async (

@@ -28,7 +28,10 @@ import {
   KeyRound,
   ShieldAlert,
   Trash2,
-  Edit3
+  Edit3,
+  Crown,
+  Award,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +41,7 @@ import {
   getClubMembers, 
   getScreeningMembers,
   updateClubMemberRole, 
+  promoteClubMember,
   getEnquiries, 
   getContacts, 
   getEngineersDayStats,
@@ -114,6 +118,12 @@ export default function AdminPortal() {
   const [confirmDeleteEnquiryId, setConfirmDeleteEnquiryId] = useState<string | null>(null);
   const [confirmDeleteContactId, setConfirmDeleteContactId] = useState<string | null>(null);
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
+
+  // Promotion Modal State
+  const [promotingMember, setPromotingMember] = useState<ClubMemberItem | null>(null);
+  const [promoDesignation, setPromoDesignation] = useState<string>("");
+  const [promoRoleAssignee, setPromoRoleAssignee] = useState<string>("");
+  const [isPromoting, setIsPromoting] = useState<boolean>(false);
 
   // Data states
   const [screeningList, setScreeningList] = useState<ClubMemberItem[]>([]);
@@ -334,6 +344,86 @@ export default function AdminPortal() {
       toast.error(error?.message || "Failed to update member role");
     } finally {
       setSavingId(null);
+    }
+  };
+
+  const openPromotionModal = (member: ClubMemberItem) => {
+    setPromotingMember(member);
+    setPromoDesignation(member.designation || "");
+    setPromoRoleAssignee(member.roleAssignee || "Executive Board");
+  };
+
+  const handleConfirmPromotion = async () => {
+    if (!promotingMember) return;
+    if (!promoDesignation.trim()) {
+      toast.error("Please enter an elevated Club Designation.");
+      return;
+    }
+
+    setIsPromoting(true);
+    try {
+      const prevDesig = promotingMember.designation || "Member";
+      const res = await promoteClubMember(promotingMember._id, {
+        designation: promoDesignation.trim(),
+        roleAssignee: promoRoleAssignee.trim(),
+        previousDesignation: prevDesig,
+      });
+
+      let cardEmailed = Boolean(res?.cardEmailSent || res?.promoEmailSent);
+
+      // Client-side fallback if backend relay couldn't reach
+      if (!cardEmailed) {
+        try {
+          const directRes = await sendEmailDirect({
+            type: "promotion",
+            member: {
+              ...promotingMember,
+              designation: promoDesignation.trim(),
+              roleAssignee: promoRoleAssignee.trim(),
+              previousDesignation: prevDesig,
+            },
+          });
+          if (directRes && directRes.success) {
+            cardEmailed = true;
+          }
+        } catch (e) {
+          console.warn("Direct promotion email dispatch note:", e);
+        }
+      }
+
+      // Update local officialList in real time
+      const updatedMember: ClubMemberItem = {
+        ...promotingMember,
+        designation: promoDesignation.trim(),
+        roleAssignee: promoRoleAssignee.trim(),
+        cardSent: cardEmailed || true,
+      };
+
+      setOfficialList((prev) =>
+        prev.map((m) => (m._id === promotingMember._id ? updatedMember : m))
+      );
+
+      // Also update editable draft
+      setEditDrafts((prev) => ({
+        ...prev,
+        [promotingMember._id]: {
+          designation: promoDesignation.trim(),
+          roleAssignee: promoRoleAssignee.trim(),
+        },
+      }));
+
+      if (cardEmailed) {
+        toast.success(`🎖️ ${promotingMember.name} officially promoted to ${promoDesignation.trim()}! Curated promotion citation & updated Leadership ID Card sent to ${promotingMember.email}!`);
+      } else {
+        toast.success(`🎖️ ${promotingMember.name} officially promoted to ${promoDesignation.trim()}! Saved to MongoDB Atlas!`);
+      }
+
+      setPromotingMember(null);
+    } catch (error: any) {
+      console.error("Promotion error:", error);
+      toast.error(error?.message || "Failed to promote member");
+    } finally {
+      setIsPromoting(false);
     }
   };
 
@@ -1205,6 +1295,19 @@ export default function AdminPortal() {
 
                         {/* Right: Actions */}
                         <div className="flex sm:flex-col items-center gap-2 w-full lg:w-auto justify-end">
+                          {/* DEDICATED PROMOTION BUTTON */}
+                          <Button
+                            id={`promote-member-btn-${member._id}`}
+                            type="button"
+                            size="sm"
+                            onClick={() => openPromotionModal(member)}
+                            className="w-full sm:w-auto bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-black rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3.5 shadow-md shadow-amber-500/25 border border-amber-300/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                            title="Promote this member to an elevated designation and dispatch an official leadership promotion email with updated ID card"
+                          >
+                            <Crown className="w-3.5 h-3.5 text-slate-950 fill-slate-950" />
+                            <span>Promote / Update Role 🎖️</span>
+                          </Button>
+
                           <Button
                             type="button"
                             size="sm"
@@ -1213,7 +1316,7 @@ export default function AdminPortal() {
                             className="w-full sm:w-auto bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3"
                           >
                             <Edit3 className="w-3.5 h-3.5 text-blue-400" />
-                            <span>{isEditing ? "Close Editor" : "Edit Role / Re-issue Card"}</span>
+                            <span>{isEditing ? "Close Editor" : "Quick Edit Designation"}</span>
                           </Button>
 
                           {confirmDeleteId === member._id ? (
@@ -1539,6 +1642,153 @@ export default function AdminPortal() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* ================================================================= */}
+        {/* PROMOTION MODAL: REASSIGN ROLE & DISPATCH CURATED PROMOTION ID CARD */}
+        {/* ================================================================= */}
+        {promotingMember && (
+          <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+            <div className="bg-[#090e21] border border-amber-500/40 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6 relative overflow-hidden">
+              {/* Gold Top Accent Line */}
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600" />
+
+              {/* Header */}
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-[10px] font-mono tracking-wider text-amber-300 uppercase">
+                    <Crown className="w-3 h-3 text-amber-400 fill-amber-400" />
+                    Leadership Elevation Portal
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black font-space text-white tracking-tight">
+                    Promote Club Member
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Reassign designation and automatically dispatch an official curated promotion congratulations email with their updated Digital Leadership ID Card.
+                  </p>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPromotingMember(null)}
+                  disabled={isPromoting}
+                  className="text-slate-400 hover:text-white p-2 rounded-xl"
+                >
+                  <X className="w-5 h-5" />
+                </Button>
+              </div>
+
+              {/* Member Overview Card */}
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center gap-4">
+                {promotingMember.photo ? (
+                  <img
+                    src={promotingMember.photo}
+                    alt={promotingMember.name}
+                    className="w-14 h-16 rounded-xl object-cover border-2 border-amber-400/50 shadow-md flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-14 h-16 rounded-xl bg-amber-500/20 border-2 border-amber-500/40 text-amber-300 font-bold text-lg flex items-center justify-center flex-shrink-0">
+                    {promotingMember.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="space-y-1 min-w-0">
+                  <h4 className="text-base font-bold text-white truncate font-space">
+                    {promotingMember.name}
+                  </h4>
+                  <p className="text-xs text-slate-400 font-mono">
+                    Reg: {promotingMember.regNumber} • {promotingMember.department.toUpperCase()} ({promotingMember.batch})
+                  </p>
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <span className="text-slate-400 text-[11px]">Current Designation:</span>
+                    <Badge className="bg-amber-500/15 text-amber-300 border-amber-500/30 text-[10px] font-mono">
+                      {promotingMember.designation || "Member"}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              {/* Promotion Form Fields */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-mono uppercase tracking-wider text-amber-300 font-bold mb-1.5">
+                    Elevated Club Designation <span className="text-red-400">*</span>
+                  </label>
+                  <Input
+                    id="promote-designation-input"
+                    placeholder="e.g. Vice President, Lead Technical Architect, Event Head..."
+                    value={promoDesignation}
+                    onChange={(e) => setPromoDesignation(e.target.value)}
+                    className="bg-white/5 border-white/15 text-white text-sm rounded-xl focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono uppercase tracking-wider text-blue-300 font-bold mb-1.5">
+                    Role Assignee / Division
+                  </label>
+                  <Input
+                    id="promote-role-assignee-input"
+                    placeholder="e.g. President & Executive Board, Core Committee..."
+                    value={promoRoleAssignee}
+                    onChange={(e) => setPromoRoleAssignee(e.target.value)}
+                    className="bg-white/5 border-white/15 text-white text-sm rounded-xl focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+                  />
+                </div>
+
+                {/* Role Progression Preview Pill */}
+                {promoDesignation.trim() && (
+                  <div className="p-3 rounded-xl bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-transparent border border-amber-500/20 text-xs flex items-center gap-2">
+                    <Award className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                    <div className="text-[11px] text-slate-300">
+                      Progression: <span className="line-through text-slate-500">{promotingMember.designation || "Member"}</span> &nbsp;➔&nbsp; <strong className="text-amber-300 font-bold">{promoDesignation.trim()}</strong>
+                    </div>
+                  </div>
+                )}
+
+                {/* Delivery Notice Callout */}
+                <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-200/90 text-xs flex items-start gap-2.5">
+                  <Mail className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-[11px] leading-relaxed">
+                    <strong>Automatic Dispatch:</strong> Upon confirmation, a curated <strong>Leadership Promotion Announcement</strong> and an updated <strong>TechVerse Digital ID Card</strong> will be instantly delivered to <code className="text-cyan-300 font-mono">{promotingMember.email}</code>.
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setPromotingMember(null)}
+                  disabled={isPromoting}
+                  className="text-slate-400 hover:text-white text-xs font-semibold rounded-xl"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  id="confirm-promotion-btn"
+                  type="button"
+                  onClick={handleConfirmPromotion}
+                  disabled={isPromoting || !promoDesignation.trim()}
+                  className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-black rounded-xl px-5 py-2.5 shadow-lg shadow-amber-500/25 border border-amber-300/40 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  {isPromoting ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin text-slate-950" />
+                      <span>Promoting &amp; Dispatching ID Card...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Crown className="w-4 h-4 text-slate-950 fill-slate-950" />
+                      <span>Confirm Promotion &amp; Send ID Card 🪪</span>
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
         )}
