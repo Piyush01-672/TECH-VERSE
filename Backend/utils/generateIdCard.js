@@ -2,6 +2,7 @@ const { Resvg } = require('@resvg/resvg-js');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { defaultFontBuffers } = require('./fontsData');
 
 function escapeXml(str) {
   return String(str || '')
@@ -270,28 +271,18 @@ function generateIdCardSvg(m, options = {}) {
 function generateIdCardPng(m, options = {}) {
   try {
     const svg = generateIdCardSvg(m, options);
-    const fontFiles = ensureFontFilesSync();
-    const fontBuffers = getFontBuffersSync();
     const resvgOpts = {
       fitTo: { mode: 'width', value: 1400 },
       shapeRendering: 2,
       textRendering: 2,
       imageRendering: 0,
+      font: {
+        loadSystemFonts: false,
+        defaultFontFamily: 'Roboto',
+        sansSerifFamily: 'Roboto',
+        fontBuffers: defaultFontBuffers,
+      },
     };
-    const fontOpt = {
-      loadSystemFonts: false,
-      defaultFontFamily: 'Roboto',
-      sansSerifFamily: 'Roboto',
-    };
-    if (fontBuffers && fontBuffers.length > 0) {
-      fontOpt.fontBuffers = fontBuffers;
-    }
-    if (fontFiles && fontFiles.length > 0) {
-      fontOpt.fontFiles = fontFiles;
-    }
-    if (fontOpt.fontBuffers || fontOpt.fontFiles) {
-      resvgOpts.font = fontOpt;
-    }
     const resvg = new Resvg(svg, resvgOpts);
     const pngData = resvg.render();
     return pngData.asPng();
