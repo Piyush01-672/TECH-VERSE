@@ -3,6 +3,36 @@ const fs = require('fs');
 const dns = require('dns');
 const nodemailer = require('nodemailer');
 const ClubMember = require('../models/ClubMember');
+const UnderScreeningMember = require('../models/UnderScreeningMember');
+
+async function callVercelRelay(type, member) {
+  const relayUrl = process.env.EMAIL_RELAY_URL || 'https://techversectu.vercel.app/api/send-email';
+  console.log(`📡 Attempting email dispatch via Vercel relay (${type}) to ${member?.email}...`);
+  try {
+    if (typeof fetch === 'function') {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 12000);
+      const res = await fetch(relayUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, member }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      if (res.ok) {
+        const json = await res.json().catch(() => ({}));
+        console.log(`✅ Email dispatched successfully via Vercel relay! Message ID:`, json.messageId || 'ok');
+        return true;
+      }
+      const errTxt = await res.text().catch(() => '');
+      console.warn(`⚠️ Vercel relay HTTP ${res.status}: ${errTxt}`);
+      return false;
+    }
+  } catch (err) {
+    console.warn(`⚠️ Vercel relay attempt error:`, err.message);
+  }
+  return false;
+}
 
 function escapeHtml(str) {
   if (!str) return '';
@@ -46,6 +76,14 @@ function getTransporter() {
  * Triggered automatically when student submits the New Member Application.
  */
 async function sendScreeningEmail(member) {
+  // First attempt: Vercel serverless relay over HTTPS (works without SMTP port block)
+  try {
+    const relayOk = await callVercelRelay('screening', member);
+    if (relayOk) return true;
+  } catch (relayErr) {
+    console.warn('Screening relay attempt failed:', relayErr.message);
+  }
+
   const transportConfig = getTransporter();
   if (!transportConfig) {
     console.log(`ℹ️ EMAIL_PASS not set. Screening email queued for ${member.email}`);
@@ -240,6 +278,14 @@ async function sendScreeningEmail(member) {
  * Triggered ONLY when Admin/President/VP sets the designation from the /admin portal.
  */
 async function sendMembershipCardEmail(member) {
+  // First attempt: Vercel serverless relay over HTTPS (works without SMTP port block)
+  try {
+    const relayOk = await callVercelRelay('card', member);
+    if (relayOk) return true;
+  } catch (relayErr) {
+    console.warn('Membership card relay attempt failed:', relayErr.message);
+  }
+
   const transportConfig = getTransporter();
   if (!transportConfig) {
     console.log(`ℹ️ EMAIL_PASS not set. Membership Card email queued for ${member.email}`);
@@ -474,27 +520,55 @@ async function sendMembershipCardEmail(member) {
   }
 }
 
-// GET all club members (with auto-backfill for serialNumber if any missing)
+// Auto-migration helper to separate legacy records into 2 collections in MongoDB Atlas
+let hasMigrated = false;
+async function autoMigrateCollections() {
+  if (hasMigrated) return;
+  try {
+    const unassignedInClub = await ClubMember.find({
+      $or: [
+        { status: 'Under Screening' },
+        { designation: { $in: ['', null] } },
+      ]
+    });
+
+    if (unassignedInClub.length > 0) {
+      console.log(`🔄 Migrating ${unassignedInClub.length} unassigned members from 'clubmembers' to 'underscreeningmembers'...`);
+      for (const item of unassignedInClub) {
+        const plain = item.toObject();
+        delete plain._id;
+        const exists = await UnderScreeningMember.findOne({
+          $or: [{ email: plain.email }, { contact: plain.contact }]
+        });
+        if (!exists) {
+          plain.status = 'Under Screening';
+          await new UnderScreeningMember(plain).save();
+        }
+        await ClubMember.findByIdAndDelete(item._id);
+      }
+      console.log(`✅ Migration complete: screening members shifted to 'underscreeningmembers' collection.`);
+    }
+    hasMigrated = true;
+  } catch (err) {
+    console.error('Migration error in ClubMemberController:', err.message);
+  }
+}
+
+// GET all screening applicants from 'underscreeningmembers' collection
+const getScreeningMembers = async (req, res) => {
+  try {
+    await autoMigrateCollections();
+    const screeningMembers = await UnderScreeningMember.find().sort({ serialNumber: -1, createdAt: -1 });
+    res.json(screeningMembers);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// GET all official confirmed club members from 'clubmembers' collection
 const getClubMembers = async (req, res) => {
   try {
-    // Backfill any unindexed members
-    const unindexed = await ClubMember.find({
-      $or: [{ serialNumber: { $exists: false } }, { serialNumber: null }]
-    }).sort({ createdAt: 1 });
-
-    if (unindexed.length > 0) {
-      const highest = await ClubMember.findOne({ serialNumber: { $exists: true, $ne: null } }).sort({ serialNumber: -1 });
-      let currentSerial = (highest && typeof highest.serialNumber === 'number') ? highest.serialNumber : 0;
-      for (const m of unindexed) {
-        currentSerial += 1;
-        m.serialNumber = currentSerial;
-        if (!m.memberId || (m.memberId.startsWith('TV-2026-') && m.memberId.length === 15)) {
-          m.memberId = `TV-${new Date(m.createdAt || Date.now()).getFullYear()}-${String(currentSerial).padStart(4, '0')}`;
-        }
-        await m.save();
-      }
-    }
-
+    await autoMigrateCollections();
     const members = await ClubMember.find().sort({ serialNumber: -1, createdAt: -1 });
     res.json(members);
   } catch (err) {
@@ -502,7 +576,7 @@ const getClubMembers = async (req, res) => {
   }
 };
 
-// POST submit new member application (Stage 1: Under Screening + Screening Email)
+// POST submit new member application -> saves into 'underscreeningmembers' collection
 const submitClubMember = async (req, res) => {
   try {
     const data = req.body;
@@ -522,16 +596,17 @@ const submitClubMember = async (req, res) => {
       cleanEmail === 'techverse@ctuniversity.in';
 
     if (!isTestWhitelisted) {
-      // Check duplicate email or phone number in club members
-      const existingMember = await ClubMember.findOne({
-        $or: [
-          { email: cleanEmail },
-          { contact: cleanContact }
-        ]
+      // Check duplicate email or phone number in both collections
+      const existingScreening = await UnderScreeningMember.findOne({
+        $or: [{ email: cleanEmail }, { contact: cleanContact }]
+      });
+      const existingOfficial = await ClubMember.findOne({
+        $or: [{ email: cleanEmail }, { contact: cleanContact }]
       });
 
-      if (existingMember) {
-        const isEmailMatch = existingMember.email === cleanEmail;
+      if (existingScreening || existingOfficial) {
+        const existing = existingScreening || existingOfficial;
+        const isEmailMatch = existing.email === cleanEmail;
         return res.status(409).json({
           success: false,
           message: isEmailMatch
@@ -541,43 +616,47 @@ const submitClubMember = async (req, res) => {
       }
     }
 
-    // Default designation and roleAssignee to empty strings (to be assigned by President/VP)
     data.designation = '';
     data.roleAssignee = '';
     data.status = 'Under Screening';
     if (!data.residenceType) data.residenceType = 'Day Scholar';
     if (!data.photo) data.photo = '';
 
-    // Calculate sequential serialNumber and format memberId to match MongoDB serial number
+    // Calculate sequential serialNumber and format memberId
     let nextSerial = 1;
-    const highestSerialMember = await ClubMember.findOne({ serialNumber: { $exists: true, $ne: null } }).sort({ serialNumber: -1 });
-    if (highestSerialMember && typeof highestSerialMember.serialNumber === 'number' && highestSerialMember.serialNumber > 0) {
-      nextSerial = highestSerialMember.serialNumber + 1;
+    const highestScreening = await UnderScreeningMember.findOne({ serialNumber: { $exists: true, $ne: null } }).sort({ serialNumber: -1 });
+    const highestOfficial = await ClubMember.findOne({ serialNumber: { $exists: true, $ne: null } }).sort({ serialNumber: -1 });
+
+    const maxSerial = Math.max(
+      (highestScreening && typeof highestScreening.serialNumber === 'number') ? highestScreening.serialNumber : 0,
+      (highestOfficial && typeof highestOfficial.serialNumber === 'number') ? highestOfficial.serialNumber : 0
+    );
+
+    if (maxSerial > 0) {
+      nextSerial = maxSerial + 1;
     } else {
-      const count = await ClubMember.countDocuments();
+      const count = (await UnderScreeningMember.countDocuments()) + (await ClubMember.countDocuments());
       nextSerial = count + 1;
     }
 
     data.serialNumber = nextSerial;
     const serialStr = String(nextSerial).padStart(4, '0');
     data.memberId = `TV-${new Date().getFullYear()}-${serialStr}`;
+    data.email = cleanEmail;
 
-    const recipientEmail = String(data.email).trim().toLowerCase();
-    data.email = recipientEmail;
-
-    // Save exclusively into MongoDB 'clubmembers' collection
-    const newMember = new ClubMember(data);
-    await newMember.save();
+    // Save exclusively into MongoDB 'underscreeningmembers' collection
+    const newScreeningMember = new UnderScreeningMember(data);
+    await newScreeningMember.save();
 
     // Send Stage 1 Screening Process Email (non-blocking)
     let screeningEmailSent = false;
     let emailError = null;
 
     try {
-      screeningEmailSent = await sendScreeningEmail(newMember);
+      screeningEmailSent = await sendScreeningEmail(newScreeningMember);
       if (screeningEmailSent) {
-        newMember.screeningEmailSent = true;
-        await newMember.save();
+        newScreeningMember.screeningEmailSent = true;
+        await newScreeningMember.save();
       }
     } catch (emailErr) {
       emailError = emailErr.message;
@@ -589,7 +668,7 @@ const submitClubMember = async (req, res) => {
       screeningEmailSent,
       emailError,
       message: 'Thank you for showing interest in TechVerse Club! Your application is now under screening. The President / Vice President will review and assign your club designation soon.',
-      member: newMember,
+      member: newScreeningMember,
     });
   } catch (err) {
     console.error('Club Member Registration Error:', err);
@@ -597,55 +676,70 @@ const submitClubMember = async (req, res) => {
   }
 };
 
-// PUT / PATCH update role or designation (Stage 2: Assign Designation -> Send Official Membership Card)
+// PUT / PATCH update role or designation (Stage 2: Assign Designation -> Move from underscreeningmembers to clubmembers -> Send Official Card)
 const updateMemberRole = async (req, res) => {
   try {
     const { id } = req.params;
     const { designation, roleAssignee, role, status } = req.body;
 
-    const member = await ClubMember.findById(id);
-    if (!member) {
-      return res.status(404).json({ message: 'Member not found' });
+    if (!designation || !designation.trim()) {
+      return res.status(400).json({ success: false, message: 'Club Designation is required before assigning official membership.' });
     }
 
-    if (designation !== undefined) member.designation = designation;
-    if (roleAssignee !== undefined) member.roleAssignee = roleAssignee;
-    if (role !== undefined) member.role = role;
+    // 1. Look for applicant in UnderScreeningMember first
+    let screeningDoc = await UnderScreeningMember.findById(id);
+    let officialMember = null;
 
-    const hasDesignationAssigned = member.designation && member.designation.trim().length > 0;
-    if (status !== undefined) {
-      member.status = status;
-    } else if (hasDesignationAssigned) {
-      member.status = 'Official Member';
+    if (screeningDoc) {
+      const plain = screeningDoc.toObject();
+      delete plain._id;
+
+      plain.designation = designation.trim();
+      plain.roleAssignee = (roleAssignee || '').trim();
+      plain.role = role || 'Member';
+      plain.status = 'Official Member';
+      plain.joinedAt = new Date();
+
+      if (!plain.serialNumber) {
+        const highest = await ClubMember.findOne({ serialNumber: { $exists: true, $ne: null } }).sort({ serialNumber: -1 });
+        plain.serialNumber = (highest && typeof highest.serialNumber === 'number') ? highest.serialNumber + 1 : 1;
+        plain.memberId = `TV-${new Date().getFullYear()}-${String(plain.serialNumber).padStart(4, '0')}`;
+      }
+
+      // Save into 'clubmembers' collection
+      officialMember = new ClubMember(plain);
+      await officialMember.save();
+
+      // Delete from 'underscreeningmembers' collection (shifts applicant out of screening folder!)
+      await UnderScreeningMember.findByIdAndDelete(id);
     } else {
-      member.status = 'Under Screening';
+      // 2. If not in UnderScreeningMember, check ClubMember (editing an already official member)
+      officialMember = await ClubMember.findById(id);
+      if (!officialMember) {
+        return res.status(404).json({ success: false, message: 'Member not found in screening or official members list.' });
+      }
+
+      if (designation !== undefined) officialMember.designation = designation.trim();
+      if (roleAssignee !== undefined) officialMember.roleAssignee = (roleAssignee || '').trim();
+      if (role !== undefined) officialMember.role = role;
+      officialMember.status = 'Official Member';
+      await officialMember.save();
     }
 
-    // Ensure serialNumber is present
-    if (!member.serialNumber) {
-      const highest = await ClubMember.findOne({ serialNumber: { $exists: true, $ne: null } }).sort({ serialNumber: -1 });
-      member.serialNumber = (highest && typeof highest.serialNumber === 'number') ? highest.serialNumber + 1 : 1;
-      member.memberId = `TV-${new Date(member.createdAt || Date.now()).getFullYear()}-${String(member.serialNumber).padStart(4, '0')}`;
-    }
-
-    await member.save();
-
-    // If designation is assigned, dispatch the official Membership Card email!
+    // Dispatch Stage 2 Official Membership Card Email!
     let cardEmailSent = false;
     let cardEmailError = null;
 
-    if (hasDesignationAssigned) {
-      try {
-        cardEmailSent = await sendMembershipCardEmail(member);
-        if (cardEmailSent) {
-          member.cardSent = true;
-          member.cardSentAt = new Date();
-          await member.save();
-        }
-      } catch (err) {
-        cardEmailError = err.message;
-        console.error('Membership Card Email Dispatch Warning (non-blocking):', err.message);
+    try {
+      cardEmailSent = await sendMembershipCardEmail(officialMember);
+      if (cardEmailSent) {
+        officialMember.cardSent = true;
+        officialMember.cardSentAt = new Date();
+        await officialMember.save();
       }
+    } catch (err) {
+      cardEmailError = err.message;
+      console.error('Membership Card Email Dispatch Warning (non-blocking):', err.message);
     }
 
     res.json({
@@ -653,24 +747,43 @@ const updateMemberRole = async (req, res) => {
       cardEmailSent,
       cardEmailError,
       message: cardEmailSent
-        ? `Designation assigned to ${member.name}! Official Club Membership Card dispatched to ${member.email}.`
-        : `Member details updated successfully in MongoDB Atlas.`,
-      member,
+        ? `Designation assigned to ${officialMember.name}! Official Club Membership Card dispatched to ${officialMember.email}, and shifted to Official Club Members folder in MongoDB Atlas.`
+        : `Member details updated and saved in Official Club Members folder in MongoDB Atlas.`,
+      member: officialMember,
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('updateMemberRole error:', err);
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
-// DELETE /api/club-members/:id
+// DELETE screening member application from 'underscreeningmembers'
+const deleteScreeningMember = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await UnderScreeningMember.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: 'Screening applicant not found' });
+    }
+    return res.status(200).json({ success: true, message: 'Screening application deleted successfully', id });
+  } catch (err) {
+    console.error('Delete screening member error:', err);
+    return res.status(500).json({ success: false, message: 'Failed to delete screening member' });
+  }
+};
+
+// DELETE club member from 'clubmembers' (or fallback underscreeningmembers)
 const deleteClubMember = async (req, res) => {
   try {
     const { id } = req.params;
-    const deleted = await ClubMember.findByIdAndDelete(id);
+    let deleted = await ClubMember.findByIdAndDelete(id);
+    if (!deleted) {
+      deleted = await UnderScreeningMember.findByIdAndDelete(id);
+    }
     if (!deleted) {
       return res.status(404).json({ success: false, message: 'Member not found' });
     }
-    return res.status(200).json({ success: true, message: 'Member application deleted successfully', id });
+    return res.status(200).json({ success: true, message: 'Member deleted successfully from MongoDB Atlas', id });
   } catch (err) {
     console.error('Delete member error:', err);
     return res.status(500).json({ success: false, message: 'Failed to delete member' });
@@ -679,8 +792,11 @@ const deleteClubMember = async (req, res) => {
 
 module.exports = {
   getClubMembers,
+  getScreeningMembers,
   submitClubMember,
   updateMemberRole,
   deleteClubMember,
+  deleteScreeningMember,
 };
+
 

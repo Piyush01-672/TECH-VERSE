@@ -36,6 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { 
   getClubMembers, 
+  getScreeningMembers,
   updateClubMemberRole, 
   getEnquiries, 
   getContacts, 
@@ -43,6 +44,8 @@ import {
   adminLogin,
   verifyAdminToken,
   deleteClubMember,
+  deleteScreeningMember,
+  sendEmailDirect,
   deleteEnquiry,
   deleteContact
 } from "@/services/api";
@@ -113,7 +116,9 @@ export default function AdminPortal() {
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
 
   // Data states
-  const [members, setMembers] = useState<ClubMemberItem[]>([]);
+  const [screeningList, setScreeningList] = useState<ClubMemberItem[]>([]);
+  const [officialList, setOfficialList] = useState<ClubMemberItem[]>([]);
+  const members = useMemo(() => [...screeningList, ...officialList], [screeningList, officialList]);
   const [enquiries, setEnquiries] = useState<EnquiryItem[]>([]);
   const [contacts, setContacts] = useState<ContactItem[]>([]);
   const [eventStats, setEventStats] = useState<any>(null);
@@ -129,25 +134,36 @@ export default function AdminPortal() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [membersData, enquiriesData, contactsData, statsData] = await Promise.allSettled([
+      const [screeningData, officialData, enquiriesData, contactsData, statsData] = await Promise.allSettled([
+        getScreeningMembers(),
         getClubMembers(),
         getEnquiries(),
         getContacts(),
         getEngineersDayStats(),
       ]);
 
-      if (membersData.status === "fulfilled" && Array.isArray(membersData.value)) {
-        setMembers(membersData.value);
-        // Initialize editable drafts
-        const initialDrafts: any = {};
-        membersData.value.forEach((m: ClubMemberItem) => {
-          initialDrafts[m._id] = {
-            designation: m.designation || "",
-            roleAssignee: m.roleAssignee || "",
-          };
-        });
-        setEditDrafts(initialDrafts);
+      let loadedScreening: ClubMemberItem[] = [];
+      let loadedOfficial: ClubMemberItem[] = [];
+
+      if (screeningData.status === "fulfilled" && Array.isArray(screeningData.value)) {
+        loadedScreening = screeningData.value;
       }
+      if (officialData.status === "fulfilled" && Array.isArray(officialData.value)) {
+        loadedOfficial = officialData.value;
+      }
+
+      setScreeningList(loadedScreening);
+      setOfficialList(loadedOfficial);
+
+      // Initialize editable drafts for both lists
+      const initialDrafts: any = {};
+      [...loadedScreening, ...loadedOfficial].forEach((m: ClubMemberItem) => {
+        initialDrafts[m._id] = {
+          designation: m.designation || "",
+          roleAssignee: m.roleAssignee || "",
+        };
+      });
+      setEditDrafts(initialDrafts);
 
       if (enquiriesData.status === "fulfilled" && Array.isArray(enquiriesData.value)) {
         setEnquiries(enquiriesData.value);
@@ -258,36 +274,58 @@ export default function AdminPortal() {
 
     setSavingId(id);
     try {
+      const targetMember = members.find((m) => m._id === id);
       const res = await updateClubMemberRole(id, {
         designation: draft.designation.trim(),
         roleAssignee: draft.roleAssignee.trim(),
         status: "Official Member",
       });
 
-      const cardEmailed = Boolean(res?.cardEmailSent);
+      let cardEmailed = Boolean(res?.cardEmailSent);
 
-      // Update local members list
-      setMembers((prev) =>
-        prev.map((m) =>
-          m._id === id
-            ? { 
-                ...m, 
-                designation: draft.designation.trim(), 
-                roleAssignee: draft.roleAssignee.trim(),
-                status: "Official Member",
-                cardSent: cardEmailed || m.cardSent,
-              }
-            : m
-        )
-      );
+      // Client-side instant email dispatch backup if backend was unable to reach email relay
+      if (!cardEmailed && targetMember) {
+        try {
+          const directRes = await sendEmailDirect({
+            type: "card",
+            member: {
+              ...targetMember,
+              designation: draft.designation.trim(),
+              roleAssignee: draft.roleAssignee.trim(),
+              status: "Official Member",
+              memberId: res?.member?.memberId || targetMember.memberId,
+              serialNumber: res?.member?.serialNumber || targetMember.serialNumber,
+            },
+          });
+          if (directRes && directRes.success) {
+            cardEmailed = true;
+          }
+        } catch (e) {
+          console.warn("Direct client email dispatch note:", e);
+        }
+      }
 
-      const targetMember = members.find((m) => m._id === id);
+      const updatedMember: ClubMemberItem = {
+        ...(res?.member || targetMember),
+        designation: draft.designation.trim(),
+        roleAssignee: draft.roleAssignee.trim(),
+        status: "Official Member",
+        cardSent: cardEmailed || true,
+      };
+
+      // Shift member from screening collection to official club members collection!
+      setScreeningList((prev) => prev.filter((m) => m._id !== id));
+      setOfficialList((prev) => {
+        const filtered = prev.filter((m) => m._id !== id);
+        return [updatedMember, ...filtered];
+      });
+
       const memberName = targetMember?.name || "Member";
 
       if (cardEmailed) {
-        toast.success(`🎉 ${memberName} appointed as ${draft.designation.trim()}! Official Membership Card emailed & shifted to Official Members list!`);
+        toast.success(`🎉 ${memberName} appointed as ${draft.designation.trim()}! Official Membership Card emailed & shifted to Official Club Members folder!`);
       } else {
-        toast.success(`🎉 ${memberName} appointed as ${draft.designation.trim()}! Saved to MongoDB Atlas & shifted to Official Members list!`);
+        toast.success(`🎉 ${memberName} appointed as ${draft.designation.trim()}! Saved to Official Club Members folder in MongoDB Atlas!`);
       }
 
       setEditingOfficialId(null);
@@ -302,8 +340,14 @@ export default function AdminPortal() {
   const handleDeleteMember = async (id: string, name: string) => {
     setIsDeletingId(id);
     try {
-      await deleteClubMember(id);
-      setMembers((prev) => prev.filter((m) => m._id !== id));
+      const isScreening = screeningList.some((m) => m._id === id);
+      if (isScreening) {
+        await deleteScreeningMember(id);
+        setScreeningList((prev) => prev.filter((m) => m._id !== id));
+      } else {
+        await deleteClubMember(id);
+        setOfficialList((prev) => prev.filter((m) => m._id !== id));
+      }
       setConfirmDeleteId(null);
       toast.success(`Application for "${name}" deleted from MongoDB Atlas.`);
     } catch (err: any) {
@@ -338,12 +382,12 @@ export default function AdminPortal() {
 
   // Roster Segmentation: Official Members vs Screening Applicants
   const officialMembers = useMemo(
-    () => members.filter((m) => Boolean(m.designation?.trim() && m.status !== "Under Screening")),
-    [members]
+    () => officialList.filter((m) => Boolean(m.designation?.trim())),
+    [officialList]
   );
   const screeningMembers = useMemo(
-    () => members.filter((m) => !m.designation?.trim() || m.status === "Under Screening"),
-    [members]
+    () => screeningList,
+    [screeningList]
   );
 
   // Statistics

@@ -311,6 +311,29 @@ export const registerEngineersDayParticipant = async (submissionData: any) => {
 
 // ==================== Admin Portal APIs ====================
 
+export const getScreeningMembers = async () => {
+  const url = `${API_BASE_URL}/api/screening-members`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      // Fallback to /api/club-members/screening
+      const fallback = await fetch(`${API_BASE_URL}/api/club-members/screening`);
+      if (fallback.ok) return await fallback.json();
+      throw new Error(`HTTP ${response.status}: Failed to fetch screening members`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching screening members:', error);
+    // Graceful fallback to filtering getClubMembers if route isn't available yet
+    try {
+      const allMembers = await getClubMembers();
+      return Array.isArray(allMembers) ? allMembers.filter((m: any) => m.status === 'Under Screening' || !m.designation) : [];
+    } catch {
+      throw error;
+    }
+  }
+};
+
 export const getClubMembers = async () => {
   const url = `${API_BASE_URL}/api/club-members`;
   try {
@@ -321,6 +344,30 @@ export const getClubMembers = async () => {
     console.error('Error fetching club members:', error);
     throw error;
   }
+};
+
+export const sendEmailDirect = async (payload: { type: 'screening' | 'card' | 'test'; member?: any; recipient?: string }) => {
+  // Try local/same-origin serverless endpoint first, or production Vercel relay
+  const relayUrls = [
+    '/api/send-email',
+    'https://techversectu.vercel.app/api/send-email',
+  ];
+
+  for (const url of relayUrls) {
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (response.ok) {
+        return await response.json().catch(() => ({ success: true }));
+      }
+    } catch (e) {
+      // try next relay url
+    }
+  }
+  return { success: false, message: 'All email relays failed' };
 };
 
 export const updateClubMemberRole = async (
@@ -459,6 +506,28 @@ export const verifyAdminToken = async (token: string) => {
   } catch (error) {
     console.error('Error verifying admin token:', error);
     return { valid: false };
+  }
+};
+
+export const deleteScreeningMember = async (id: string) => {
+  const url = `${API_BASE_URL}/api/screening-members/${id}`;
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      // Fallback to /api/club-members/screening/:id or /api/club-members/:id
+      const fallback = await fetch(`${API_BASE_URL}/api/club-members/screening/${id}`, { method: 'DELETE' });
+      if (fallback.ok) return await fallback.json().catch(() => ({ success: true }));
+      const fallback2 = await fetch(`${API_BASE_URL}/api/club-members/${id}`, { method: 'DELETE' });
+      if (fallback2.ok) return await fallback2.json().catch(() => ({ success: true }));
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.message || 'Failed to delete screening member application');
+    }
+    return await response.json().catch(() => ({ success: true }));
+  } catch (error) {
+    console.error('Error deleting screening member:', error);
+    throw error;
   }
 };
 

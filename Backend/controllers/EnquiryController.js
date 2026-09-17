@@ -1,5 +1,5 @@
 const Enquiry = require('../models/Enquiry');
-const ClubMember = require('../models/ClubMember');
+const UnderScreeningMember = require('../models/UnderScreeningMember');
 
 const getEnquiries = async (req, res) => {
   try {
@@ -42,12 +42,12 @@ const submitEnquiry = async (req, res) => {
     const newEnquiry = new Enquiry(data);
     await newEnquiry.save();
 
-    // Also persist directly into ClubMember collection in MongoDB
+    // Also persist directly into UnderScreeningMember collection in MongoDB
     try {
-      const newClubMember = new ClubMember(data);
-      await newClubMember.save();
+      const newScreeningMember = new UnderScreeningMember(data);
+      await newScreeningMember.save();
     } catch (cmErr) {
-      console.warn('ClubMember collection sync note:', cmErr.message);
+      console.warn('UnderScreeningMember collection sync note:', cmErr.message);
     }
 
     res.status(201).json({ message: 'Enquiry submitted successfully!', enquiry: newEnquiry });

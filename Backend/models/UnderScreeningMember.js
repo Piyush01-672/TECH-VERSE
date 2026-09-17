@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const ClubMemberSchema = new mongoose.Schema({
+const UnderScreeningMemberSchema = new mongoose.Schema({
   serialNumber: { type: Number, index: true },
   memberId: { type: String, default: '' },
   name: { type: String, required: true },
@@ -16,12 +16,9 @@ const ClubMemberSchema = new mongoose.Schema({
   designation: { type: String, default: '' },
   roleAssignee: { type: String, default: '' },
   role: { type: String, default: 'Member' },
-  status: { type: String, default: 'Official Member' },
-  screeningEmailSent: { type: Boolean, default: true },
-  cardSent: { type: Boolean, default: false },
-  cardSentAt: { type: Date },
-  joinedAt: { type: Date, default: Date.now },
+  status: { type: String, default: 'Under Screening' },
+  screeningEmailSent: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
-}, { strict: false, collection: 'clubmembers' });
+}, { strict: false, collection: 'underscreeningmembers' });
 
-module.exports = mongoose.model('ClubMember', ClubMemberSchema);
+module.exports = mongoose.model('UnderScreeningMember', UnderScreeningMemberSchema);
