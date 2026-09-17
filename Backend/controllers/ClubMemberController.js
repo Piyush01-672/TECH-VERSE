@@ -110,6 +110,7 @@ async function sendScreeningEmail(member) {
   if (fs.existsSync(techverseLogoPath)) attachments.push({ filename: 'techverse-logo.jpg', path: techverseLogoPath, cid: 'techverseLogo' });
   if (fs.existsSync(soetLogoPath)) attachments.push({ filename: 'soet-logo.png', path: soetLogoPath, cid: 'soetLogo' });
 
+  const techverseLogoUrl = 'https://techversectu.vercel.app/techverse-logo.jpg';
   const submittedDate = member.createdAt ? new Date(member.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
   const htmlContent = `
@@ -208,17 +209,25 @@ async function sendScreeningEmail(member) {
       </p>
 
       <!-- FORMAL SIGN-OFF -->
-      <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 13px; color: #475569; line-height: 1.6;">
-        Sincerely,<br/>
-        <strong style="color: #0f172a; font-size: 14px;">President and Committee Members of the Club</strong><br/>
-        TechVerse Club • School of Engineering &amp; Technology<br/>
-        CT University, Ludhiana, Punjab
-      </div>
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+        <tr>
+          <td style="vertical-align: middle; font-size: 13px; color: #475569; line-height: 1.6;">
+            Sincerely,<br/>
+            <strong style="color: #0f172a; font-size: 14px;">President and Committee Members of the Club</strong><br/>
+            TechVerse Club • School of Engineering &amp; Technology<br/>
+            CT University, Ludhiana, Punjab
+          </td>
+          <td align="right" style="vertical-align: middle; width: 72px;">
+            <img src="${techverseLogoUrl}" alt="TechVerse Club Logo" width="58" height="58" style="display: block; width: 58px; height: 58px; border-radius: 12px; border: 1.5px solid #cbd5e1; object-fit: cover; box-shadow: 0 2px 6px rgba(15,23,42,0.08);" />
+          </td>
+        </tr>
+      </table>
     </div>
 
     <!-- FOOTER -->
-    <div style="background: #f8fafc; padding: 14px 28px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8;">
-      Official Communication • TechVerse Club, SOET, CT University • Inquiries: techverse@ctuniversity.in
+    <div style="background: #f8fafc; padding: 14px 28px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8; line-height: 1.6;">
+      <img src="${techverseLogoUrl}" alt="TechVerse" width="18" height="18" style="vertical-align: -4px; border-radius: 50%; border: 1px solid #cbd5e1; margin-right: 6px; display: inline-block;" />
+      Official Communication • TechVerse Club, SOET, CT University • Inquiries: <a href="mailto:techverse@ctuniversity.in" style="color: #0284c7; text-decoration: none;">techverse@ctuniversity.in</a>
     </div>
   </div>
 </body>
@@ -419,7 +428,10 @@ async function sendMembershipCardEmail(member) {
     </div>
 
     <!-- FOOTER -->
-    <div style="background: #f1f5f9; padding: 16px 24px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #64748b;">
+    <div style="background: #f1f5f9; padding: 16px 24px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #64748b; line-height: 1.6;">
+      <div style="margin-bottom: 6px;">
+        <img src="${techverseLogoUrl}" alt="TechVerse" width="22" height="22" style="vertical-align: middle; border-radius: 50%; border: 1px solid #cbd5e1; display: inline-block;" />
+      </div>
       <p style="margin: 0 0 4px 0; font-weight: 700; color: #334155;">TechVerse Club • School of Engineering &amp; Technology</p>
       <p style="margin: 0; font-size: 10px;">CT University, Ferozepur Road, Ludhiana, Punjab - 142024</p>
       <p style="margin: 6px 0 0 0; font-size: 10px; color: #94a3b8;">Email: <a href="mailto:techverse@ctuniversity.in" style="color: #2563eb; text-decoration: none;">techverse@ctuniversity.in</a> • Official Membership Credential</p>
@@ -910,17 +922,27 @@ async function sendResignationEmail(member, remarks) {
               <p style="margin: 20px 0 0 0; color: #334155; line-height: 1.6;">
                 We wish you boundless success, rapid career advancement, and excellence in all your future professional endeavors. Keep innovating, building with ambition, and shining bright!
               </p>
-              <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b; line-height: 1.6;">
-                Warmest regards and highest recommendations,<br/>
-                <strong style="color: #0f172a;">President and Committee Members of the Club</strong><br/>
-                TechVerse Club • School of Engineering &amp; Technology<br/>
-                CT University, Ludhiana, Punjab
-              </div>
+              <table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                <tr>
+                  <td style="vertical-align: middle; font-size: 13px; color: #64748b; line-height: 1.6;">
+                    Warmest regards and highest recommendations,<br/>
+                    <strong style="color: #0f172a;">President and Committee Members of the Club</strong><br/>
+                    TechVerse Club • School of Engineering &amp; Technology<br/>
+                    CT University, Ludhiana, Punjab
+                  </td>
+                  <td align="right" style="vertical-align: middle; width: 72px;">
+                    <img src="${techverseLogoUrl}" alt="TechVerse Club Logo" width="58" height="58" style="display: block; width: 58px; height: 58px; border-radius: 12px; border: 1.5px solid #cbd5e1; object-fit: cover; box-shadow: 0 2px 6px rgba(15,23,42,0.08);" />
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
           <tr>
-            <td style="background: #f8fafc; padding: 16px 24px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8;">
-              <p style="margin: 0 0 4px 0;">Official Administrative Communication • TechVerse Club</p>
+            <td style="background: #f8fafc; padding: 16px 24px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8; line-height: 1.6;">
+              <p style="margin: 0 0 4px 0;">
+                <img src="${techverseLogoUrl}" alt="TechVerse" width="18" height="18" style="vertical-align: -4px; border-radius: 50%; border: 1px solid #cbd5e1; margin-right: 6px; display: inline-block;" />
+                Official Administrative Communication • TechVerse Club
+              </p>
               <p style="margin: 0;">Inquiries: <a href="mailto:techverse@ctuniversity.in" style="color: #2563eb; text-decoration: none;">techverse@ctuniversity.in</a></p>
             </td>
           </tr>
@@ -1055,17 +1077,27 @@ async function sendTerminationEmail(member, reason, remarks, fineAmount) {
               <p style="margin: 18px 0 0 0; color: #334155; line-height: 1.7;">
                 Every phase of university life offers an opportunity for self-reflection, learning, and growth. We sincerely thank you for the time you spent with us and wish you the very best in your academic studies, personal development, and future endeavors.
               </p>
-              <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b; line-height: 1.6;">
-                With sincere regards and best wishes,<br/>
-                <strong style="color: #0f172a;">President and Committee Members of the Club</strong><br/>
-                TechVerse Club • School of Engineering &amp; Technology<br/>
-                CT University, Ludhiana, Punjab
-              </div>
+              <table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                <tr>
+                  <td style="vertical-align: middle; font-size: 13px; color: #64748b; line-height: 1.6;">
+                    With sincere regards and best wishes,<br/>
+                    <strong style="color: #0f172a;">President and Committee Members of the Club</strong><br/>
+                    TechVerse Club • School of Engineering &amp; Technology<br/>
+                    CT University, Ludhiana, Punjab
+                  </td>
+                  <td align="right" style="vertical-align: middle; width: 72px;">
+                    <img src="${techverseLogoUrl}" alt="TechVerse Club Logo" width="58" height="58" style="display: block; width: 58px; height: 58px; border-radius: 12px; border: 1.5px solid #cbd5e1; object-fit: cover; box-shadow: 0 2px 6px rgba(15,23,42,0.08);" />
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
           <tr>
-            <td style="background: #f8fafc; padding: 16px 24px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8;">
-              <p style="margin: 0 0 4px 0;">Official Administrative Communication • TechVerse Club</p>
+            <td style="background: #f8fafc; padding: 16px 24px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8; line-height: 1.6;">
+              <p style="margin: 0 0 4px 0;">
+                <img src="${techverseLogoUrl}" alt="TechVerse" width="18" height="18" style="vertical-align: -4px; border-radius: 50%; border: 1px solid #cbd5e1; margin-right: 6px; display: inline-block;" />
+                Official Administrative Communication • TechVerse Club
+              </p>
               <p style="margin: 0;">Department Contact: <a href="mailto:techverse@ctuniversity.in" style="color: #6366f1; text-decoration: none;">techverse@ctuniversity.in</a></p>
             </td>
           </tr>
