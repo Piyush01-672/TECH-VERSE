@@ -18,6 +18,8 @@ const UnderScreeningMemberSchema = new mongoose.Schema({
   role: { type: String, default: 'Member' },
   status: { type: String, default: 'Under Screening' },
   screeningEmailSent: { type: Boolean, default: false },
+  consentGiven: { type: Boolean, default: false },
+  consentTimestamp: { type: Date },
   createdAt: { type: Date, default: Date.now },
 }, { strict: false, collection: 'underscreeningmembers' });
 

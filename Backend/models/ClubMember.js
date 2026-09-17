@@ -20,6 +20,8 @@ const ClubMemberSchema = new mongoose.Schema({
   screeningEmailSent: { type: Boolean, default: true },
   cardSent: { type: Boolean, default: false },
   cardSentAt: { type: Date },
+  consentGiven: { type: Boolean, default: false },
+  consentTimestamp: { type: Date },
   joinedAt: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now },
 }, { strict: false, collection: 'clubmembers' });

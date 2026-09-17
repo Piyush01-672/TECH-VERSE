@@ -46,6 +46,8 @@ import {
   UserCog,
   Clock,
   Mail,
+  ShieldAlert,
+  AlertTriangle,
 } from "lucide-react";
 
 import UniversityLogo from "@/assets/univeee-logo.png";
@@ -74,6 +76,9 @@ const formSchema = z.object({
     .array(z.string())
     .min(1, { message: "Select at least one area of interest" }),
   otherInterest: z.string().optional(),
+  clubConsent: z.boolean().refine((val) => val === true, {
+    message: "You must read and agree to the club commitment and disciplinary terms before submitting.",
+  }),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -121,6 +126,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
       photo: "",
       interests: ["Coding & App/Web Development"],
       otherInterest: "",
+      clubConsent: false,
     },
   });
 
@@ -210,6 +216,8 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
 
     const payload = {
       ...data,
+      consentGiven: true,
+      consentTimestamp: new Date().toISOString(),
       designation: "", // Assigned by President/VP in /admin
       roleAssignee: "",
     };
@@ -718,6 +726,69 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                     </FormItem>
                   )}
                 />
+
+                {/* ======================================================================= */}
+                {/* ⚠️ MANDATORY DECLARATION & CODE OF CONDUCT CONSENT                      */}
+                {/* ======================================================================= */}
+                <div className="border-2 border-amber-300 bg-gradient-to-br from-amber-50/70 via-red-50/30 to-slate-50 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3.5">
+                  <div className="flex items-start gap-2.5">
+                    <div className="p-2 bg-amber-100 border border-amber-300 text-amber-900 rounded-xl flex-shrink-0 mt-0.5">
+                      <ShieldAlert className="w-5 h-5 text-amber-700" />
+                    </div>
+                    <div>
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-red-100 text-red-800 border border-red-200 rounded-md text-[10px] font-black uppercase tracking-wider mb-1">
+                        Important • Read &amp; Agree Before Submitting
+                      </div>
+                      <h4 className="text-sm sm:text-base font-black text-slate-900 leading-snug">
+                        Club Commitment &amp; Disciplinary Code of Conduct
+                      </h4>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 text-xs text-slate-700 leading-relaxed bg-white/90 p-3.5 sm:p-4 rounded-xl border border-amber-200/80 shadow-xs">
+                    <div className="flex items-start gap-2.5">
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-blue-800 font-black text-[11px] flex-shrink-0 mt-0.5">
+                        1
+                      </span>
+                      <p>
+                        <strong className="text-slate-900 font-bold">Voluntary Commitment &amp; Punctuality:</strong> It is totally of my own will, interest, and passion to join TechVerse Club. I solemnly pledge to remain active in the community, contribute sincerely, and complete every assigned club task on time.
+                      </p>
+                    </div>
+
+                    <div className="border-t border-slate-100 pt-2.5 flex items-start gap-2.5">
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-100 text-red-800 font-black text-[11px] flex-shrink-0 mt-0.5">
+                        2
+                      </span>
+                      <p>
+                        <strong className="text-red-900 font-bold">Strict Disciplinary Actions &amp; Fines:</strong> If found guilty of any punishable act — such as <strong className="text-red-700 font-bold">sharing club IDs for bunking</strong>, taking club work casually, not being active in the community, or failing to attend mandatory club meetings — necessary disciplinary actions will be taken by the department, an <strong className="text-red-700 font-bold">immediate fine of ₹1,000</strong> will be imposed, and I may face suspension or expulsion from TechVerse Club.
+                      </p>
+                    </div>
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="clubConsent"
+                    render={({ field }) => (
+                      <FormItem className="space-y-1 pt-1">
+                        <div className="flex items-start space-x-3">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="mt-0.5 border-slate-400 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 h-4 w-4 rounded"
+                            />
+                          </FormControl>
+                          <div className="space-y-0.5 leading-tight">
+                            <FormLabel className="text-xs sm:text-sm font-bold text-slate-900 cursor-pointer block">
+                              I have carefully read, understood, and voluntarily agree to the above commitments and disciplinary terms. <span className="text-red-500">*</span>
+                            </FormLabel>
+                          </div>
+                        </div>
+                        <FormMessage className="text-xs font-semibold text-red-600 pl-7" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 {/* Submit Button */}
                 <Button

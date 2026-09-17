@@ -85,18 +85,18 @@ function generateIdCardSvg(m, options = {}) {
 
   let photoElement = '';
   if (photoBase64) {
-    photoElement = `<image href="${photoBase64}" x="50" y="240" width="200" height="240" preserveAspectRatio="xMidYMid slice" clip-path="url(#photoClip)"/>`;
+    photoElement = `<image href="${photoBase64}" x="50" y="240" width="200" height="280" preserveAspectRatio="xMidYMid slice" clip-path="url(#photoClip)"/>`;
   } else {
     const initial = name.charAt(0) || 'M';
     photoElement = `
-      <rect x="50" y="240" width="200" height="240" rx="20" fill="#1e293b" stroke="${borderColor}" stroke-width="2"/>
-      <circle cx="150" cy="340" r="60" fill="${isPromotion ? '#312e81' : '#1e3a8a'}" opacity="0.6"/>
-      <text x="150" y="375" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="75" font-weight="900" fill="${borderColor}" text-anchor="middle">${initial}</text>
+      <rect x="50" y="240" width="200" height="280" rx="20" fill="#1e293b" stroke="${borderColor}" stroke-width="2"/>
+      <circle cx="150" cy="370" r="70" fill="${isPromotion ? '#312e81' : '#1e3a8a'}" opacity="0.6"/>
+      <text x="150" y="405" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="85" font-weight="900" fill="${borderColor}" text-anchor="middle">${initial}</text>
     `;
   }
 
   let barcodeLines = '';
-  const seedString = `${regNumber}${memberId}TECHVERSE`;
+  const seedString = `${regNumber}TECHVERSE`;
   for (let i = 0; i < 58; i++) {
     const x = 70 + i * 9.6;
     const charCode = seedString.charCodeAt(i % seedString.length);
@@ -126,7 +126,7 @@ function generateIdCardSvg(m, options = {}) {
       <rect x="0" y="0" width="700" height="1060" rx="36" />
     </clipPath>
     <clipPath id="photoClip">
-      <rect x="50" y="240" width="200" height="240" rx="20" />
+      <rect x="50" y="240" width="200" height="280" rx="20" />
     </clipPath>
     <clipPath id="techverseClip">
       <circle cx="350" cy="98" r="36" />
@@ -158,17 +158,20 @@ function generateIdCardSvg(m, options = {}) {
     <rect x="40" y="202" width="620" height="28" rx="8" fill="${isPromotion ? '#fef3c7' : '#eff6ff'}" stroke="${borderColor}" stroke-width="1.5"/>
     <text x="350" y="221" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11" font-weight="900" fill="${isPromotion ? '#92400e' : '#1e40af'}" text-anchor="middle" letter-spacing="2">${badgeTitle}</text>
 
-    <rect x="48" y="238" width="204" height="244" rx="22" fill="none" stroke="${borderColor}" stroke-width="4"/>
+    <!-- PHOTO BOX (Balanced & Clean) -->
+    <rect x="48" y="238" width="204" height="284" rx="22" fill="none" stroke="${borderColor}" stroke-width="4"/>
     ${photoElement}
 
-    <rect x="48" y="492" width="204" height="50" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
-    <text x="150" y="510" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="9" font-weight="800" fill="#64748b" text-anchor="middle" letter-spacing="1">MEMBER ID</text>
-    <text x="150" y="531" font-family="monospace, 'Courier New'" font-size="14" font-weight="900" fill="#0f172a" text-anchor="middle">${memberId}</text>
+    <!-- Security Chip / Official Authenticity Seal Under Photo -->
+    <g transform="translate(48, 542)">
+      <rect x="0" y="0" width="204" height="66" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <circle cx="28" cy="33" r="16" fill="${isPromotion ? '#fef3c7' : '#eff6ff'}" stroke="${borderColor}" stroke-width="2"/>
+      <text x="28" y="38" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="${borderColor}" text-anchor="middle">★</text>
+      <text x="56" y="28" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10" font-weight="900" fill="#0f172a" letter-spacing="1">AUTHENTIC CREDENTIAL</text>
+      <text x="56" y="45" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="9" font-weight="700" fill="#64748b">CT UNIVERSITY • SOET</text>
+    </g>
 
-    <rect x="48" y="550" width="204" height="30" rx="8" fill="${isPromotion ? '#fef9c3' : '#ecfdf5'}" stroke="${isPromotion ? '#fde047' : '#a7f3d0'}" stroke-width="1.5"/>
-    <text x="150" y="570" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11" font-weight="900" fill="${isPromotion ? '#854d0e' : '#059669'}" text-anchor="middle">${badgeSubtitle}</text>
-    <text x="150" y="602" font-family="monospace, 'Courier New'" font-size="12" font-weight="700" fill="#2563eb" text-anchor="middle">Official Serial ${serial}</text>
-
+    <!-- RIGHT SIDE MEMBER DETAILS -->
     <g transform="translate(280, 238)">
       <text x="0" y="18" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1.5">FULL NAME</text>
       <text x="0" y="46" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="23" font-weight="900" fill="#0f172a">${name}</text>
@@ -210,10 +213,11 @@ function generateIdCardSvg(m, options = {}) {
       </g>
     </g>
 
+    <!-- CLEAN BARCODE SECTION (Without MemberId / Serial) -->
     <g transform="translate(45, 730)">
       <rect x="0" y="0" width="610" height="92" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
       ${barcodeLines}
-      <text x="305" y="78" font-family="monospace, 'Courier New'" font-size="12" font-weight="800" fill="#0f172a" text-anchor="middle" letter-spacing="4">* ${memberId} • REG-${regNumber} *</text>
+      <text x="305" y="78" font-family="monospace, 'Courier New'" font-size="12" font-weight="800" fill="#0f172a" text-anchor="middle" letter-spacing="4">* REG-${regNumber} • TECHVERSE • CT UNIVERSITY *</text>
     </g>
 
     <rect x="0" y="850" width="700" height="210" fill="#0f172a"/>

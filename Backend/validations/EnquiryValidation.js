@@ -14,6 +14,9 @@ const EnquiryValidationSchema = Joi.object({
   designation: Joi.string().allow('', null).optional(),
   roleAssignee: Joi.string().allow('', null).optional(),
   memberId: Joi.string().allow('', null).optional(),
+  clubConsent: Joi.boolean().optional(),
+  consentGiven: Joi.boolean().optional(),
+  consentTimestamp: Joi.any().optional(),
 }).unknown(true);
 
 module.exports = {
