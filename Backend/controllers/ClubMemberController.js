@@ -4,6 +4,7 @@ const dns = require('dns');
 const nodemailer = require('nodemailer');
 const ClubMember = require('../models/ClubMember');
 const UnderScreeningMember = require('../models/UnderScreeningMember');
+const { generateIdCardPng } = require('../utils/generateIdCard');
 
 async function callVercelRelay(type, member) {
   const relayUrl = process.env.EMAIL_RELAY_URL || 'https://techversectu.vercel.app/api/send-email';
@@ -300,195 +301,155 @@ async function sendMembershipCardEmail(member) {
     : (member.department === 'bca' ? 'BCA (School of Engineering & Technology)' : String(member.department).toUpperCase());
   const interestsList = Array.isArray(member.interests) ? member.interests.join(', ') : (member.interests || 'Technology & Innovation');
 
-  // Prepare attachments for the 3 logos
+  const isPromotion = Boolean(member.isPromotion);
+  const cleanReg = String(member.regNumber || member.memberId || 'Member').replace(/[^a-zA-Z0-9_-]/g, '');
+  const cardFilename = `TechVerse-Official-ID-Card-${cleanReg}.png`;
+
+  let cardPngBuffer = null;
+  try {
+    cardPngBuffer = generateIdCardPng(member, { isPromotion });
+  } catch (cardErr) {
+    console.warn('Backend generateIdCardPng fallback error:', cardErr.message);
+  }
+
   const attachments = [];
-  const assetsDir = path.join(__dirname, '../assets');
-  const univLogoPath = path.join(assetsDir, 'univeee-logo.png');
-  const techverseLogoPath = path.join(assetsDir, 'techverse-logo.jpg');
-  const soetLogoPath = path.join(assetsDir, 'soet-logo.png');
-
-  if (fs.existsSync(univLogoPath)) attachments.push({ filename: 'univeee-logo.png', path: univLogoPath, cid: 'univLogo' });
-  if (fs.existsSync(techverseLogoPath)) attachments.push({ filename: 'techverse-logo.jpg', path: techverseLogoPath, cid: 'techverseLogo' });
-  if (fs.existsSync(soetLogoPath)) attachments.push({ filename: 'soet-logo.png', path: soetLogoPath, cid: 'soetLogo' });
-
-  // Photo attachment handling
-  let photoHtml = '';
-  let hasPhotoAttachment = false;
-
-  if (member.photo && typeof member.photo === 'string') {
-    if (member.photo.startsWith('data:image/')) {
-      const matches = member.photo.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-      if (matches && matches.length === 3) {
-        const mimeType = matches[1];
-        const buffer = Buffer.from(matches[2], 'base64');
-        attachments.push({
-          filename: 'member-photo.jpg',
-          content: buffer,
-          cid: 'memberPhoto',
-          contentType: mimeType,
-        });
-        photoHtml = `<img src="cid:memberPhoto" alt="${escapeHtml(member.name)}" style="width: 110px; height: 130px; object-fit: cover; border-radius: 12px; border: 2px solid #2563eb; display: block; margin: auto;" />`;
-        hasPhotoAttachment = true;
-      }
-    } else if (member.photo.startsWith('http://') || member.photo.startsWith('https://')) {
-      photoHtml = `<img src="${member.photo}" alt="${escapeHtml(member.name)}" style="width: 110px; height: 130px; object-fit: cover; border-radius: 12px; border: 2px solid #2563eb; display: block; margin: auto;" />`;
-      hasPhotoAttachment = true;
-    }
+  if (cardPngBuffer) {
+    // Inline image for the dedicated card frame
+    attachments.push({
+      filename: cardFilename,
+      content: cardPngBuffer,
+      cid: 'idCardInline',
+      contentType: 'image/png',
+    });
+    // Explicit attachment for download
+    attachments.push({
+      filename: cardFilename,
+      content: cardPngBuffer,
+      contentType: 'image/png',
+      contentDisposition: 'attachment',
+    });
   }
 
-  if (!hasPhotoAttachment) {
-    const initial = (member.name && member.name.trim().length > 0) ? escapeHtml(member.name.trim().charAt(0).toUpperCase()) : 'M';
-    photoHtml = `<div style="width: 110px; height: 130px; border-radius: 12px; background: #e0e7ff; border: 2px dashed #3b82f6; display: flex; align-items: center; justify-content: center; text-align: center; margin: auto;"><span style="font-size: 32px; color: #1e40af; font-weight: bold; line-height: 130px;">${initial}</span></div>`;
-  }
+  const heroBannerHtml = isPromotion ? `
+  <div style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #1e3a8a 100%); padding: 28px 24px; text-align: center; color: #ffffff;">
+    <span style="display: inline-block; background: rgba(250,204,21,0.25); border: 1px solid #facc15; color: #fef08a; font-size: 11px; font-weight: bold; padding: 4px 14px; border-radius: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">🎖️ Official Leadership Promotion • Career Elevation</span>
+    <h1 style="margin: 6px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Congratulations ${escapeHtml(member.name)}, You've Been Promoted! 🚀</h1>
+    <p style="margin: 4px 0 0 0; font-size: 13px; color: #e0e7ff; line-height: 1.5;">
+      In recognition of your outstanding leadership and contributions to TechVerse, you have officially been elevated to <strong>${escapeHtml(member.designation || 'Club Leader')}</strong> (${escapeHtml(member.roleAssignee || 'Executive Board')}).
+    </p>
+  </div>
+  ` : `
+  <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); padding: 28px 24px; text-align: center; color: #ffffff;">
+    <span style="display: inline-block; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #38bdf8; font-size: 11px; font-weight: bold; padding: 4px 14px; border-radius: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Official Selection Confirmed • Screening Approved</span>
+    <h1 style="margin: 6px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Congratulations ${escapeHtml(member.name)}, You're Selected! 🎉</h1>
+    <p style="margin: 4px 0 0 0; font-size: 13px; color: #cbd5e1;">Your screening is complete. The President &amp; Vice President have confirmed your official designation as <strong>${escapeHtml(member.designation)}</strong> (${escapeHtml(member.roleAssignee || 'Core Team Member')}). Welcome to the TechVerse family!</p>
+  </div>
+  `;
+
+  const letterBodyHtml = isPromotion ? `
+  <div style="background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%); border-left: 4px solid #eab308; border-radius: 0 12px 12px 0; padding: 18px; margin: 0 0 24px 0;">
+    <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #854d0e; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">
+      🌟 Executive Leadership Citation &amp; Promotion Announcement
+    </h4>
+    <p style="margin: 0 0 12px 0; font-size: 13px; color: #713f12; line-height: 1.6;">
+      Dear <strong>${escapeHtml(member.name)}</strong>, on behalf of the President, Vice President, and Faculty Advisors of <strong>TechVerse Club • School of Engineering &amp; Technology, CT University</strong>, we proudly commend your exemplary dedication and technical excellence.
+    </p>
+    <div style="background: #ffffff; border-radius: 8px; padding: 10px 14px; border: 1px solid #fde047; font-size: 12px; color: #713f12;">
+      <span style="color: #64748b;">Previous Designation:</span> <strong style="text-decoration: line-through; color: #64748b;">${escapeHtml(member.previousDesignation || 'Member')}</strong> &nbsp;&nbsp;➔&nbsp;&nbsp; 
+      <span style="color: #b45309; font-weight: bold;">New Elevated Designation:</span> <span style="background: #fef08a; color: #854d0e; font-weight: 800; padding: 2px 8px; border-radius: 4px;">🎖️ ${escapeHtml(member.designation)}</span>
+    </div>
+    <p style="margin: 12px 0 0 0; font-size: 12px; color: #854d0e; line-height: 1.5;">
+      Your official <strong>TechVerse Leadership &amp; Membership Card</strong> has been generated below as a standalone printable badge. A print-ready, high-resolution PNG file (<code style="color: #854d0e;">${cardFilename}</code>) is also attached to this email for physical lanyard printing.
+    </p>
+  </div>
+  ` : `
+  <div style="background: #eff6ff; border-left: 4px solid #2563eb; border-radius: 0 12px 12px 0; padding: 18px; margin: 0 0 24px 0;">
+    <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #1e40af; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">
+      🎉 Welcome to TechVerse Club, CT University!
+    </h4>
+    <p style="margin: 0 0 10px 0; font-size: 13px; color: #1e3a8a; line-height: 1.6;">
+      Dear <strong>${escapeHtml(member.name)}</strong>, the screening committee has approved your application. You have officially been appointed as <strong>${escapeHtml(member.designation || 'Active Member')}</strong> (${escapeHtml(member.roleAssignee || 'Core Team')}).
+    </p>
+    <p style="margin: 0; font-size: 12px; color: #1e40af; line-height: 1.5;">
+      Your verified <strong>Digital Club Membership Card</strong> has been generated below as a standalone printable badge. A print-ready lossless PNG file (<code style="color: #1e40af;">${cardFilename}</code>) is attached below for instant download and lamination.
+    </p>
+  </div>
+  `;
 
   const emailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Official TechVerse Club Membership Card</title>
+  <title>${isPromotion ? 'Official Leadership Promotion - TechVerse Club' : 'Official TechVerse Club Membership Card'}</title>
 </head>
-<body style="margin: 0; padding: 20px; background-color: #0b1120; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 2px solid #3b82f6;">
+<body style="margin: 0; padding: 24px 12px; background-color: #0b1120; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b;">
+  <div style="max-width: 660px; margin: 0 auto; background: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 12px 45px rgba(0,0,0,0.45); border: 2px solid ${isPromotion ? '#f59e0b' : '#3b82f6'};">
     
-    <!-- CONGRATULATIONS HERO BANNER -->
-    <tr>
-      <td style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); padding: 26px 24px; text-align: center; color: #ffffff;">
-        <span style="display: inline-block; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #38bdf8; font-size: 11px; font-weight: bold; padding: 4px 14px; border-radius: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Official Selection Confirmed • Screening Approved</span>
-        <h1 style="margin: 6px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Congratulations ${escapeHtml(member.name)}, You're Selected! 🎉</h1>
-        <p style="margin: 4px 0 0 0; font-size: 13px; color: #cbd5e1;">Your screening is complete. The President &amp; Vice President have confirmed your official designation as <strong>${escapeHtml(member.designation)}</strong> (${escapeHtml(member.roleAssignee || 'Core Team Member')}). Welcome to the TechVerse family!</p>
-      </td>
-    </tr>
+    ${heroBannerHtml}
 
-    <!-- CARD HEADER: 3 LOGOS -->
-    <tr>
-      <td style="background: #f8fafc; padding: 18px 20px 14px 20px; border-bottom: 2px solid #e2e8f0;">
-        <table width="100%" cellspacing="0" cellpadding="0" border="0">
-          <tr>
-            <td align="center" width="30%" style="vertical-align: middle;">
-              <img src="cid:univLogo" alt="CT University" style="max-height: 55px; max-width: 90px; object-fit: contain;" />
-            </td>
-            <td align="center" width="40%" style="vertical-align: middle;">
-              <img src="cid:techverseLogo" alt="TechVerse Club" style="max-height: 65px; max-width: 65px; border-radius: 50%; border: 2px solid #2563eb; object-fit: cover;" />
-            </td>
-            <td align="center" width="30%" style="vertical-align: middle;">
-              <img src="cid:soetLogo" alt="School of Engineering & Technology" style="max-height: 55px; max-width: 90px; object-fit: contain;" />
-            </td>
-          </tr>
-        </table>
+    <div style="padding: 26px 22px;">
+      ${letterBodyHtml}
 
-        <!-- DIAMOND CONNECTOR RIBBON -->
-        <table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top: 12px;">
-          <tr>
-            <td align="center" style="font-size: 10px; font-weight: 800; color: #047857; letter-spacing: 2px; text-transform: uppercase;">
-              ◆ ◆ &nbsp;&nbsp; TECHVERSE CLUB • CT UNIVERSITY &nbsp;&nbsp; ◆ ◆
-            </td>
-          </tr>
-          <tr>
-            <td align="center" style="font-size: 11px; font-weight: 700; color: #1e40af; text-transform: uppercase; padding-top: 2px;">
-              School of Engineering & Technology
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
+      <!-- SEPARATE STANDALONE ID CARD SECTION DIVIDER -->
+      <div style="text-align: center; margin: 30px 0 16px 0;">
+        <span style="display: inline-block; background: ${isPromotion ? 'rgba(245,158,11,0.12)' : 'rgba(37,99,235,0.1)'}; border: 1.5px solid ${isPromotion ? '#f59e0b' : '#2563eb'}; color: ${isPromotion ? '#92400e' : '#1e40af'}; font-size: 11px; font-weight: 800; padding: 6px 18px; border-radius: 24px; text-transform: uppercase; letter-spacing: 2px;">
+          🪪 OFFICIAL DIGITAL IDENTITY CARD (STANDALONE BADGE)
+        </span>
+        <p style="margin: 8px 0 0 0; font-size: 12px; color: #64748b;">
+          Standard CR80 / Lanyard Badge Specification • Valid University-Wide
+        </p>
+      </div>
 
-    <!-- CARD CONTENT BODY -->
-    <tr>
-      <td style="padding: 24px;">
-        <table width="100%" cellspacing="0" cellpadding="0" border="0">
-          <tr>
-            <!-- PHOTO COLUMN -->
-            <td width="35%" style="vertical-align: top; padding-right: 18px; text-align: center;">
-              ${photoHtml}
-              <div style="margin-top: 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 6px 4px;">
-                <span style="display: block; font-size: 9px; font-weight: bold; color: #1e40af; text-transform: uppercase; letter-spacing: 1px;">Member ID</span>
-                <span style="font-size: 12px; font-weight: 800; color: #0f172a; font-family: monospace;">${escapeHtml(member.memberId)}</span>
-                <span style="display: block; font-size: 10px; font-weight: 700; color: #2563eb; font-family: monospace; margin-top: 2px;">Serial #${member.serialNumber || '1'}</span>
-              </div>
-              <div style="margin-top: 6px;">
-                <span style="display: inline-block; font-size: 10px; font-weight: 700; color: #059669; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 6px;">Verified Member</span>
-              </div>
-            </td>
+      <!-- STANDALONE ID CARD CONTAINER -->
+      <div style="background: #090d16; border-radius: 28px; padding: 24px 16px; margin: 12px auto; max-width: 480px; text-align: center; box-shadow: inset 0 2px 10px rgba(255,255,255,0.05), 0 20px 40px rgba(0,0,0,0.5); border: 1px solid #1e293b;">
+        <!-- Lanyard Slot Graphical Indicator -->
+        <div style="width: 70px; height: 12px; background: #1e293b; border-radius: 6px; margin: 0 auto 16px auto; border: 2px solid #334155;"></div>
 
-            <!-- DETAILS COLUMN -->
-            <td width="65%" style="vertical-align: top;">
-              <table width="100%" cellspacing="0" cellpadding="4" border="0" style="font-size: 12px;">
-                <tr>
-                  <td width="38%" style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Full Name:</td>
-                  <td style="color: #0f172a; font-weight: 800; font-size: 14px;">${escapeHtml(member.name)}</td>
-                </tr>
-                <tr>
-                  <td style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Reg. Number:</td>
-                  <td style="color: #1e40af; font-weight: 700; font-family: monospace;">${escapeHtml(member.regNumber)}</td>
-                </tr>
-                <tr>
-                  <td style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Department:</td>
-                  <td style="color: #0f172a; font-weight: 600;">${escapeHtml(departmentDisplay)}</td>
-                </tr>
-                <tr>
-                  <td style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Batch:</td>
-                  <td style="color: #0f172a; font-weight: 600;">${escapeHtml(member.batch)}</td>
-                </tr>
-                <tr>
-                  <td style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Residence:</td>
-                  <td style="color: #0f172a; font-weight: 600;">
-                    <span style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: bold;">${escapeHtml(member.residenceType || 'Day Scholar')}</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Contact No.:</td>
-                  <td style="color: #0f172a; font-weight: 600; font-family: monospace;">${escapeHtml(member.contact)}</td>
-                </tr>
-                <tr>
-                  <td style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Club Designation:</td>
-                  <td>
-                    <span style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-weight: 800; font-size: 11px; padding: 3px 8px; border-radius: 4px;">
-                      ${escapeHtml(member.designation) || 'Active Member'}
-                    </span>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 10px;">Role Assignee:</td>
-                  <td>
-                    <span style="background: #dbeafe; color: #1e3a8a; border: 1px solid #bfdbfe; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 4px;">
-                      ${escapeHtml(member.roleAssignee) || 'Core Team'}
-                    </span>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
+        <!-- The Separate Standalone ID Card Image -->
+        ${cardPngBuffer ? `
+          <img src="cid:idCardInline" alt="TechVerse Official ID Card" style="width: 100%; max-width: 440px; height: auto; display: block; margin: 0 auto; border-radius: 22px; box-shadow: 0 12px 30px rgba(0,0,0,0.8); border: 2px solid ${isPromotion ? '#f59e0b' : '#38bdf8'};" />
+        ` : `
+          <p style="color: #94a3b8; font-size: 13px;">[ID Card Graphic Generated in Attached File]</p>
+        `}
 
-        <!-- INTERESTS & NOTE -->
-        <div style="margin-top: 18px; padding: 12px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 11px;">
-          <p style="margin: 0 0 6px 0; font-weight: bold; color: #334155;">Interests & Domains: <span style="color: #2563eb; font-weight: 600;">${escapeHtml(interestsList)}</span></p>
-          <p style="margin: 0; color: #64748b; font-size: 10px; line-height: 1.4;">
-            ℹ️ <strong>Club Protocol:</strong> Your official Designation and Role Assignee have been assigned and approved by the President and Vice President. Please save this digital membership card for all university technical hackathons, workshops, and exclusive club events.
-          </p>
+        <!-- Download Badge Notice -->
+        <div style="margin-top: 18px; padding: 14px 16px; background: #111827; border-radius: 14px; border: 1px solid #374151; text-align: center;">
+          <div style="font-size: 13px; font-weight: 800; color: #f8fafc; margin-bottom: 4px;">
+            📥 Print-Ready ID Card File Attached (.PNG)
+          </div>
+          <div style="font-size: 11px; color: #94a3b8; line-height: 1.5;">
+            The original high-resolution card (<strong style="color: ${isPromotion ? '#fbbf24' : '#38bdf8'};">${cardFilename}</strong>) is attached below.<br/>
+            You can download it directly from this email to print on PVC ID card material or 300 GSM photo paper.
+          </div>
         </div>
-      </td>
-    </tr>
+      </div>
+
+      <div style="margin-top: 24px; padding: 14px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 11px; color: #64748b; line-height: 1.5; text-align: center;">
+        ℹ️ <strong>University Protocol:</strong> This credential certifies active club membership &amp; leadership in the School of Engineering &amp; Technology, CT University. For inquiries or replacement, email <a href="mailto:techverse@ctuniversity.in" style="color: #2563eb; text-decoration: none;">techverse@ctuniversity.in</a>.
+      </div>
+    </div>
 
     <!-- FOOTER -->
-    <tr>
-      <td style="background: #f1f5f9; padding: 14px 24px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #64748b;">
-        <p style="margin: 0 0 4px 0; font-weight: 700; color: #334155;">TechVerse Club • School of Engineering & Technology</p>
-        <p style="margin: 0; font-size: 10px;">CT University, Ferozepur Road, Ludhiana, Punjab</p>
-        <p style="margin: 6px 0 0 0; font-size: 10px; color: #94a3b8;">Email: <a href="mailto:techverse@ctuniversity.in" style="color: #2563eb; text-decoration: none;">techverse@ctuniversity.in</a> • Official Membership Credential</p>
-      </td>
-    </tr>
-  </table>
+    <div style="background: #f1f5f9; padding: 16px 24px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #64748b;">
+      <p style="margin: 0 0 4px 0; font-weight: 700; color: #334155;">TechVerse Club • School of Engineering &amp; Technology</p>
+      <p style="margin: 0; font-size: 10px;">CT University, Ferozepur Road, Ludhiana, Punjab - 142024</p>
+      <p style="margin: 6px 0 0 0; font-size: 10px; color: #94a3b8;">Email: <a href="mailto:techverse@ctuniversity.in" style="color: #2563eb; text-decoration: none;">techverse@ctuniversity.in</a> • Official Membership Credential</p>
+    </div>
+  </div>
 </body>
 </html>
   `;
+
+  const subjectTitle = isPromotion
+    ? `🎖️ Official Promotion Announced - Congratulations ${member.name} on Becoming ${member.designation || 'Club Leader'}! | TechVerse Club`
+    : `🎉 Official TechVerse Club Membership Card Issued - ${member.name} (${member.designation || 'Active Member'})`;
 
   const mailOptions = {
     from: `"TechVerse Club • CT University" <${emailUser}>`,
     to: recipientEmail,
     replyTo: emailUser,
-    subject: `🎉 Official TechVerse Club Membership Card Issued - ${member.name} (${member.designation || 'Active Member'})`,
+    subject: subjectTitle,
     html: emailHtml,
     attachments,
   };
