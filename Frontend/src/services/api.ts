@@ -417,6 +417,78 @@ export const promoteClubMember = async (
   }
 };
 
+export const acceptMemberResignation = async (
+  id: string,
+  data: { remarks?: string; sendEmail?: boolean }
+) => {
+  const url = `${API_BASE_URL}/api/club-members/${id}/resign`;
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    let resData;
+    try {
+      resData = await response.json();
+    } catch (e) {
+      resData = {};
+    }
+
+    if (!response.ok) {
+      const fallback = await fetch(`${API_BASE_URL}/api/club-members/${id}/resign`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (fallback.ok) return await fallback.json();
+      throw new Error(resData.message || 'Failed to accept member resignation');
+    }
+
+    return resData;
+  } catch (error) {
+    console.error('Error accepting member resignation:', error);
+    throw error;
+  }
+};
+
+export const terminateClubMember = async (
+  id: string,
+  data: { reason: string; remarks?: string; fineAmount?: number; sendEmail?: boolean }
+) => {
+  const url = `${API_BASE_URL}/api/club-members/${id}/terminate`;
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    let resData;
+    try {
+      resData = await response.json();
+    } catch (e) {
+      resData = {};
+    }
+
+    if (!response.ok) {
+      const fallback = await fetch(`${API_BASE_URL}/api/club-members/${id}/terminate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (fallback.ok) return await fallback.json();
+      throw new Error(resData.message || 'Failed to terminate club member');
+    }
+
+    return resData;
+  } catch (error) {
+    console.error('Error terminating club member:', error);
+    throw error;
+  }
+};
+
 export const updateClubMemberRole = async (
   id: string,
   updateData: { designation?: string; roleAssignee?: string; role?: string; status?: string }

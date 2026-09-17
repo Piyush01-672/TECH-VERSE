@@ -435,6 +435,180 @@ export default async function handler(req, res) {
       });
     }
 
+    // =========================================================================
+    // TYPE: RESIGNATION (Formal Resignation Acceptance)
+    // =========================================================================
+    if (type === 'resignation') {
+      const m = member || {};
+      const resignationRemarks = m.resignationRemarks || req.body?.remarks || 'Voluntary resignation accepted on personal/academic grounds.';
+      const desig = m.designation || 'Club Member';
+      const roleAssignee = m.roleAssignee || 'Core Team';
+
+      const resignationHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Acceptance of Resignation - TechVerse Club</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 30px 10px;">
+    <tr>
+      <td align="center">
+        <table width="640" border="0" cellspacing="0" cellpadding="0" style="max-width: 640px; width: 100%; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;">
+          <tr>
+            <td style="background: linear-gradient(135deg, #0f172a 0%, #334155 100%); padding: 26px 20px; text-align: center;">
+              <span style="display: inline-block; background: rgba(251,191,36,0.15); border: 1px solid #f59e0b; color: #fbbf24; font-size: 11px; font-weight: 800; padding: 4px 14px; border-radius: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Official Administrative Notice</span>
+              <h1 style="margin: 6px 0; font-size: 22px; font-weight: 800; color: #ffffff;">Acceptance of Formal Resignation</h1>
+              <p style="margin: 4px 0 0 0; font-size: 13px; color: #cbd5e1;">TechVerse Club • School of Engineering &amp; Technology, CT University</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 28px 24px; color: #334155; font-size: 14px; line-height: 1.6;">
+              <p style="margin: 0 0 14px 0;">Dear <strong>${escapeHtml(m.name)}</strong> (Reg No: <strong>${escapeHtml(m.regNumber)}</strong>),</p>
+              <p style="margin: 0 0 16px 0;">
+                This communication serves as official confirmation that the Executive Board and Faculty Advisors of <strong>TechVerse Club (SOET, CT University)</strong> have formally received and accepted your resignation from the active appointment of <strong>${escapeHtml(desig)}</strong> (${escapeHtml(roleAssignee)}).
+              </p>
+              
+              <div style="background: #f8fafc; border-left: 4px solid #f59e0b; padding: 14px 18px; border-radius: 0 10px 10px 0; margin: 18px 0; font-size: 13px;">
+                <span style="display: block; color: #92400e; font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; margin-bottom: 4px;">Executive Remarks / Reason</span>
+                <span style="color: #475569;">${escapeHtml(resignationRemarks)}</span>
+              </div>
+
+              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 14px 18px; border-radius: 10px; margin: 18px 0; font-size: 13px; color: #166534;">
+                <p style="margin: 0 0 6px 0; font-weight: 800; font-size: 13px;">🌟 Commendation for Past Service</p>
+                <p style="margin: 0;">We sincerely thank you for the passion, technical contributions, and enthusiasm you brought to our community during your tenure. Your official membership record has been archived as <strong>Resigned in Good Standing</strong>.</p>
+              </div>
+
+              <p style="margin: 18px 0 0 0; color: #64748b; font-size: 13px;">
+                We wish you the very best in all your future academic, technical, and professional pursuits. You are always welcome at open TechVerse symposiums and guest lectures.
+              </p>
+
+              <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b;">
+                <strong>Executive Board &amp; Faculty Leadership</strong><br/>
+                TechVerse Club • School of Engineering &amp; Technology<br/>
+                CT University, Ludhiana, Punjab
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+      `;
+
+      const info = await transporter.sendMail({
+        from: `"TechVerse Club • CT University" <${emailUser}>`,
+        to: cleanRecipient,
+        replyTo: emailUser,
+        subject: `TechVerse Club — Formal Resignation Accepted | CT University`,
+        html: resignationHtml,
+      });
+
+      return res.status(200).json({
+        success: true,
+        messageId: info.messageId,
+        message: `Resignation acceptance email sent to ${cleanRecipient}`,
+      });
+    }
+
+    // =========================================================================
+    // TYPE: TERMINATION (Disciplinary Termination Notice)
+    // =========================================================================
+    if (type === 'termination') {
+      const m = member || {};
+      const terminationReason = m.terminationReason || req.body?.reason || 'Violation of Club Code of Conduct & Rules';
+      const terminationRemarks = m.terminationRemarks || req.body?.remarks || 'Disciplinary action initiated by the department.';
+      const fineAmount = m.fineAmount || req.body?.fineAmount || 1000;
+      const desig = m.designation || 'Club Member';
+
+      const terminationHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Disciplinary Termination Notice - TechVerse Club</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 30px 10px;">
+    <tr>
+      <td align="center">
+        <table width="640" border="0" cellspacing="0" cellpadding="0" style="max-width: 640px; width: 100%; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.06); border: 2px solid #ef4444;">
+          <tr>
+            <td style="background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #450a0a 100%); padding: 26px 20px; text-align: center;">
+              <span style="display: inline-block; background: rgba(254,202,202,0.2); border: 1px solid #f87171; color: #fee2e2; font-size: 11px; font-weight: 800; padding: 4px 14px; border-radius: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Strict Disciplinary Action Notice</span>
+              <h1 style="margin: 6px 0; font-size: 22px; font-weight: 900; color: #ffffff;">Notice of Membership Termination &amp; Revocation</h1>
+              <p style="margin: 4px 0 0 0; font-size: 13px; color: #fca5a5;">School of Engineering &amp; Technology • CT University</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 28px 24px; color: #1e293b; font-size: 14px; line-height: 1.6;">
+              <p style="margin: 0 0 14px 0;">Dear <strong>${escapeHtml(m.name)}</strong> (Reg No: <strong>${escapeHtml(m.regNumber)}</strong>),</p>
+              <p style="margin: 0 0 16px 0;">
+                Notice is hereby served that pursuant to departmental review and administrative verification, your official membership, designation (<strong style="color: #991b1b;">${escapeHtml(desig)}</strong>), and all associated privileges in <strong>TechVerse Club (SOET, CT University)</strong> have been <strong style="color: #b91c1c;">TERMINATED with immediate effect</strong> on disciplinary grounds.
+              </p>
+
+              <div style="background: #fef2f2; border: 1px solid #fecaca; border-left: 5px solid #dc2626; padding: 16px 18px; border-radius: 0 12px 12px 0; margin: 20px 0;">
+                <h4 style="margin: 0 0 8px 0; color: #991b1b; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Disciplinary Findings &amp; Penalties</h4>
+                <table width="100%" cellpadding="4" cellspacing="0" style="font-size: 13px; color: #334155;">
+                  <tr>
+                    <td width="36%" style="font-weight: 700; color: #7f1d1d;">Punishable Offense:</td>
+                    <td style="color: #b91c1c; font-weight: bold;">${escapeHtml(terminationReason)}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 700; color: #7f1d1d;">Departmental Remarks:</td>
+                    <td>${escapeHtml(terminationRemarks)}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 700; color: #7f1d1d;">Imposed Fine Penalty:</td>
+                    <td style="color: #dc2626; font-weight: 900; font-size: 14px;">₹${fineAmount} (INR)</td>
+                  </tr>
+                </table>
+              </div>
+
+              <div style="background: #fff1f2; border: 1px dashed #f43f5e; padding: 14px 18px; border-radius: 10px; margin: 18px 0; font-size: 12px; color: #9f1239;">
+                <p style="margin: 0 0 6px 0; font-weight: 800;">🚫 Credential Revocation Alert</p>
+                <p style="margin: 0;">
+                  As agreed in the mandatory Code of Conduct declaration submitted with your application, sharing club IDs for bunking classes, taking work casually, unexcused absence, or inactivity carries strict penalties. Your official digital ID Card is officially invalidated in university records, and you are barred from representing TechVerse Club in university hackathons or symposiums.
+                </p>
+              </div>
+
+              <p style="margin: 16px 0 0 0; font-size: 13px; color: #475569;">
+                For clearance of the imposed disciplinary fine (₹${fineAmount}) or formal dispute representation, please report directly to the SOET Department Office during working hours.
+              </p>
+
+              <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b;">
+                <strong>Disciplinary Committee &amp; Faculty Leadership</strong><br/>
+                TechVerse Club • School of Engineering &amp; Technology<br/>
+                CT University, Ludhiana, Punjab
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+      `;
+
+      const info = await transporter.sendMail({
+        from: `"TechVerse Disciplinary Committee • CT University" <${emailUser}>`,
+        to: cleanRecipient,
+        replyTo: emailUser,
+        subject: `TechVerse Club — NOTICE OF DISCIPLINARY TERMINATION & CREDENTIAL REVOCATION | CT University`,
+        html: terminationHtml,
+      });
+
+      return res.status(200).json({
+        success: true,
+        messageId: info.messageId,
+        message: `Disciplinary termination notice sent to ${cleanRecipient}`,
+      });
+    }
+
     // Default: Official Membership Card (type === 'card' or type === 'promotion' or type === 'membership')
     const isPromotion = type === 'promotion';
     const m = member || {};

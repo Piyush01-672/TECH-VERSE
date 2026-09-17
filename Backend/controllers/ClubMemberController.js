@@ -830,12 +830,166 @@ const promoteMember = async (req, res) => {
   }
 };
 
+/**
+ * Dispatch Resignation Acceptance Email
+ */
+async function sendResignationEmail(member, remarks) {
+  try {
+    const payload = member.toObject ? member.toObject() : { ...member };
+    payload.resignationRemarks = remarks || 'Voluntary resignation accepted on personal/academic grounds.';
+    const relayOk = await callVercelRelay('resignation', payload);
+    if (relayOk) return true;
+  } catch (relayErr) {
+    console.warn('Resignation relay attempt failed:', relayErr.message);
+  }
+
+  const transportConfig = getTransporter();
+  if (!transportConfig) return false;
+  const { transporter, emailUser } = transportConfig;
+
+  try {
+    await transporter.sendMail({
+      from: `"TechVerse Club • CT University" <${emailUser}>`,
+      to: member.email,
+      replyTo: emailUser,
+      subject: `TechVerse Club — Formal Resignation Accepted | CT University`,
+      html: `<p>Dear ${escapeHtml(member.name)}, your resignation from TechVerse Club has been accepted. Thank you for your service.</p>`,
+    });
+    return true;
+  } catch (err) {
+    console.error('Local resignation email fallback error:', err.message);
+    return false;
+  }
+}
+
+/**
+ * Dispatch Disciplinary Termination Notice Email
+ */
+async function sendTerminationEmail(member, reason, remarks, fineAmount) {
+  try {
+    const payload = member.toObject ? member.toObject() : { ...member };
+    payload.terminationReason = reason;
+    payload.terminationRemarks = remarks;
+    payload.fineAmount = fineAmount || 1000;
+    const relayOk = await callVercelRelay('termination', payload);
+    if (relayOk) return true;
+  } catch (relayErr) {
+    console.warn('Termination relay attempt failed:', relayErr.message);
+  }
+
+  const transportConfig = getTransporter();
+  if (!transportConfig) return false;
+  const { transporter, emailUser } = transportConfig;
+
+  try {
+    await transporter.sendMail({
+      from: `"TechVerse Disciplinary Committee • CT University" <${emailUser}>`,
+      to: member.email,
+      replyTo: emailUser,
+      subject: `TechVerse Club — NOTICE OF DISCIPLINARY TERMINATION & CREDENTIAL REVOCATION | CT University`,
+      html: `<p>Dear ${escapeHtml(member.name)}, notice is hereby given that your membership in TechVerse Club has been TERMINATED due to: ${escapeHtml(reason)}. Imposed fine: ₹${fineAmount}.</p>`,
+    });
+    return true;
+  } catch (err) {
+    console.error('Local termination email fallback error:', err.message);
+    return false;
+  }
+}
+
+// PATCH / POST accept resignation
+const acceptResignation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { remarks, sendEmail = true } = req.body || {};
+
+    let member = await ClubMember.findById(id);
+    if (!member) {
+      member = await UnderScreeningMember.findById(id);
+      if (!member) {
+        return res.status(404).json({ success: false, message: 'Official member not found.' });
+      }
+    }
+
+    member.status = 'Resigned';
+    member.resignedAt = new Date();
+    member.resignationRemarks = (remarks || '').trim() || 'Voluntary resignation accepted on personal/academic grounds.';
+    await member.save();
+
+    let emailSent = false;
+    if (sendEmail) {
+      try {
+        emailSent = await sendResignationEmail(member, member.resignationRemarks);
+      } catch (emailErr) {
+        console.warn('Resignation email warning:', emailErr.message);
+      }
+    }
+
+    res.json({
+      success: true,
+      emailSent,
+      message: `Formal resignation accepted for ${member.name}. Status updated to Resigned.`,
+      member,
+    });
+  } catch (err) {
+    console.error('acceptResignation error:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// PATCH / POST terminate member on disciplinary grounds
+const terminateMember = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason, remarks, fineAmount = 1000, sendEmail = true } = req.body || {};
+
+    if (!reason || !reason.trim()) {
+      return res.status(400).json({ success: false, message: 'Disciplinary termination reason is required.' });
+    }
+
+    let member = await ClubMember.findById(id);
+    if (!member) {
+      member = await UnderScreeningMember.findById(id);
+      if (!member) {
+        return res.status(404).json({ success: false, message: 'Official member not found.' });
+      }
+    }
+
+    member.status = 'Terminated';
+    member.terminatedAt = new Date();
+    member.terminationReason = reason.trim();
+    member.terminationRemarks = (remarks || '').trim() || 'Disciplinary action taken by SOET Department.';
+    member.fineAmount = Number(fineAmount) || 1000;
+    await member.save();
+
+    let emailSent = false;
+    if (sendEmail) {
+      try {
+        emailSent = await sendTerminationEmail(member, member.terminationReason, member.terminationRemarks, member.fineAmount);
+      } catch (emailErr) {
+        console.warn('Termination email warning:', emailErr.message);
+      }
+    }
+
+    res.json({
+      success: true,
+      emailSent,
+      message: `Member ${member.name} has been terminated on disciplinary grounds. ID credentials revoked.`,
+      member,
+    });
+  } catch (err) {
+    console.error('terminateMember error:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
 module.exports = {
   getClubMembers,
   getScreeningMembers,
   submitClubMember,
   updateMemberRole,
   promoteMember,
+  acceptResignation,
+  terminateMember,
   deleteClubMember,
   deleteScreeningMember,
 };

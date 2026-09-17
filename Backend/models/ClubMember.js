@@ -22,6 +22,12 @@ const ClubMemberSchema = new mongoose.Schema({
   cardSentAt: { type: Date },
   consentGiven: { type: Boolean, default: false },
   consentTimestamp: { type: Date },
+  resignedAt: { type: Date },
+  resignationRemarks: { type: String, default: '' },
+  terminatedAt: { type: Date },
+  terminationReason: { type: String, default: '' },
+  terminationRemarks: { type: String, default: '' },
+  fineAmount: { type: Number, default: 0 },
   joinedAt: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now },
 }, { strict: false, collection: 'clubmembers' });

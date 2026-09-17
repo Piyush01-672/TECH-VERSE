@@ -31,6 +31,11 @@ import {
   Edit3,
   Crown,
   Award,
+  UserMinus,
+  UserX,
+  AlertTriangle,
+  Ban,
+  FileText,
   X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -42,6 +47,8 @@ import {
   getScreeningMembers,
   updateClubMemberRole, 
   promoteClubMember,
+  acceptMemberResignation,
+  terminateClubMember,
   getEnquiries, 
   getContacts, 
   getEngineersDayStats,
@@ -75,6 +82,12 @@ export interface ClubMemberItem {
   cardSent?: boolean;
   screeningEmailSent?: boolean;
   cardSentAt?: string;
+  resignedAt?: string;
+  resignationRemarks?: string;
+  terminatedAt?: string;
+  terminationReason?: string;
+  terminationRemarks?: string;
+  fineAmount?: number;
   createdAt?: string;
 }
 
@@ -124,6 +137,24 @@ export default function AdminPortal() {
   const [promoDesignation, setPromoDesignation] = useState<string>("");
   const [promoRoleAssignee, setPromoRoleAssignee] = useState<string>("");
   const [isPromoting, setIsPromoting] = useState<boolean>(false);
+
+  // Resignation Modal State
+  const [resigningMember, setResigningMember] = useState<ClubMemberItem | null>(null);
+  const [resignationRemarks, setResignationRemarks] = useState<string>("Voluntary resignation accepted on personal/academic grounds.");
+  const [sendResignationEmail, setSendResignationEmail] = useState<boolean>(true);
+  const [isSubmittingResignation, setIsSubmittingResignation] = useState<boolean>(false);
+
+  // Disciplinary Termination Modal State
+  const [terminatingMember, setTerminatingMember] = useState<ClubMemberItem | null>(null);
+  const [terminationReason, setTerminationReason] = useState<string>("Sharing club IDs for bunking classes (Strict Disciplinary Violation)");
+  const [customTerminationReason, setCustomTerminationReason] = useState<string>("");
+  const [fineAmount, setFineAmount] = useState<string>("1000");
+  const [terminationRemarks, setTerminationRemarks] = useState<string>("");
+  const [sendTerminationEmail, setSendTerminationEmail] = useState<boolean>(true);
+  const [isSubmittingTermination, setIsSubmittingTermination] = useState<boolean>(false);
+
+  // Status Filter in Official Members Tab
+  const [officialStatusFilter, setOfficialStatusFilter] = useState<"all" | "active" | "resigned" | "terminated">("active");
 
   // Data states
   const [screeningList, setScreeningList] = useState<ClubMemberItem[]>([]);
@@ -427,6 +458,136 @@ export default function AdminPortal() {
     }
   };
 
+  const openResignationModal = (member: ClubMemberItem) => {
+    setResigningMember(member);
+    setResignationRemarks(member.resignationRemarks || "Voluntary resignation accepted on personal/academic grounds.");
+    setSendResignationEmail(true);
+  };
+
+  const handleConfirmResignation = async () => {
+    if (!resigningMember) return;
+    setIsSubmittingResignation(true);
+    try {
+      const res = await acceptMemberResignation(resigningMember._id, {
+        remarks: resignationRemarks.trim(),
+        sendEmail: sendResignationEmail,
+      });
+
+      let emailSent = Boolean(res?.emailSent);
+      if (sendResignationEmail && !emailSent) {
+        try {
+          const directRes = await sendEmailDirect({
+            type: "resignation",
+            member: {
+              ...resigningMember,
+              resignationRemarks: resignationRemarks.trim(),
+              status: "Resigned",
+            },
+          });
+          if (directRes && directRes.success) emailSent = true;
+        } catch (e) {
+          console.warn("Direct resignation email note:", e);
+        }
+      }
+
+      const updatedMember: ClubMemberItem = {
+        ...resigningMember,
+        status: "Resigned",
+        resignedAt: new Date().toISOString(),
+        resignationRemarks: resignationRemarks.trim(),
+      };
+
+      setOfficialList((prev) =>
+        prev.map((m) => (m._id === resigningMember._id ? updatedMember : m))
+      );
+
+      if (emailSent) {
+        toast.success(`Formal resignation accepted for ${resigningMember.name}! Acknowledgment email sent to ${resigningMember.email}.`);
+      } else {
+        toast.success(`Formal resignation accepted for ${resigningMember.name}! Status updated in MongoDB Atlas.`);
+      }
+
+      setResigningMember(null);
+    } catch (err: any) {
+      console.error("Resignation error:", err);
+      toast.error(err?.message || "Failed to accept member resignation");
+    } finally {
+      setIsSubmittingResignation(false);
+    }
+  };
+
+  const openTerminateModal = (member: ClubMemberItem) => {
+    setTerminatingMember(member);
+    setTerminationReason(member.terminationReason || "Sharing club IDs for bunking classes (Strict Disciplinary Violation)");
+    setCustomTerminationReason("");
+    setFineAmount(String(member.fineAmount || 1000));
+    setTerminationRemarks(member.terminationRemarks || "");
+    setSendTerminationEmail(true);
+  };
+
+  const handleConfirmTermination = async () => {
+    if (!terminatingMember) return;
+    const finalReason = terminationReason === "Other"
+      ? (customTerminationReason.trim() || "Violation of Club Code of Conduct & Rules")
+      : terminationReason;
+
+    setIsSubmittingTermination(true);
+    try {
+      const finalFine = Number(fineAmount) || 1000;
+      const res = await terminateClubMember(terminatingMember._id, {
+        reason: finalReason,
+        remarks: terminationRemarks.trim(),
+        fineAmount: finalFine,
+        sendEmail: sendTerminationEmail,
+      });
+
+      let emailSent = Boolean(res?.emailSent);
+      if (sendTerminationEmail && !emailSent) {
+        try {
+          const directRes = await sendEmailDirect({
+            type: "termination",
+            member: {
+              ...terminatingMember,
+              status: "Terminated",
+              terminationReason: finalReason,
+              terminationRemarks: terminationRemarks.trim(),
+              fineAmount: finalFine,
+            },
+          });
+          if (directRes && directRes.success) emailSent = true;
+        } catch (e) {
+          console.warn("Direct termination email note:", e);
+        }
+      }
+
+      const updatedMember: ClubMemberItem = {
+        ...terminatingMember,
+        status: "Terminated",
+        terminatedAt: new Date().toISOString(),
+        terminationReason: finalReason,
+        terminationRemarks: terminationRemarks.trim(),
+        fineAmount: finalFine,
+      };
+
+      setOfficialList((prev) =>
+        prev.map((m) => (m._id === terminatingMember._id ? updatedMember : m))
+      );
+
+      if (emailSent) {
+        toast.error(`Member ${terminatingMember.name} has been TERMINATED. Formal disciplinary notice emailed to ${terminatingMember.email}.`);
+      } else {
+        toast.error(`Member ${terminatingMember.name} has been TERMINATED. Status recorded in MongoDB Atlas.`);
+      }
+
+      setTerminatingMember(null);
+    } catch (err: any) {
+      console.error("Termination error:", err);
+      toast.error(err?.message || "Failed to terminate club member");
+    } finally {
+      setIsSubmittingTermination(false);
+    }
+  };
+
   const handleDeleteMember = async (id: string, name: string) => {
     setIsDeletingId(id);
     try {
@@ -503,6 +664,20 @@ export default function AdminPortal() {
     });
   }, [screeningMembers, searchQuery, deptFilter]);
 
+  // Official Status Counts
+  const activeOfficialCount = useMemo(
+    () => officialMembers.filter((m) => m.status !== "Resigned" && m.status !== "Terminated").length,
+    [officialMembers]
+  );
+  const resignedOfficialCount = useMemo(
+    () => officialMembers.filter((m) => m.status === "Resigned").length,
+    [officialMembers]
+  );
+  const terminatedOfficialCount = useMemo(
+    () => officialMembers.filter((m) => m.status === "Terminated").length,
+    [officialMembers]
+  );
+
   // Filtered Official Club Members
   const filteredOfficialMembers = useMemo(() => {
     return officialMembers.filter((m) => {
@@ -518,9 +693,19 @@ export default function AdminPortal() {
         String(m.serialNumber || "").includes(q);
 
       const matchesDept = deptFilter === "all" || m.department?.toLowerCase() === deptFilter.toLowerCase();
-      return matchesSearch && matchesDept;
+
+      let matchesStatus = true;
+      if (officialStatusFilter === "active") {
+        matchesStatus = m.status !== "Resigned" && m.status !== "Terminated";
+      } else if (officialStatusFilter === "resigned") {
+        matchesStatus = m.status === "Resigned";
+      } else if (officialStatusFilter === "terminated") {
+        matchesStatus = m.status === "Terminated";
+      }
+
+      return matchesSearch && matchesDept && matchesStatus;
     });
-  }, [officialMembers, searchQuery, deptFilter]);
+  }, [officialMembers, searchQuery, deptFilter, officialStatusFilter]);
 
   // 1. Loading State while checking authentication token
   if (authChecking) {
@@ -1148,7 +1333,7 @@ export default function AdminPortal() {
 
             {/* Search & Filter Bar */}
             <div className="p-4 rounded-2xl bg-[#0b1126]/80 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="relative w-full md:w-96">
+              <div className="relative w-full md:w-80">
                 <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <Input
                   id="admin-official-search-input"
@@ -1161,6 +1346,58 @@ export default function AdminPortal() {
               </div>
 
               <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                {/* Status Filter Buttons */}
+                <div className="flex items-center p-1 bg-white/5 border border-white/10 rounded-xl">
+                  <button
+                    id="filter-active-members-btn"
+                    type="button"
+                    onClick={() => setOfficialStatusFilter("active")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      officialStatusFilter === "active"
+                        ? "bg-emerald-600 text-white shadow"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    Active ({activeOfficialCount})
+                  </button>
+                  <button
+                    id="filter-resigned-members-btn"
+                    type="button"
+                    onClick={() => setOfficialStatusFilter("resigned")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      officialStatusFilter === "resigned"
+                        ? "bg-amber-600 text-white shadow"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    Resigned ({resignedOfficialCount})
+                  </button>
+                  <button
+                    id="filter-terminated-members-btn"
+                    type="button"
+                    onClick={() => setOfficialStatusFilter("terminated")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      officialStatusFilter === "terminated"
+                        ? "bg-red-600 text-white shadow"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    Terminated ({terminatedOfficialCount})
+                  </button>
+                  <button
+                    id="filter-all-members-btn"
+                    type="button"
+                    onClick={() => setOfficialStatusFilter("all")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      officialStatusFilter === "all"
+                        ? "bg-blue-600 text-white shadow"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    All ({officialMembers.length})
+                  </button>
+                </div>
+
                 <select
                   value={deptFilter}
                   onChange={(e) => setDeptFilter(e.target.value)}
@@ -1231,10 +1468,20 @@ export default function AdminPortal() {
                               <h3 className="text-base sm:text-lg font-bold text-white font-space">
                                 {member.name}
                               </h3>
-                              <Badge className="bg-emerald-500/15 text-emerald-300 border-emerald-500/40 text-[10px] font-mono">
-                                ✓ Official Member
-                              </Badge>
-                              {member.cardSent && (
+                              {member.status === "Resigned" ? (
+                                <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/40 text-[10px] font-mono">
+                                  ⚠️ Resigned
+                                </Badge>
+                              ) : member.status === "Terminated" ? (
+                                <Badge className="bg-red-500/25 text-red-300 border-red-500/50 text-[10px] font-mono font-bold">
+                                  🚫 Terminated • Fine: ₹{member.fineAmount || 1000}
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-emerald-500/15 text-emerald-300 border-emerald-500/40 text-[10px] font-mono">
+                                  ✓ Official Member
+                                </Badge>
+                              )}
+                              {member.cardSent && member.status !== "Terminated" && (
                                 <Badge className="bg-blue-500/15 text-blue-300 border-blue-500/40 text-[10px] font-mono">
                                   🪪 ID Card Sent
                                 </Badge>
@@ -1250,6 +1497,19 @@ export default function AdminPortal() {
                                 ⚡ {member.roleAssignee || "Core Team"}
                               </span>
                             </div>
+
+                            {/* Status Remarks Banners */}
+                            {member.status === "Resigned" && member.resignationRemarks && (
+                              <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-xs">
+                                <strong>Resignation Note:</strong> {member.resignationRemarks} {member.resignedAt ? `• Accepted on ${new Date(member.resignedAt).toLocaleDateString()}` : ""}
+                              </div>
+                            )}
+
+                            {member.status === "Terminated" && member.terminationReason && (
+                              <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/25 text-red-200 text-xs">
+                                <strong className="text-red-400">Violation:</strong> {member.terminationReason} {member.fineAmount ? `• Imposed Fine: ₹${member.fineAmount}` : ""} {member.terminatedAt ? `• Terminated on ${new Date(member.terminatedAt).toLocaleDateString()}` : ""}
+                              </div>
+                            )}
 
                             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400 pt-1">
                               {member.serialNumber && (
@@ -1295,30 +1555,77 @@ export default function AdminPortal() {
 
                         {/* Right: Actions */}
                         <div className="flex sm:flex-col items-center gap-2 w-full lg:w-auto justify-end">
-                          {/* DEDICATED PROMOTION BUTTON */}
-                          <Button
-                            id={`promote-member-btn-${member._id}`}
-                            type="button"
-                            size="sm"
-                            onClick={() => openPromotionModal(member)}
-                            className="w-full sm:w-auto bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-black rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3.5 shadow-md shadow-amber-500/25 border border-amber-300/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                            title="Promote this member to an elevated designation and dispatch an official leadership promotion email with updated ID card"
-                          >
-                            <Crown className="w-3.5 h-3.5 text-slate-950 fill-slate-950" />
-                            <span>Promote / Update Role 🎖️</span>
-                          </Button>
+                          {/* Active Member Action Set */}
+                          {member.status !== "Resigned" && member.status !== "Terminated" ? (
+                            <>
+                              {/* 1. DEDICATED PROMOTION BUTTON */}
+                              <Button
+                                id={`promote-member-btn-${member._id}`}
+                                type="button"
+                                size="sm"
+                                onClick={() => openPromotionModal(member)}
+                                className="w-full sm:w-auto bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-black rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3.5 shadow-md shadow-amber-500/25 border border-amber-300/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                title="Promote this member to an elevated designation and dispatch an official leadership promotion email with updated ID card"
+                              >
+                                <Crown className="w-3.5 h-3.5 text-slate-950 fill-slate-950" />
+                                <span>Promote / Update Role 🎖️</span>
+                              </Button>
 
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setEditingOfficialId(isEditing ? null : member._id)}
-                            className="w-full sm:w-auto bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3"
-                          >
-                            <Edit3 className="w-3.5 h-3.5 text-blue-400" />
-                            <span>{isEditing ? "Close Editor" : "Quick Edit Designation"}</span>
-                          </Button>
+                              {/* 2. ACCEPT RESIGNATION BUTTON */}
+                              <Button
+                                id={`accept-resignation-btn-${member._id}`}
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => openResignationModal(member)}
+                                className="w-full sm:w-auto bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3 transition-colors"
+                                title="Accept formal resignation from this member and dispatch official confirmation"
+                              >
+                                <UserMinus className="w-3.5 h-3.5 text-amber-400" />
+                                <span>Accept Resignation</span>
+                              </Button>
 
+                              {/* 3. TERMINATE BUTTON */}
+                              <Button
+                                id={`terminate-member-btn-${member._id}`}
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => openTerminateModal(member)}
+                                className="w-full sm:w-auto bg-red-600/15 hover:bg-red-600/25 text-red-300 border-red-500/40 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3 transition-colors shadow-sm"
+                                title="Disciplinary termination and membership revocation"
+                              >
+                                <UserX className="w-3.5 h-3.5 text-red-400" />
+                                <span>Terminate</span>
+                              </Button>
+
+                              {/* 4. QUICK EDIT DESIGNATION */}
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setEditingOfficialId(isEditing ? null : member._id)}
+                                className="w-full sm:w-auto bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3"
+                              >
+                                <Edit3 className="w-3.5 h-3.5 text-blue-400" />
+                                <span>{isEditing ? "Close Editor" : "Quick Edit Designation"}</span>
+                              </Button>
+                            </>
+                          ) : (
+                            <div className="w-full sm:w-auto text-center">
+                              {member.status === "Resigned" ? (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-mono text-amber-300 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/30">
+                                  ⚠️ Resigned Member
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-mono text-red-400 bg-red-500/10 px-3 py-1.5 rounded-xl border border-red-500/30 font-bold">
+                                  🚫 Terminated (Fine ₹{member.fineAmount || 1000})
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {/* 5. REJECT / DELETE BUTTON */}
                           {confirmDeleteId === member._id ? (
                             <div className="flex items-center gap-1.5 w-full sm:w-auto animate-fade-in">
                               <Button
@@ -1359,7 +1666,7 @@ export default function AdminPortal() {
                               size="sm"
                               onClick={() => setConfirmDeleteId(member._id)}
                               className="w-full sm:w-auto bg-red-500/10 hover:bg-red-500/20 text-red-300 border-red-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3 transition-colors"
-                              title="Delete this member from MongoDB Atlas"
+                              title="Delete this member record from MongoDB Atlas"
                             >
                               <Trash2 className="w-3.5 h-3.5 text-red-400" />
                               <span>Reject / Delete</span>
@@ -1785,6 +2092,263 @@ export default function AdminPortal() {
                     <>
                       <Crown className="w-4 h-4 text-slate-950 fill-slate-950" />
                       <span>Confirm Promotion &amp; Send ID Card 🪪</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* RESIGNATION ACCEPTANCE MODAL */}
+        {resigningMember && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+            <div className="relative w-full max-w-lg rounded-3xl bg-[#0b1126] border border-amber-500/30 p-6 sm:p-7 shadow-2xl space-y-5">
+              <button
+                type="button"
+                onClick={() => setResigningMember(null)}
+                className="absolute top-5 right-5 p-1 text-slate-400 hover:text-white rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center flex-shrink-0">
+                  <UserMinus className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white font-space">
+                    Accept Formal Resignation
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Offboard member gracefully and archive records
+                  </p>
+                </div>
+              </div>
+
+              {/* Member Summary */}
+              <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-sm">
+                  {resigningMember.name.charAt(0)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-bold text-white truncate">{resigningMember.name}</h4>
+                  <p className="text-xs text-slate-400 font-mono">
+                    {resigningMember.designation} • Reg: {resigningMember.regNumber}
+                  </p>
+                </div>
+              </div>
+
+              {/* Remarks Field */}
+              <div className="space-y-2">
+                <label className="block text-xs font-mono uppercase tracking-wider text-amber-300 font-bold">
+                  Resignation Remarks / Reason
+                </label>
+                <Input
+                  id="resignation-remarks-input"
+                  placeholder="e.g. Voluntary resignation accepted on personal/academic grounds."
+                  value={resignationRemarks}
+                  onChange={(e) => setResignationRemarks(e.target.value)}
+                  className="bg-white/5 border-white/15 text-white text-xs rounded-xl focus:border-amber-400"
+                />
+              </div>
+
+              {/* Email Toggle */}
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-2.5">
+                <input
+                  type="checkbox"
+                  id="send-resignation-email-check"
+                  checked={sendResignationEmail}
+                  onChange={(e) => setSendResignationEmail(e.target.checked)}
+                  className="mt-0.5 rounded border-amber-400 text-amber-600 focus:ring-amber-500"
+                />
+                <label htmlFor="send-resignation-email-check" className="text-xs text-amber-200 cursor-pointer">
+                  <strong>Dispatch Formal Resignation Acceptance Email:</strong> Sends an official letter from <code className="text-amber-300">techverse@ctuniversity.in</code> thanking the member for their past tenure and confirming acceptance.
+                </label>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2.5 pt-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setResigningMember(null)}
+                  disabled={isSubmittingResignation}
+                  className="text-slate-400 hover:text-white text-xs font-semibold rounded-xl"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  id="confirm-resignation-btn"
+                  type="button"
+                  onClick={handleConfirmResignation}
+                  disabled={isSubmittingResignation}
+                  className="bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 text-xs font-bold rounded-xl px-5 py-2.5 shadow-md flex items-center gap-2"
+                >
+                  {isSubmittingResignation ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Processing Resignation...</span>
+                    </>
+                  ) : (
+                    <>
+                      <UserMinus className="w-3.5 h-3.5" />
+                      <span>Accept Resignation</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* DISCIPLINARY TERMINATION MODAL */}
+        {terminatingMember && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fade-in">
+            <div className="relative w-full max-w-lg rounded-3xl bg-[#0e0a14] border-2 border-red-500/50 p-6 sm:p-7 shadow-2xl space-y-5">
+              <button
+                type="button"
+                onClick={() => setTerminatingMember(null)}
+                className="absolute top-5 right-5 p-1 text-slate-400 hover:text-white rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-red-600/20 border border-red-500/40 text-red-400 flex items-center justify-center flex-shrink-0">
+                  <UserX className="w-6 h-6 text-red-500" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white font-space">
+                    Disciplinary Termination &amp; Revocation
+                  </h3>
+                  <p className="text-xs text-red-300">
+                    Immediate revocation of club credentials and privileges
+                  </p>
+                </div>
+              </div>
+
+              {/* Member Summary */}
+              <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-red-600/30 text-red-200 flex items-center justify-center font-bold text-sm">
+                  {terminatingMember.name.charAt(0)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-bold text-white truncate">{terminatingMember.name}</h4>
+                  <p className="text-xs text-slate-400 font-mono">
+                    {terminatingMember.designation} • Reg: {terminatingMember.regNumber}
+                  </p>
+                </div>
+              </div>
+
+              {/* Punishable Offense Reason Select */}
+              <div className="space-y-2">
+                <label className="block text-xs font-mono uppercase tracking-wider text-red-300 font-bold">
+                  Violation / Punishable Offense <span className="text-red-400">*</span>
+                </label>
+                <select
+                  id="termination-reason-select"
+                  value={terminationReason}
+                  onChange={(e) => setTerminationReason(e.target.value)}
+                  className="w-full bg-white/5 border border-red-500/30 text-white text-xs px-3 py-2.5 rounded-xl focus:outline-none focus:border-red-400"
+                >
+                  <option value="Sharing club IDs for bunking classes (Strict Disciplinary Violation)" className="bg-[#0b1126] text-white">
+                    Sharing club IDs for bunking classes (Strict Disciplinary Violation)
+                  </option>
+                  <option value="Taking club tasks and responsibilities casually" className="bg-[#0b1126] text-white">
+                    Taking club tasks and responsibilities casually
+                  </option>
+                  <option value="Inactivity in community & unexcused meeting absence" className="bg-[#0b1126] text-white">
+                    Inactivity in community &amp; unexcused meeting absence
+                  </option>
+                  <option value="Violation of Club Code of Conduct & Departmental Misconduct" className="bg-[#0b1126] text-white">
+                    Violation of Club Code of Conduct &amp; Departmental Misconduct
+                  </option>
+                  <option value="Other" className="bg-[#0b1126] text-white">
+                    Other Reason (Specify below)
+                  </option>
+                </select>
+
+                {terminationReason === "Other" && (
+                  <Input
+                    placeholder="Specify exact disciplinary reason..."
+                    value={customTerminationReason}
+                    onChange={(e) => setCustomTerminationReason(e.target.value)}
+                    className="mt-2 bg-white/5 border-red-500/30 text-white text-xs rounded-xl focus:border-red-400"
+                  />
+                )}
+              </div>
+
+              {/* Fine Amount & Remarks */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-mono uppercase tracking-wider text-red-300 font-bold mb-1">
+                    Imposed Fine (₹)
+                  </label>
+                  <Input
+                    id="termination-fine-input"
+                    type="number"
+                    placeholder="1000"
+                    value={fineAmount}
+                    onChange={(e) => setFineAmount(e.target.value)}
+                    className="bg-white/5 border-red-500/30 text-white text-xs rounded-xl focus:border-red-400 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 font-bold mb-1">
+                    Disciplinary Remarks
+                  </label>
+                  <Input
+                    id="termination-remarks-input"
+                    placeholder="e.g. Fine to be cleared at SOET office"
+                    value={terminationRemarks}
+                    onChange={(e) => setTerminationRemarks(e.target.value)}
+                    className="bg-white/5 border-white/10 text-white text-xs rounded-xl focus:border-red-400"
+                  />
+                </div>
+              </div>
+
+              {/* Email Notice Toggle */}
+              <div className="p-3 rounded-xl bg-red-950/40 border border-red-500/30 flex items-start gap-2.5">
+                <input
+                  type="checkbox"
+                  id="send-termination-email-check"
+                  checked={sendTerminationEmail}
+                  onChange={(e) => setSendTerminationEmail(e.target.checked)}
+                  className="mt-0.5 rounded border-red-400 text-red-600 focus:ring-red-500"
+                />
+                <label htmlFor="send-termination-email-check" className="text-xs text-red-200 cursor-pointer">
+                  <strong>Dispatch Disciplinary Notice &amp; Revocation Email:</strong> Serves formal termination notice to <code className="text-red-300 font-mono">{terminatingMember.email}</code> referencing the consented Code of Conduct, ₹{fineAmount || 1000} fine, and immediate ID card cancellation.
+                </label>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2.5 pt-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setTerminatingMember(null)}
+                  disabled={isSubmittingTermination}
+                  className="text-slate-400 hover:text-white text-xs font-semibold rounded-xl"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  id="confirm-termination-btn"
+                  type="button"
+                  onClick={handleConfirmTermination}
+                  disabled={isSubmittingTermination}
+                  className="bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 text-white text-xs font-bold rounded-xl px-5 py-2.5 shadow-lg shadow-red-600/30 flex items-center gap-2"
+                >
+                  {isSubmittingTermination ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Terminating &amp; Revoking...</span>
+                    </>
+                  ) : (
+                    <>
+                      <UserX className="w-3.5 h-3.5" />
+                      <span>Confirm Immediate Termination</span>
                     </>
                   )}
                 </Button>
