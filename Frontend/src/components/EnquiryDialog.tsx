@@ -368,13 +368,13 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
               <div className="bg-amber-50 p-4 rounded-xl border border-amber-200 space-y-2">
                 <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
                   <ShieldCheck className="w-4 h-4 text-amber-700 flex-shrink-0" />
-                  <span>President / Vice President Review</span>
+                  <span>President &amp; Club Committee Review</span>
                 </div>
                 <p className="text-slate-600 text-[11px] leading-relaxed">
-                  The President & Vice President of TechVerse Club will review your profile and audition responses to assign your official <strong>Club Designation</strong> and <strong>Role Assignee</strong> soon.
+                  The President and Club Committee Members of TechVerse Club will review your profile and audition responses to assign your official <strong>Club Designation</strong> and <strong>Role Assignee</strong> soon.
                 </p>
                 <p className="text-emerald-700 font-semibold text-[11px] leading-relaxed">
-                  🪪 Once your designation is assigned in the Admin Portal, your official verified <strong>TechVerse Club Membership Card</strong> will be automatically generated and delivered directly to your email inbox.
+                  Once your designation is assigned in the Admin Portal, your official verified <strong>TechVerse Club Membership Card</strong> will be automatically generated and delivered directly to your email inbox.
                 </p>
               </div>
             </div>
@@ -413,7 +413,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                 New Member Joining Portal
               </div>
               <DialogTitle className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">
-                TechVerse Club — New Member Application 🚀
+                TechVerse Club — New Member Application
               </DialogTitle>
               <DialogDescription className="text-gray-600 text-sm max-w-xl mx-auto">
                 Fill in your details below to become an official member of TechVerse Club. Your verified Club Membership ID Card will be generated and emailed directly from <strong className="text-blue-600 font-medium">techverse@ctuniversity.in</strong>.
@@ -802,7 +802,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                       Submitting Application...
                     </span>
                   ) : (
-                    "Submit Application & Enter Screening 🚀"
+                    "Submit Application for Review"
                   )}
                 </Button>
               </form>

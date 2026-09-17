@@ -140,7 +140,7 @@ export default function AdminPortal() {
 
   // Resignation Modal State
   const [resigningMember, setResigningMember] = useState<ClubMemberItem | null>(null);
-  const [resignationRemarks, setResignationRemarks] = useState<string>("Voluntary resignation accepted on personal/academic grounds.");
+  const [resignationRemarks, setResignationRemarks] = useState<string>("Duty completed with excellence. Relieved in good standing for future career growth.");
   const [sendResignationEmail, setSendResignationEmail] = useState<boolean>(true);
   const [isSubmittingResignation, setIsSubmittingResignation] = useState<boolean>(false);
 
@@ -381,7 +381,7 @@ export default function AdminPortal() {
   const openPromotionModal = (member: ClubMemberItem) => {
     setPromotingMember(member);
     setPromoDesignation(member.designation || "");
-    setPromoRoleAssignee(member.roleAssignee || "Executive Board");
+    setPromoRoleAssignee(member.roleAssignee || "President and Committee Members of the Club");
   };
 
   const handleConfirmPromotion = async () => {
@@ -460,7 +460,7 @@ export default function AdminPortal() {
 
   const openResignationModal = (member: ClubMemberItem) => {
     setResigningMember(member);
-    setResignationRemarks(member.resignationRemarks || "Voluntary resignation accepted on personal/academic grounds.");
+    setResignationRemarks(member.resignationRemarks || "Duty completed with excellence. Relieved in good standing for future career growth.");
     setSendResignationEmail(true);
   };
 
@@ -2039,7 +2039,7 @@ export default function AdminPortal() {
                   </label>
                   <Input
                     id="promote-role-assignee-input"
-                    placeholder="e.g. President & Executive Board, Core Committee..."
+                    placeholder="e.g. President and Committee Members of the Club, Core Committee..."
                     value={promoRoleAssignee}
                     onChange={(e) => setPromoRoleAssignee(e.target.value)}
                     className="bg-white/5 border-white/15 text-white text-sm rounded-xl focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
@@ -2146,7 +2146,7 @@ export default function AdminPortal() {
                 </label>
                 <Input
                   id="resignation-remarks-input"
-                  placeholder="e.g. Voluntary resignation accepted on personal/academic grounds."
+                  placeholder="e.g. Duty completed with excellence. Relieved in good standing for future career growth."
                   value={resignationRemarks}
                   onChange={(e) => setResignationRemarks(e.target.value)}
                   className="bg-white/5 border-white/15 text-white text-xs rounded-xl focus:border-amber-400"
@@ -2163,7 +2163,7 @@ export default function AdminPortal() {
                   className="mt-0.5 rounded border-amber-400 text-amber-600 focus:ring-amber-500"
                 />
                 <label htmlFor="send-resignation-email-check" className="text-xs text-amber-200 cursor-pointer">
-                  <strong>Dispatch Soft-Toned Resignation Acceptance Email:</strong> Sends a warm appreciation &amp; farewell letter from <code className="text-amber-300">techverse@ctuniversity.in</code> thanking the member for their contributions and wishing them future success.
+                  <strong>Dispatch Curated Career-Growth Resignation Email:</strong> Sends a warm commendation &amp; farewell letter on behalf of President &amp; Core Club Committee thanking the member for outstanding duty completion and wishing them exponential career growth.
                 </label>
               </div>
 

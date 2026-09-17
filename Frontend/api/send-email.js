@@ -2,6 +2,16 @@ import nodemailer from 'nodemailer';
 import { Resvg } from '@resvg/resvg-js';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
+
+function escapeXml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
 
 function escapeHtml(str) {
   if (!str) return '';
@@ -58,6 +68,61 @@ async function getLogoBase64(filename, fallbackUrl) {
   return '';
 }
 
+async function ensureFontFiles() {
+  const possibleDirs = [
+    path.join(__dirname, 'fonts'),
+    path.join(process.cwd(), 'api', 'fonts'),
+    path.join(process.cwd(), 'Frontend', 'api', 'fonts'),
+    path.join(process.cwd(), 'Backend', 'assets', 'fonts'),
+    path.join(__dirname, '../assets/fonts'),
+  ];
+
+  const boldCandidates = possibleDirs.map(d => path.join(d, 'Roboto-Bold.ttf'));
+  const regCandidates = possibleDirs.map(d => path.join(d, 'Roboto-Regular.ttf'));
+
+  const foundBold = boldCandidates.find(p => fs.existsSync(p));
+  const foundReg = regCandidates.find(p => fs.existsSync(p));
+
+  const fontFiles = [];
+  if (foundBold) fontFiles.push(foundBold);
+  if (foundReg) fontFiles.push(foundReg);
+
+  if (fontFiles.length >= 2) return fontFiles;
+
+  // Local Windows system font fallback
+  if (process.platform === 'win32') {
+    if (fs.existsSync('C:/Windows/Fonts/segoeuib.ttf')) fontFiles.push('C:/Windows/Fonts/segoeuib.ttf');
+    if (fs.existsSync('C:/Windows/Fonts/segoeui.ttf')) fontFiles.push('C:/Windows/Fonts/segoeui.ttf');
+    if (fontFiles.length >= 2) return fontFiles;
+  }
+
+  // Cloud serverless / AWS Lambda fallback: download once into /tmp
+  try {
+    const tmpDir = os.tmpdir();
+    const tmpBold = path.join(tmpDir, 'Roboto-Bold.ttf');
+    const tmpReg = path.join(tmpDir, 'Roboto-Regular.ttf');
+
+    if (!fs.existsSync(tmpBold)) {
+      const resp = await fetch('https://raw.githubusercontent.com/googlefonts/roboto-2/main/src/hinted/Roboto-Bold.ttf');
+      if (resp.ok) {
+        fs.writeFileSync(tmpBold, Buffer.from(await resp.arrayBuffer()));
+      }
+    }
+    if (!fs.existsSync(tmpReg)) {
+      const resp = await fetch('https://raw.githubusercontent.com/googlefonts/roboto-2/main/src/hinted/Roboto-Regular.ttf');
+      if (resp.ok) {
+        fs.writeFileSync(tmpReg, Buffer.from(await resp.arrayBuffer()));
+      }
+    }
+    if (fs.existsSync(tmpBold) && !fontFiles.includes(tmpBold)) fontFiles.push(tmpBold);
+    if (fs.existsSync(tmpReg) && !fontFiles.includes(tmpReg)) fontFiles.push(tmpReg);
+  } catch (err) {
+    console.warn('Could not download fallback fonts:', err.message);
+  }
+
+  return fontFiles;
+}
+
 function generateIdCardSvg(m, options = {}) {
   const isPromotion = Boolean(options.isPromotion);
   const univLogoBase64 = options.univLogoBase64 || '';
@@ -65,38 +130,37 @@ function generateIdCardSvg(m, options = {}) {
   const soetLogoBase64 = options.soetLogoBase64 || '';
   const photoBase64 = options.photoBase64 || null;
 
-  const name = (m.name || 'Club Member').toUpperCase();
-  const regNumber = m.regNumber || 'N/A';
-  const memberId = m.memberId || `TV-${new Date().getFullYear()}-${String(m.serialNumber || '1').padStart(4, '0')}`;
-  const serial = `#${m.serialNumber || '1'}`;
-  const department = (m.department === 'btech' ? 'B.Tech (SOET)' : (m.department === 'bca' ? 'BCA (SOET)' : String(m.department || 'B.Tech').toUpperCase()));
-  const batch = m.batch || '2024-2028';
-  const designation = m.designation || (isPromotion ? 'Club Leader' : 'Active Member');
-  const roleAssignee = m.roleAssignee || (isPromotion ? 'Executive Board' : 'Core Team Member');
-  const residence = m.residenceType || 'Day Scholar';
-  const contact = m.contact || 'N/A';
+  const rawName = (m.name || 'Club Member').toUpperCase();
+  const name = escapeXml(rawName);
+  const regNumber = escapeXml(m.regNumber || 'N/A');
+  const department = escapeXml(m.department === 'btech' ? 'B.Tech (SOET)' : (m.department === 'bca' ? 'BCA (SOET)' : String(m.department || 'B.Tech').toUpperCase()));
+  const batch = escapeXml(m.batch || '2024-2028');
+  const designation = escapeXml(m.designation || (isPromotion ? 'Club Leader' : 'Active Member'));
+  const roleAssignee = escapeXml(m.roleAssignee || (isPromotion ? 'President and Committee Members of the Club' : 'Core Team Member'));
+  const residence = escapeXml(m.residenceType || 'Day Scholar');
+  const contact = escapeXml(m.contact || 'N/A');
 
   const borderColor = isPromotion ? '#f59e0b' : '#3b82f6';
   const accentGradientStart = isPromotion ? '#1e1b4b' : '#0f172a';
   const accentGradientMid = isPromotion ? '#312e81' : '#1e3a8a';
   const accentGradientEnd = isPromotion ? '#1e3a8a' : '#0284c7';
   const badgeTitle = isPromotion ? 'EXECUTIVE LEADERSHIP CREDENTIAL' : 'OFFICIAL CLUB IDENTITY CARD';
-  const badgeSubtitle = isPromotion ? '🎖️ PROMOTED LEADER' : 'VERIFIED CLUB MEMBER';
+  const fontFam = "Roboto, 'Segoe UI', Arial, sans-serif";
 
   let photoElement = '';
   if (photoBase64) {
     photoElement = `<image href="${photoBase64}" x="50" y="240" width="200" height="280" preserveAspectRatio="xMidYMid slice" clip-path="url(#photoClip)"/>`;
   } else {
-    const initial = name.charAt(0) || 'M';
+    const initial = escapeXml(rawName.charAt(0) || 'M');
     photoElement = `
       <rect x="50" y="240" width="200" height="280" rx="20" fill="#1e293b" stroke="${borderColor}" stroke-width="2"/>
       <circle cx="150" cy="370" r="70" fill="${isPromotion ? '#312e81' : '#1e3a8a'}" opacity="0.6"/>
-      <text x="150" y="405" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="85" font-weight="900" fill="${borderColor}" text-anchor="middle">${initial}</text>
+      <text x="150" y="402" font-family="${fontFam}" font-size="85" font-weight="900" fill="${borderColor}" text-anchor="middle">${initial}</text>
     `;
   }
 
   let barcodeLines = '';
-  const seedString = `${regNumber}TECHVERSE`;
+  const seedString = `${m.regNumber || '2024'}TECHVERSE`;
   for (let i = 0; i < 58; i++) {
     const x = 70 + i * 9.6;
     const charCode = seedString.charCodeAt(i % seedString.length);
@@ -152,13 +216,13 @@ function generateIdCardSvg(m, options = {}) {
       ${soetLogoBase64 ? `<image href="${soetLogoBase64}" x="0" y="0" width="105" height="65" preserveAspectRatio="xMidYMid meet"/>` : ''}
     </g>
 
-    <text x="350" y="156" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="20" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="3">CT UNIVERSITY</text>
-    <text x="350" y="176" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11" font-weight="800" fill="#cbd5e1" text-anchor="middle" letter-spacing="2">SCHOOL OF ENGINEERING &amp; TECHNOLOGY • TECHVERSE CLUB</text>
+    <text x="350" y="156" font-family="${fontFam}" font-size="20" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="3">CT UNIVERSITY</text>
+    <text x="350" y="176" font-family="${fontFam}" font-size="11" font-weight="800" fill="#cbd5e1" text-anchor="middle" letter-spacing="2">SCHOOL OF ENGINEERING &amp; TECHNOLOGY • TECHVERSE CLUB</text>
 
     <rect x="40" y="202" width="620" height="28" rx="8" fill="${isPromotion ? '#fef3c7' : '#eff6ff'}" stroke="${borderColor}" stroke-width="1.5"/>
-    <text x="350" y="221" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11" font-weight="900" fill="${isPromotion ? '#92400e' : '#1e40af'}" text-anchor="middle" letter-spacing="2">${badgeTitle}</text>
+    <text x="350" y="221" font-family="${fontFam}" font-size="11" font-weight="900" fill="${isPromotion ? '#92400e' : '#1e40af'}" text-anchor="middle" letter-spacing="2">${badgeTitle}</text>
 
-    <!-- PHOTO BOX (Balanced & Clean) -->
+    <!-- PHOTO BOX -->
     <rect x="48" y="238" width="204" height="284" rx="22" fill="none" stroke="${borderColor}" stroke-width="4"/>
     ${photoElement}
 
@@ -166,67 +230,67 @@ function generateIdCardSvg(m, options = {}) {
     <g transform="translate(48, 542)">
       <rect x="0" y="0" width="204" height="66" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
       <circle cx="28" cy="33" r="16" fill="${isPromotion ? '#fef3c7' : '#eff6ff'}" stroke="${borderColor}" stroke-width="2"/>
-      <text x="28" y="38" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="${borderColor}" text-anchor="middle">★</text>
-      <text x="56" y="28" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10" font-weight="900" fill="#0f172a" letter-spacing="1">AUTHENTIC CREDENTIAL</text>
-      <text x="56" y="45" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="9" font-weight="700" fill="#64748b">CT UNIVERSITY • SOET</text>
+      <polygon points="28,24 30.5,30 37,30.5 32,34.5 34,41 28.5,37 23,41 25,34.5 20,30.5 26.5,30" fill="${borderColor}"/>
+      <text x="56" y="28" font-family="${fontFam}" font-size="10" font-weight="900" fill="#0f172a" letter-spacing="1">AUTHENTIC CREDENTIAL</text>
+      <text x="56" y="45" font-family="${fontFam}" font-size="9" font-weight="700" fill="#64748b">CT UNIVERSITY • SOET</text>
     </g>
 
     <!-- RIGHT SIDE MEMBER DETAILS -->
     <g transform="translate(280, 238)">
-      <text x="0" y="18" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1.5">FULL NAME</text>
-      <text x="0" y="46" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="23" font-weight="900" fill="#0f172a">${name}</text>
+      <text x="0" y="18" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1.5">FULL NAME</text>
+      <text x="0" y="46" font-family="${fontFam}" font-size="23" font-weight="900" fill="#0f172a">${name}</text>
       <line x1="0" y1="58" x2="375" y2="58" stroke="#e2e8f0" stroke-width="1.5"/>
 
-      <text x="0" y="80" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">REGISTRATION NO.</text>
-      <text x="0" y="103" font-family="monospace, 'Courier New'" font-size="18" font-weight="900" fill="#1e40af">${regNumber}</text>
+      <text x="0" y="80" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">REGISTRATION NO.</text>
+      <text x="0" y="103" font-family="${fontFam}" font-size="18" font-weight="900" fill="#1e40af">${regNumber}</text>
 
-      <text x="0" y="130" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">DEPARTMENT &amp; BATCH</text>
-      <text x="0" y="150" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#1e293b">${department} • ${batch}</text>
+      <text x="0" y="130" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">DEPARTMENT &amp; BATCH</text>
+      <text x="0" y="150" font-family="${fontFam}" font-size="14" font-weight="700" fill="#1e293b">${department} • ${batch}</text>
 
-      <text x="0" y="180" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">OFFICIAL CLUB DESIGNATION</text>
+      <text x="0" y="180" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">OFFICIAL CLUB DESIGNATION</text>
       <rect x="0" y="188" width="375" height="34" rx="8" fill="${isPromotion ? '#fef3c7' : '#f0fdf4'}" stroke="${borderColor}" stroke-width="2"/>
-      <text x="14" y="211" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="${isPromotion ? '#92400e' : '#166534'}">${isPromotion ? '🎖️ ' : ''}${designation}${isPromotion ? ' (PROMOTED)' : ''}</text>
+      <text x="14" y="211" font-family="${fontFam}" font-size="14" font-weight="900" fill="${isPromotion ? '#92400e' : '#166534'}">${isPromotion ? 'PROMOTED • ' : ''}${designation}</text>
 
-      <text x="0" y="246" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">ROLE ASSIGNEE / DIVISION</text>
+      <text x="0" y="246" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">ROLE ASSIGNEE / DIVISION</text>
       <rect x="0" y="254" width="375" height="28" rx="6" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
-      <text x="14" y="273" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#1e40af">${roleAssignee}</text>
+      <text x="14" y="273" font-family="${fontFam}" font-size="12" font-weight="800" fill="#1e40af">${roleAssignee}</text>
 
-      <text x="0" y="304" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">RESIDENCE TYPE</text>
-      <text x="0" y="322" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#334155">${residence}</text>
+      <text x="0" y="304" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">RESIDENCE TYPE</text>
+      <text x="0" y="322" font-family="${fontFam}" font-size="13" font-weight="700" fill="#334155">${residence}</text>
 
-      <text x="190" y="304" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">CONTACT NUMBER</text>
-      <text x="190" y="322" font-family="monospace, 'Courier New'" font-size="13" font-weight="700" fill="#334155">${contact}</text>
+      <text x="190" y="304" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">CONTACT NUMBER</text>
+      <text x="190" y="322" font-family="${fontFam}" font-size="13" font-weight="700" fill="#334155">${contact}</text>
     </g>
 
     <line x1="45" y1="630" x2="655" y2="630" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,4"/>
 
     <g transform="translate(48, 646)">
       <rect x="0" y="0" width="375" height="64" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
-      <text x="16" y="22" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10" font-weight="900" fill="#0f172a" letter-spacing="1">VERIFIED UNIVERSITY CREDENTIAL</text>
-      <text x="16" y="38" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="9" fill="#64748b">Recognized for University Symposiums, Hackathons &amp; Events</text>
-      <text x="16" y="52" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="9" font-weight="700" fill="#059669">✓ Cryptographically Logged • Academic Session ${batch}</text>
+      <text x="16" y="22" font-family="${fontFam}" font-size="10" font-weight="900" fill="#0f172a" letter-spacing="1">VERIFIED UNIVERSITY CREDENTIAL</text>
+      <text x="16" y="38" font-family="${fontFam}" font-size="9" fill="#64748b">Recognized for University Symposiums, Hackathons &amp; Events</text>
+      <text x="16" y="52" font-family="${fontFam}" font-size="9" font-weight="700" fill="#059669">Log Validated • Academic Session ${batch}</text>
 
       <g transform="translate(415, -2)">
-        <text x="95" y="40" font-family="'Brush Script MT', 'Segoe Script', cursive, sans-serif" font-size="25" fill="#1e3a8a" text-anchor="middle">TechVerse CTU</text>
+        <text x="95" y="40" font-family="${fontFam}" font-style="italic" font-weight="900" font-size="22" fill="#1e3a8a" text-anchor="middle">TechVerse CTU</text>
         <line x1="0" y1="48" x2="190" y2="48" stroke="#0f172a" stroke-width="1.5"/>
-        <text x="95" y="62" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="9" font-weight="800" fill="#475569" text-anchor="middle" letter-spacing="0.5">AUTHORIZED SIGNATORY</text>
+        <text x="95" y="62" font-family="${fontFam}" font-size="9" font-weight="800" fill="#475569" text-anchor="middle" letter-spacing="0.5">AUTHORIZED SIGNATORY</text>
       </g>
     </g>
 
-    <!-- CLEAN BARCODE SECTION (Without MemberId / Serial) -->
+    <!-- CLEAN BARCODE SECTION -->
     <g transform="translate(45, 730)">
       <rect x="0" y="0" width="610" height="92" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
       ${barcodeLines}
-      <text x="305" y="78" font-family="monospace, 'Courier New'" font-size="12" font-weight="800" fill="#0f172a" text-anchor="middle" letter-spacing="4">* REG-${regNumber} • TECHVERSE • CT UNIVERSITY *</text>
+      <text x="305" y="78" font-family="${fontFam}" font-size="12" font-weight="800" fill="#0f172a" text-anchor="middle" letter-spacing="4">* REG-${regNumber} • TECHVERSE • CT UNIVERSITY *</text>
     </g>
 
     <rect x="0" y="850" width="700" height="210" fill="#0f172a"/>
     <line x1="0" y1="850" x2="700" y2="850" stroke="${borderColor}" stroke-width="3"/>
 
-    <text x="350" y="885" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#f8fafc" text-anchor="middle" letter-spacing="1.5">TECHVERSE CLUB • SCHOOL OF ENGINEERING &amp; TECHNOLOGY</text>
-    <text x="350" y="906" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">CT University, Ferozepur Road, Ludhiana, Punjab - 142024</text>
-    <text x="350" y="927" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Inquiries: techverse@ctuniversity.in • https://techversectu.vercel.app</text>
-    <text x="350" y="952" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="9" font-weight="700" fill="${borderColor}" text-anchor="middle" letter-spacing="1">PROPERTY OF TECHVERSE CLUB • IF FOUND, PLEASE RETURN TO SOET OFFICE</text>
+    <text x="350" y="885" font-family="${fontFam}" font-size="12" font-weight="800" fill="#f8fafc" text-anchor="middle" letter-spacing="1.5">TECHVERSE CLUB • SCHOOL OF ENGINEERING &amp; TECHNOLOGY</text>
+    <text x="350" y="906" font-family="${fontFam}" font-size="11" fill="#94a3b8" text-anchor="middle">CT University, Ferozepur Road, Ludhiana, Punjab - 142024</text>
+    <text x="350" y="927" font-family="${fontFam}" font-size="10" fill="#64748b" text-anchor="middle">Inquiries: techverse@ctuniversity.in • https://techversectu.vercel.app</text>
+    <text x="350" y="952" font-family="${fontFam}" font-size="9" font-weight="700" fill="${borderColor}" text-anchor="middle" letter-spacing="1">PROPERTY OF TECHVERSE CLUB • IF FOUND, PLEASE RETURN TO SOET OFFICE</text>
   </g>
 </svg>
   `;
@@ -304,17 +368,17 @@ export default async function handler(req, res) {
 <html>
 <head>
   <meta charset="utf-8">
-  <title>TechVerse Club Application Received</title>
+  <title>TechVerse Club Membership Application Received</title>
 </head>
 <body style="margin: 0; padding: 24px 12px; background-color: #0b1120; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 2px solid #3b82f6;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #cbd5e1;">
     
-    <!-- HEADER BRANDING -->
+    <!-- HEADER BRANDING (FORMAL INSTITUTIONAL) -->
     <tr>
-      <td style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); padding: 24px 20px; text-align: center; color: #ffffff;">
-        <span style="display: inline-block; background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; color: #38bdf8; font-size: 11px; font-weight: bold; padding: 4px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px;">Application Acknowledgment</span>
-        <h1 style="margin: 4px 0 8px 0; font-size: 22px; font-weight: 800; color: #ffffff;">Application Received! Welcome to Screening 🚀</h1>
-        <p style="margin: 0; font-size: 13px; color: #94a3b8;">TechVerse Club • School of Engineering & Technology, CT University</p>
+      <td style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 26px 22px; text-align: center; color: #ffffff;">
+        <span style="display: inline-block; background: rgba(148, 163, 184, 0.18); border: 1px solid rgba(148, 163, 184, 0.35); color: #e2e8f0; font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 16px; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px;">Official Application Acknowledgment</span>
+        <h1 style="margin: 4px 0 6px 0; font-size: 21px; font-weight: 700; color: #ffffff; letter-spacing: -0.2px;">Membership Application Received</h1>
+        <p style="margin: 0; font-size: 12px; color: #cbd5e1;">School of Engineering &amp; Technology • CT University</p>
       </td>
     </tr>
 
@@ -327,7 +391,7 @@ export default async function handler(req, res) {
               <img src="${univLogoUrl}" alt="CT University" style="max-height: 48px; max-width: 80px; object-fit: contain;" />
             </td>
             <td align="center" width="40%" style="vertical-align: middle;">
-              <img src="${techverseLogoUrl}" alt="TechVerse Club" style="max-height: 55px; max-width: 55px; border-radius: 50%; border: 2px solid #2563eb; object-fit: cover;" />
+              <img src="${techverseLogoUrl}" alt="TechVerse Club" style="max-height: 52px; max-width: 52px; border-radius: 50%; border: 2px solid #334155; object-fit: cover;" />
             </td>
             <td align="center" width="30%" style="vertical-align: middle;">
               <img src="${soetLogoUrl}" alt="SOET" style="max-height: 48px; max-width: 80px; object-fit: contain;" />
@@ -337,82 +401,78 @@ export default async function handler(req, res) {
       </td>
     </tr>
 
-    <!-- BODY -->
+    <!-- BODY CONTENT -->
     <tr>
       <td style="padding: 28px 24px;">
-        <p style="font-size: 15px; margin: 0 0 16px 0; color: #0f172a; line-height: 1.6;">
+        <p style="font-size: 14px; margin: 0 0 14px 0; color: #0f172a; line-height: 1.6;">
           Dear <strong>${escapeHtml(m.name)}</strong>,
         </p>
 
-        <p style="font-size: 14px; margin: 0 0 16px 0; color: #334155; line-height: 1.6;">
-          Thank you for showing interest in joining <strong>TechVerse Club</strong>! Your membership application has been registered successfully and is currently under our official <strong>Screening &amp; Audition Process</strong>.
+        <p style="font-size: 13.5px; margin: 0 0 16px 0; color: #334155; line-height: 1.65;">
+          Thank you for submitting your application to join <strong>TechVerse Club</strong> at the School of Engineering &amp; Technology, CT University. We confirm that your application has been successfully registered and is currently under official evaluation.
         </p>
 
-        <!-- APPLICATION SUMMARY CARD -->
-        <div style="background: #f1f5f9; border-radius: 12px; border: 1px solid #cbd5e1; padding: 16px; margin: 20px 0;">
-          <h3 style="margin: 0 0 12px 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #1e40af; font-weight: 800;">
-            📋 Application Summary
+        <!-- FORMAL APPLICATION SUMMARY TABLE (NON-ID CARD FORMAT) -->
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 18px; margin: 18px 0;">
+          <h3 style="margin: 0 0 10px 0; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #334155; font-weight: 700; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px;">
+            Application Submission Details
           </h3>
-          <table width="100%" cellspacing="0" cellpadding="4" border="0" style="font-size: 13px;">
+          <table width="100%" cellspacing="0" cellpadding="5" border="0" style="font-size: 13px; color: #334155;">
             <tr>
-              <td width="42%" style="color: #64748b; font-weight: 600;">Application / Member ID:</td>
-              <td style="color: #0f172a; font-weight: 800; font-family: monospace;">${escapeHtml(m.memberId || '')}</td>
+              <td width="38%" style="color: #64748b; font-weight: 600;">Application Reference:</td>
+              <td style="color: #0f172a; font-weight: 700; font-family: monospace;">Ref #${m.serialNumber || '1'} (TV-${new Date().getFullYear()})</td>
             </tr>
             <tr>
-              <td style="color: #64748b; font-weight: 600;">Application Serial No.:</td>
-              <td style="color: #1e40af; font-weight: 800; font-family: monospace;">#${m.serialNumber || '1'}</td>
+              <td style="color: #64748b; font-weight: 600;">Applicant Name:</td>
+              <td style="color: #0f172a; font-weight: 600;">${escapeHtml(m.name)}</td>
             </tr>
             <tr>
-              <td style="color: #64748b; font-weight: 600;">Registration No.:</td>
-              <td style="color: #0f172a; font-weight: 700; font-family: monospace;">${escapeHtml(m.regNumber || '')}</td>
+              <td style="color: #64748b; font-weight: 600;">University Registration No.:</td>
+              <td style="color: #0f172a; font-weight: 600; font-family: monospace;">${escapeHtml(m.regNumber || '')}</td>
             </tr>
             <tr>
-              <td style="color: #64748b; font-weight: 600;">Department &amp; Batch:</td>
+              <td style="color: #64748b; font-weight: 600;">Academic Program:</td>
               <td style="color: #0f172a;">${escapeHtml(departmentDisplay)} (${escapeHtml(m.batch || '')})</td>
             </tr>
             <tr>
-              <td style="color: #64748b; font-weight: 600;">Primary Interests:</td>
-              <td style="color: #2563eb; font-weight: 600;">${escapeHtml(interestsList)}</td>
+              <td style="color: #64748b; font-weight: 600;">Preferred Domain:</td>
+              <td style="color: #0f172a;">${escapeHtml(interestsList)}</td>
             </tr>
             <tr>
-              <td style="color: #64748b; font-weight: 600;">Current Status:</td>
-              <td>
-                <span style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-weight: 800; font-size: 11px; padding: 2px 8px; border-radius: 4px;">
-                  ⏳ Under Screening Process
-                </span>
-              </td>
+              <td style="color: #64748b; font-weight: 600;">Submission Status:</td>
+              <td style="color: #2563eb; font-weight: 700;">Received &bull; Under Committee Review</td>
             </tr>
           </table>
         </div>
 
-        <h4 style="font-size: 14px; margin: 20px 0 8px 0; color: #0f172a;">What happens next?</h4>
-        <ul style="font-size: 13px; color: #475569; padding-left: 20px; line-height: 1.7; margin: 0 0 20px 0;">
-          <li>The <strong>President</strong> and <strong>Vice President</strong> of TechVerse Club will review your academic discipline, technical interests, and project ambitions.</li>
-          <li>Once evaluated, an official club designation (e.g. <em>Web Architect, AI/ML Lead, Event Coordinator, Core Member</em>) will be assigned to your profile in the Admin Portal.</li>
-          <li>Upon role assignment, your verified <strong>TechVerse Club Membership ID Card</strong> will be issued and emailed to you automatically!</li>
-        </ul>
-
-        <div style="background: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 0 10px 10px 0; padding: 14px 16px; margin: 20px 0;">
-          <h4 style="margin: 0 0 6px 0; font-size: 13px; color: #15803d; font-weight: 700;">🪪 Official Membership Card Dispatch</h4>
-          <p style="margin: 0; font-size: 13px; color: #166534; line-height: 1.5;">
-            As soon as your club designation is assigned by the administration in the portal, your official verified <strong>TechVerse Club Membership Card</strong> will be automatically generated and delivered directly to this email address.
-          </p>
+        <!-- EXPLICIT CLARIFICATION NOTICE (PREVENTS ID CARD CONFUSION) -->
+        <div style="background: #f1f5f9; border-left: 4px solid #64748b; padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 18px 0; font-size: 12px; color: #475569; line-height: 1.5;">
+          <strong>Please Note:</strong> This communication is an official acknowledgment of application receipt only. <u>It does not constitute an official club membership card nor does it confirm club appointment.</u> Official membership credentials and verified digital ID cards will be issued separately upon committee evaluation and designation assignment.
         </div>
 
-        <p style="font-size: 14px; margin: 24px 0 4px 0; color: #334155; line-height: 1.6;">
-          Warm regards,<br />
-          <strong>President &amp; Vice President</strong><br />
+        <!-- REVIEW PROCESS STEPS -->
+        <h4 style="font-size: 13.5px; margin: 18px 0 8px 0; color: #0f172a; font-weight: 700;">Evaluation Procedure</h4>
+        <ul style="font-size: 13px; color: #475569; padding-left: 18px; line-height: 1.65; margin: 0 0 18px 0;">
+          <li>The <strong>President and Club Committee Members</strong> of TechVerse Club will review your academic discipline, technical interests, and project background.</li>
+          <li>Shortlisted candidates will be notified regarding their role assignments and induction schedule.</li>
+          <li>Upon official role confirmation in the portal, your verified <strong>TechVerse Club Membership Card</strong> will be generated and delivered directly to your email address.</li>
+        </ul>
+
+        <!-- FORMAL SIGN-OFF -->
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b; line-height: 1.6;">
+          Sincerely,<br />
+          <strong style="color: #0f172a;">President &amp; Club Committee Members</strong><br />
           TechVerse Club • School of Engineering &amp; Technology<br />
           CT University, Ludhiana, Punjab
-        </p>
+        </div>
       </td>
     </tr>
 
     <!-- FOOTER -->
     <tr>
       <td style="background: #f8fafc; padding: 14px 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #64748b;">
-        <p style="margin: 0 0 4px 0;">Official Screening Notification • TechVerse Club</p>
-        <p style="margin: 0;">Email: <a href="mailto:techverse@ctuniversity.in" style="color: #2563eb; text-decoration: none;">techverse@ctuniversity.in</a></p>
+        <p style="margin: 0 0 4px 0;">Official Administrative Communication • TechVerse Club</p>
+        <p style="margin: 0;">Inquiries: <a href="mailto:techverse@ctuniversity.in" style="color: #2563eb; text-decoration: none;">techverse@ctuniversity.in</a></p>
       </td>
     </tr>
   </table>
@@ -424,7 +484,7 @@ export default async function handler(req, res) {
         from: `"TechVerse Club • CT University" <${emailUser}>`,
         to: cleanRecipient,
         replyTo: emailUser,
-        subject: `🚀 TechVerse Club Application Received - Welcome to Screening, ${m.name}! (App #${m.serialNumber || '1'})`,
+        subject: `Application Received: TechVerse Club Membership Application - ${m.name} (Ref #${m.serialNumber || '1'})`,
         html: htmlContent,
       });
 
@@ -439,11 +499,11 @@ export default async function handler(req, res) {
     // TYPE: RESIGNATION (Formal Resignation Acceptance)
     // =========================================================================
     // =========================================================================
-    // TYPE: RESIGNATION (Warm & Soft-Toned Resignation Acceptance)
+    // TYPE: RESIGNATION (Warm, Curated & Career-Growth Relieving Notice)
     // =========================================================================
     if (type === 'resignation') {
       const m = member || {};
-      const resignationRemarks = m.resignationRemarks || req.body?.remarks || 'Voluntary departure on academic and personal grounds.';
+      const resignationRemarks = m.resignationRemarks || req.body?.remarks || 'Duty completed with excellence. Relieved in good standing to pursue career growth and higher professional aspirations.';
       const desig = m.designation || 'Club Member';
       const roleAssignee = m.roleAssignee || 'Core Team';
 
@@ -452,7 +512,7 @@ export default async function handler(req, res) {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Acceptance of Resignation &amp; Best Wishes - TechVerse Club</title>
+  <title>Honorable Relieving &amp; Best Wishes for Your Future Career Growth - TechVerse Club</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
   <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; padding: 32px 12px;">
@@ -462,9 +522,9 @@ export default async function handler(req, res) {
           
           <!-- HEADER -->
           <tr>
-            <td style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #2563eb 100%); padding: 30px 24px; text-align: center; color: #ffffff;">
-              <span style="display: inline-block; background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.4); color: #fde68a; font-size: 11px; font-weight: 800; padding: 5px 16px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px;">Appreciation &amp; Farewell Message 🌟</span>
-              <h1 style="margin: 4px 0 8px 0; font-size: 23px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">Thank You for Being Part of TechVerse</h1>
+            <td style="background: linear-gradient(135deg, #064e3b 0%, #0f172a 55%, #1e3a8a 100%); padding: 30px 24px; text-align: center; color: #ffffff;">
+              <span style="display: inline-block; background: rgba(52,211,153,0.18); border: 1px solid rgba(52,211,153,0.4); color: #a7f3d0; font-size: 11px; font-weight: 800; padding: 5px 16px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px;">Exemplary Service Recognition • Future Career Best Wishes 🌟</span>
+              <h1 style="margin: 4px 0 8px 0; font-size: 23px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">Thank You for Your Outstanding Service &amp; Dedication</h1>
               <p style="margin: 0; font-size: 13px; color: #cbd5e1;">School of Engineering &amp; Technology • CT University</p>
             </td>
           </tr>
@@ -478,7 +538,7 @@ export default async function handler(req, res) {
                     <img src="${univLogoUrl}" alt="CT University" style="max-height: 46px; max-width: 85px; object-fit: contain;" />
                   </td>
                   <td align="center" width="40%" style="vertical-align: middle;">
-                    <img src="${techverseLogoUrl}" alt="TechVerse Club" style="max-height: 52px; max-width: 52px; border-radius: 50%; border: 2px solid #3b82f6; object-fit: cover;" />
+                    <img src="${techverseLogoUrl}" alt="TechVerse Club" style="max-height: 52px; max-width: 52px; border-radius: 50%; border: 2px solid #10b981; object-fit: cover;" />
                   </td>
                   <td align="center" width="30%" style="vertical-align: middle;">
                     <img src="${soetLogoUrl}" alt="SOET" style="max-height: 46px; max-width: 85px; object-fit: contain;" />
@@ -496,45 +556,45 @@ export default async function handler(req, res) {
               </p>
               
               <p style="margin: 0 0 16px 0;">
-                We are writing to warmly acknowledge and confirm that the Executive Board and Faculty Advisors of <strong>TechVerse Club (SOET, CT University)</strong> have received and accepted your formal resignation from your active role as <strong>${escapeHtml(desig)}</strong> (${escapeHtml(roleAssignee)}).
+                On behalf of the <strong>President and Committee Members of the Club (TechVerse Club, SOET, CT University)</strong>, we are writing to warmly acknowledge and confirm that your official resignation from your active post as <strong>${escapeHtml(desig)}</strong> (${escapeHtml(roleAssignee)}) has been accepted on a truly commendable note.
               </p>
 
               <p style="margin: 0 0 18px 0;">
-                University life comes with changing schedules, demanding coursework, and new personal journeys. We completely understand and respect your decision to step back at this time to focus on your studies and personal commitments.
+                Throughout your tenure, you performed your duties with exceptional dedication, technical excellence, and sincere commitment. As you conclude your active service with the club to focus on your graduation and embark on your <strong>future career growth, higher professional opportunities, and personal milestones</strong>, the club leadership proudly celebrates the impactful work and positive spirit you brought to our community.
               </p>
 
               <!-- APPRECIATION CARD -->
               <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 5px solid #22c55e; padding: 18px 20px; border-radius: 0 14px 14px 0; margin: 22px 0;">
                 <h4 style="margin: 0 0 6px 0; font-size: 14px; color: #15803d; font-weight: 800;">
-                  🌟 Heartfelt Gratitude for Your Contributions
+                  🏆 Commendation for Duty Completed with Excellence
                 </h4>
                 <p style="margin: 0; color: #166534; font-size: 13.5px; line-height: 1.6;">
-                  Thank you sincerely for the passion, creative ideas, and time you dedicated to TechVerse Club during your tenure. Your enthusiasm and collaboration helped enrich our community and made our club events and initiatives truly special. Your official record has been respectfully archived as <strong>Resigned in Good Standing</strong>.
+                  Thank you sincerely for the passion, creative leadership, and craftsmanship you dedicated to TechVerse Club. You fulfilled your responsibilities with utmost sincerity, inspiring fellow peers and elevating our club events, technical workshops, and initiatives. In honor of your stellar service, your official registry record has been proudly archived as <strong>Relieved with Honors &amp; Full Clearance (Alumnus in Good Standing)</strong>.
                 </p>
               </div>
 
               <!-- NOTES BOX -->
               <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #f59e0b; padding: 14px 18px; border-radius: 0 12px 12px 0; margin: 20px 0; font-size: 13px;">
-                <span style="display: block; color: #92400e; font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; margin-bottom: 4px;">Leadership Note &amp; Remarks</span>
+                <span style="display: block; color: #92400e; font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; margin-bottom: 4px;">Club Committee Note &amp; Remarks</span>
                 <span style="color: #475569; font-style: italic;">"${escapeHtml(resignationRemarks)}"</span>
               </div>
 
               <!-- OPEN DOORS & FUTURE WISHES -->
               <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 16px 18px; border-radius: 12px; margin: 20px 0; font-size: 13px; color: #1e40af;">
-                <p style="margin: 0 0 6px 0; font-weight: 800;">🤝 You Are Always Part of the TechVerse Family</p>
+                <p style="margin: 0 0 6px 0; font-weight: 800;">🚀 Soaring Ahead Towards New Career Milestones</p>
                 <p style="margin: 0; line-height: 1.6;">
-                  Please remember that concluding an official administrative post does not mean goodbye. Our doors are always open to you! You are warmly invited to join all open TechVerse workshops, hackathons, seminars, and community meetups as an alumnus of the club.
+                  Moving onward to conquer new professional horizons is a proud milestone. The skills honed, projects delivered, and teamwork fostered during your journey here will serve as strong foundations for your career ahead. You will always remain an esteemed alumnus of the TechVerse family—our doors are permanently open to welcome you back as a guest mentor, speaker, or collaborator.
                 </p>
               </div>
 
-              <p style="margin: 20px 0 0 0; color: #334155;">
-                We wish you boundless happiness, academic excellence, and great success in all your future endeavors. Keep innovating, building, and shining bright!
+              <p style="margin: 20px 0 0 0; color: #334155; line-height: 1.6;">
+                We wish you boundless success, rapid career advancement, and excellence in all your future professional endeavors. Keep innovating, building with ambition, and shining bright!
               </p>
 
               <!-- SIGNATURE -->
               <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b; line-height: 1.6;">
-                Warmest regards and best wishes,<br/>
-                <strong style="color: #0f172a;">Executive Board &amp; Faculty Advisors</strong><br/>
+                Warmest regards and highest recommendations,<br/>
+                <strong style="color: #0f172a;">President and Committee Members of the Club</strong><br/>
                 TechVerse Club • School of Engineering &amp; Technology<br/>
                 CT University, Ludhiana, Punjab
               </div>
@@ -560,7 +620,7 @@ export default async function handler(req, res) {
         from: `"TechVerse Club • CT University" <${emailUser}>`,
         to: cleanRecipient,
         replyTo: emailUser,
-        subject: `With Sincere Gratitude & Best Wishes • TechVerse Club, CT University`,
+        subject: `🌟 With Sincere Appreciation & Best Wishes for Your Future Career Growth • TechVerse Club, CT University`,
         html: resignationHtml,
       });
 
@@ -577,7 +637,7 @@ export default async function handler(req, res) {
     if (type === 'termination') {
       const m = member || {};
       const terminationReason = m.terminationReason || req.body?.reason || 'Non-alignment with Club Code of Conduct & commitments';
-      const terminationRemarks = m.terminationRemarks || req.body?.remarks || 'Administrative review conducted by faculty advisory committee.';
+      const terminationRemarks = m.terminationRemarks || req.body?.remarks || 'Administrative review conducted by the Club Executive Committee.';
       const fineAmount = m.fineAmount || req.body?.fineAmount || 1000;
       const desig = m.designation || 'Club Member';
       const roleAssignee = m.roleAssignee || 'Core Team';
@@ -635,7 +695,7 @@ export default async function handler(req, res) {
               </p>
 
               <p style="margin: 0 0 18px 0;">
-                TechVerse was created to foster an environment where all members actively support one another, deliver on shared commitments, and adhere to community guidelines. During recent reviews by the faculty advisory committee and student leads, it was noted that certain core expectations could unfortunately not be maintained.
+                TechVerse was created to foster an environment where all members actively support one another, deliver on shared commitments, and adhere to community guidelines. During recent reviews by the President and Committee Members of the Club, it was noted that certain core expectations could unfortunately not be maintained.
               </p>
 
               <!-- SUMMARY OF REVIEW CARD (SOFT SLATE/AMBER) -->
@@ -649,7 +709,7 @@ export default async function handler(req, res) {
                     <td style="color: #1e293b; font-weight: 600;">${escapeHtml(terminationReason)}</td>
                   </tr>
                   <tr>
-                    <td style="font-weight: 700; color: #475569; vertical-align: top;">Faculty Remarks:</td>
+                    <td style="font-weight: 700; color: #475569; vertical-align: top;">Committee Remarks:</td>
                     <td style="color: #475569;">${escapeHtml(terminationRemarks)}</td>
                   </tr>
                   <tr>
@@ -663,14 +723,14 @@ export default async function handler(req, res) {
 
               <!-- GENTLE TRANSITION EXPLANATION -->
               <p style="margin: 0 0 16px 0;">
-                We genuinely understand that balancing college courses, exam preparations, and various personal responsibilities can be challenging. However, to remain fair to all peers who are actively executing upcoming initiatives, the executive leadership and faculty advisors have concluded your official active appointment with TechVerse Club, effective today.
+                We genuinely understand that balancing college courses, exam preparations, and various personal responsibilities can be challenging. However, to remain fair to all peers who are actively executing upcoming initiatives, the President and Committee Members of the Club have concluded your official active appointment with TechVerse Club, effective today.
               </p>
 
               <!-- CREDENTIALS TRANSITION (RESPECTFUL & GENTLE) -->
               <div style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 16px 18px; border-radius: 12px; margin: 20px 0; font-size: 13px; color: #334155;">
                 <p style="margin: 0 0 6px 0; font-weight: 800; color: #1e293b;">ℹ️ Membership Records &amp; Clearance Information</p>
                 <p style="margin: 0; line-height: 1.6;">
-                  In line with this update, your active club digital ID card and official portal access have been deactivated in the club registry. Should you wish to discuss this update, request clarification, or complete the clearance formalities (₹${fineAmount}), you are warmly welcome to visit the SOET Department Office during academic working hours—our faculty coordinators will be pleased to assist you.
+                  In line with this update, your active club digital ID card and official portal access have been deactivated in the club registry. Should you wish to discuss this update, request clarification, or complete the clearance formalities (₹${fineAmount}), you are warmly welcome to visit the SOET Department Office during academic working hours—our club committee leads will be pleased to assist you.
                 </p>
               </div>
 
@@ -682,7 +742,7 @@ export default async function handler(req, res) {
               <!-- SIGNATURE -->
               <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b; line-height: 1.6;">
                 With sincere regards and best wishes,<br/>
-                <strong style="color: #0f172a;">Faculty Advisory Committee &amp; Executive Board</strong><br/>
+                <strong style="color: #0f172a;">President and Committee Members of the Club</strong><br/>
                 TechVerse Club • School of Engineering &amp; Technology<br/>
                 CT University, Ludhiana, Punjab
               </div>
@@ -760,7 +820,22 @@ export default async function handler(req, res) {
         soetLogoBase64,
         photoBase64,
       });
-      const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: 1400 } });
+      const fontFiles = await ensureFontFiles();
+      const resvgOpts = {
+        fitTo: { mode: 'width', value: 1400 },
+        shapeRendering: 2,
+        textRendering: 2,
+        imageRendering: 0,
+      };
+      if (fontFiles && fontFiles.length > 0) {
+        resvgOpts.font = {
+          fontFiles,
+          loadSystemFonts: false,
+          defaultFontFamily: 'Roboto',
+          sansSerifFamily: 'Roboto',
+        };
+      }
+      const resvg = new Resvg(svg, resvgOpts);
       cardPngBuffer = resvg.render().asPng();
     } catch (resvgErr) {
       console.error('Resvg PNG rendering failed, attempting SVG fallback:', resvgErr);
@@ -793,9 +868,9 @@ export default async function handler(req, res) {
     <!-- PROMOTION HERO BANNER -->
     <div style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #1e3a8a 100%); padding: 28px 24px; text-align: center; color: #ffffff;">
       <span style="display: inline-block; background: rgba(250,204,21,0.25); border: 1px solid #facc15; color: #fef08a; font-size: 11px; font-weight: bold; padding: 4px 14px; border-radius: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">🎖️ Official Leadership Promotion • Career Elevation</span>
-      <h1 style="margin: 6px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Congratulations ${escapeHtml(m.name)}, You've Been Promoted! 🚀</h1>
+      <h1 style="margin: 6px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Congratulations ${escapeHtml(m.name)}, You've Been Promoted!</h1>
       <p style="margin: 4px 0 0 0; font-size: 13px; color: #e0e7ff; line-height: 1.5;">
-        In recognition of your outstanding leadership and contributions to TechVerse, you have officially been elevated to <strong>${escapeHtml(m.designation || 'Club Leader')}</strong> (${escapeHtml(m.roleAssignee || 'Executive Board')}).
+        In recognition of your outstanding leadership and contributions to TechVerse, you have officially been elevated to <strong>${escapeHtml(m.designation || 'Club Leader')}</strong> (${escapeHtml(m.roleAssignee || 'President and Committee Members of the Club')}).
       </p>
     </div>
     ` : `
@@ -803,7 +878,7 @@ export default async function handler(req, res) {
     <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); padding: 28px 24px; text-align: center; color: #ffffff;">
       <span style="display: inline-block; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #38bdf8; font-size: 11px; font-weight: bold; padding: 4px 14px; border-radius: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Official Selection Confirmed • Screening Approved</span>
       <h1 style="margin: 6px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Congratulations ${escapeHtml(m.name)}, You're Selected! 🎉</h1>
-      <p style="margin: 4px 0 0 0; font-size: 13px; color: #cbd5e1;">Your screening is complete. The President &amp; Vice President have confirmed your official designation as <strong>${escapeHtml(m.designation || 'Club Member')}</strong> (${escapeHtml(m.roleAssignee || 'Core Team Member')}). Welcome to the TechVerse family!</p>
+      <p style="margin: 4px 0 0 0; font-size: 13px; color: #cbd5e1;">Your screening is complete. The President and Club Committee Members have confirmed your official designation as <strong>${escapeHtml(m.designation || 'Club Member')}</strong> (${escapeHtml(m.roleAssignee || 'Core Team Member')}). Welcome to the TechVerse family!</p>
     </div>
     `;
 
@@ -814,7 +889,7 @@ export default async function handler(req, res) {
         🌟 Executive Leadership Citation &amp; Promotion Announcement
       </h4>
       <p style="margin: 0 0 12px 0; font-size: 13px; color: #713f12; line-height: 1.6;">
-        Dear <strong>${escapeHtml(m.name)}</strong>, on behalf of the President, Vice President, and Faculty Advisors of <strong>TechVerse Club • School of Engineering &amp; Technology, CT University</strong>, we proudly commend your exemplary dedication and technical excellence. You have consistently demonstrated outstanding drive, teamwork, and leadership.
+        Dear <strong>${escapeHtml(m.name)}</strong>, on behalf of the President and Committee Members of the Club (<strong>TechVerse Club • School of Engineering &amp; Technology, CT University</strong>), we proudly commend your exemplary dedication and technical excellence. You have consistently demonstrated outstanding drive, teamwork, and leadership.
       </p>
       <div style="background: #ffffff; border-radius: 8px; padding: 10px 14px; border: 1px solid #fde047; font-size: 12px; color: #713f12;">
         <span style="color: #64748b;">Previous Designation:</span> <strong style="text-decoration: line-through; color: #64748b;">${escapeHtml(m.previousDesignation || 'Member')}</strong> &nbsp;&nbsp;➔&nbsp;&nbsp; 
