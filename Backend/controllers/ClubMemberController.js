@@ -110,119 +110,117 @@ async function sendScreeningEmail(member) {
   if (fs.existsSync(techverseLogoPath)) attachments.push({ filename: 'techverse-logo.jpg', path: techverseLogoPath, cid: 'techverseLogo' });
   if (fs.existsSync(soetLogoPath)) attachments.push({ filename: 'soet-logo.png', path: soetLogoPath, cid: 'soetLogo' });
 
+  const submittedDate = member.createdAt ? new Date(member.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
   const htmlContent = `
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>TechVerse Club Membership Application Received</title>
+  <title>TechVerse Club Membership Application Acknowledgment</title>
 </head>
-<body style="margin: 0; padding: 24px 12px; background-color: #0b1120; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #cbd5e1;">
+<body style="margin: 0; padding: 36px 16px; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; -webkit-font-smoothing: antialiased;">
+  <div style="max-width: 650px; margin: 0 auto; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 4px 16px rgba(15,23,42,0.06); overflow: hidden;">
     
-    <!-- HEADER BRANDING (FORMAL INSTITUTIONAL) -->
-    <tr>
-      <td style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 26px 22px; text-align: center; color: #ffffff;">
-        <span style="display: inline-block; background: rgba(148, 163, 184, 0.18); border: 1px solid rgba(148, 163, 184, 0.35); color: #e2e8f0; font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 16px; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px;">Official Application Acknowledgment</span>
-        <h1 style="margin: 4px 0 6px 0; font-size: 21px; font-weight: 700; color: #ffffff; letter-spacing: -0.2px;">Membership Application Received</h1>
-        <p style="margin: 0; font-size: 12px; color: #cbd5e1;">School of Engineering &amp; Technology • CT University</p>
-      </td>
-    </tr>
+    <!-- INSTITUTIONAL LETTERHEAD -->
+    <div style="padding: 24px 28px 20px 28px; border-bottom: 2px solid #0f172a; background: #ffffff;">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0">
+        <tr>
+          <td width="70%" style="vertical-align: middle;">
+            <div style="font-size: 16px; font-weight: 800; color: #0f172a; letter-spacing: -0.2px; text-transform: uppercase;">TechVerse Club</div>
+            <div style="font-size: 13px; font-weight: 600; color: #334155; margin-top: 2px;">School of Engineering &amp; Technology</div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">CT University, Ferozepur Road, Ludhiana, Punjab</div>
+          </td>
+          <td width="30%" align="right" style="vertical-align: middle;">
+            <div style="display: inline-block; background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; text-align: center;">
+              <div style="font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.8px;">Application Ref</div>
+              <div style="font-size: 13px; font-weight: 800; color: #0f172a; font-family: monospace;">Ref #${member.serialNumber || '1'}</div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
 
-    <!-- LOGOS RIBBON -->
-    <tr>
-      <td style="background: #f8fafc; padding: 14px 20px; border-bottom: 1px solid #e2e8f0;">
-        <table width="100%" cellspacing="0" cellpadding="0" border="0">
-          <tr>
-            <td align="center" width="30%" style="vertical-align: middle;">
-              <img src="cid:univLogo" alt="CT University" style="max-height: 48px; max-width: 80px; object-fit: contain;" />
-            </td>
-            <td align="center" width="40%" style="vertical-align: middle;">
-              <img src="cid:techverseLogo" alt="TechVerse Club" style="max-height: 52px; max-width: 52px; border-radius: 50%; border: 2px solid #334155; object-fit: cover;" />
-            </td>
-            <td align="center" width="30%" style="vertical-align: middle;">
-              <img src="cid:soetLogo" alt="SOET" style="max-height: 48px; max-width: 80px; object-fit: contain;" />
-            </td>
+    <!-- OFFICIAL NOTICE HEADER -->
+    <div style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 14px 28px;">
+      <div style="font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 1px;">Official Memorandum • Application Status</div>
+      <div style="font-size: 18px; font-weight: 800; color: #0f172a; margin-top: 4px;">Acknowledgment of Club Membership Application</div>
+    </div>
+
+    <!-- FORMAL LETTER BODY -->
+    <div style="padding: 28px 28px 32px 28px; font-size: 14px; line-height: 1.7; color: #334155;">
+      <p style="margin: 0 0 16px 0; font-size: 15px; color: #0f172a;">
+        Dear <strong>${escapeHtml(member.name)}</strong>,
+      </p>
+
+      <p style="margin: 0 0 16px 0;">
+        Thank you for your interest in joining <strong>TechVerse Club</strong> at the School of Engineering &amp; Technology, CT University. This official memorandum confirms that your application for membership has been successfully registered and placed under active screening.
+      </p>
+
+      <!-- APPLICATION RECORD TABLE -->
+      <div style="margin: 22px 0; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden;">
+        <div style="background: #f8fafc; padding: 10px 16px; border-bottom: 1px solid #e2e8f0; font-size: 12px; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 0.8px;">
+          Registered Application Particulars
+        </div>
+        <table width="100%" cellspacing="0" cellpadding="8" border="0" style="font-size: 13px; background: #ffffff;">
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td width="36%" style="color: #64748b; font-weight: 600; padding: 10px 16px;">Applicant Name:</td>
+            <td style="color: #0f172a; font-weight: 700; padding: 10px 16px;">${escapeHtml(member.name)}</td>
+          </tr>
+          <tr style="background: #fafafa; border-bottom: 1px solid #f1f5f9;">
+            <td style="color: #64748b; font-weight: 600; padding: 10px 16px;">Registration Number:</td>
+            <td style="color: #0f172a; font-weight: 700; font-family: monospace; padding: 10px 16px;">${escapeHtml(member.regNumber || 'N/A')}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="color: #64748b; font-weight: 600; padding: 10px 16px;">Academic Program:</td>
+            <td style="color: #0f172a; padding: 10px 16px;">${escapeHtml(departmentDisplay)}</td>
+          </tr>
+          <tr style="background: #fafafa; border-bottom: 1px solid #f1f5f9;">
+            <td style="color: #64748b; font-weight: 600; padding: 10px 16px;">Academic Batch:</td>
+            <td style="color: #0f172a; padding: 10px 16px;">${escapeHtml(member.batch || '2024-2028')}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="color: #64748b; font-weight: 600; padding: 10px 16px;">Technical Interests:</td>
+            <td style="color: #0f172a; padding: 10px 16px;">${escapeHtml(interestsList)}</td>
+          </tr>
+          <tr style="background: #fafafa; border-bottom: 1px solid #f1f5f9;">
+            <td style="color: #64748b; font-weight: 600; padding: 10px 16px;">Submission Date:</td>
+            <td style="color: #0f172a; padding: 10px 16px;">${submittedDate}</td>
+          </tr>
+          <tr style="background: #ffffff;">
+            <td style="color: #64748b; font-weight: 600; padding: 10px 16px;">Current Status:</td>
+            <td style="color: #0284c7; font-weight: 700; padding: 10px 16px;">Received &bull; Under Screening Review</td>
           </tr>
         </table>
-      </td>
-    </tr>
+      </div>
 
-    <!-- BODY CONTENT -->
-    <tr>
-      <td style="padding: 28px 24px;">
-        <p style="font-size: 14px; margin: 0 0 14px 0; color: #0f172a; line-height: 1.6;">
-          Dear <strong>${escapeHtml(member.name)}</strong>,
-        </p>
+      <!-- FORMAL CLARIFICATION NOTICE -->
+      <div style="background: #f8fafc; border-left: 4px solid #0f172a; padding: 14px 18px; border-radius: 0 6px 6px 0; margin: 20px 0; font-size: 12.5px; color: #475569; line-height: 1.6;">
+        <strong style="color: #0f172a;">Institutional Notice:</strong> This communication is an official acknowledgment of application receipt only. It is not an ID card or formal club appointment. Official membership credentials and verified digital ID cards are issued separately following evaluation and designation confirmation.
+      </div>
 
-        <p style="font-size: 13.5px; margin: 0 0 16px 0; color: #334155; line-height: 1.65;">
-          Thank you for submitting your application to join <strong>TechVerse Club</strong> at the School of Engineering &amp; Technology, CT University. We confirm that your application has been successfully registered and is currently under official evaluation.
-        </p>
+      <p style="margin: 18px 0 16px 0;">
+        Your application is currently being evaluated by the <strong>President and Committee Members of the Club</strong>. Candidates whose profiles align with club requirements will be contacted regarding role assignments and onboarding formalities.
+      </p>
 
-        <!-- FORMAL APPLICATION SUMMARY TABLE (NON-ID CARD FORMAT) -->
-        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 18px; margin: 18px 0;">
-          <h3 style="margin: 0 0 10px 0; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #334155; font-weight: 700; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px;">
-            Application Submission Details
-          </h3>
-          <table width="100%" cellspacing="0" cellpadding="5" border="0" style="font-size: 13px; color: #334155;">
-            <tr>
-              <td width="38%" style="color: #64748b; font-weight: 600;">Application Reference:</td>
-              <td style="color: #0f172a; font-weight: 700; font-family: monospace;">Ref #${member.serialNumber || '1'} (TV-${new Date().getFullYear()})</td>
-            </tr>
-            <tr>
-              <td style="color: #64748b; font-weight: 600;">Applicant Name:</td>
-              <td style="color: #0f172a; font-weight: 600;">${escapeHtml(member.name)}</td>
-            </tr>
-            <tr>
-              <td style="color: #64748b; font-weight: 600;">University Registration No.:</td>
-              <td style="color: #0f172a; font-weight: 600; font-family: monospace;">${escapeHtml(member.regNumber)}</td>
-            </tr>
-            <tr>
-              <td style="color: #64748b; font-weight: 600;">Academic Program:</td>
-              <td style="color: #0f172a;">${escapeHtml(departmentDisplay)} (${escapeHtml(member.batch)})</td>
-            </tr>
-            <tr>
-              <td style="color: #64748b; font-weight: 600;">Preferred Domain:</td>
-              <td style="color: #0f172a;">${escapeHtml(interestsList)}</td>
-            </tr>
-            <tr>
-              <td style="color: #64748b; font-weight: 600;">Submission Status:</td>
-              <td style="color: #2563eb; font-weight: 700;">Received &bull; Under Committee Review</td>
-            </tr>
-          </table>
-        </div>
+      <p style="margin: 0 0 24px 0;">
+        If you have any questions or require any changes to your submission details, please write to us at <a href="mailto:techverse@ctuniversity.in" style="color: #0284c7; text-decoration: none; font-weight: 600;">techverse@ctuniversity.in</a>.
+      </p>
 
-        <!-- EXPLICIT CLARIFICATION NOTICE (PREVENTS ID CARD CONFUSION) -->
-        <div style="background: #f1f5f9; border-left: 4px solid #64748b; padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 18px 0; font-size: 12px; color: #475569; line-height: 1.5;">
-          <strong>Please Note:</strong> This communication is an official acknowledgment of application receipt only. <u>It does not constitute an official club membership card nor does it confirm club appointment.</u> Official membership credentials and verified digital ID cards will be issued separately upon committee evaluation and designation assignment.
-        </div>
-
-        <!-- REVIEW PROCESS STEPS -->
-        <h4 style="font-size: 13.5px; margin: 18px 0 8px 0; color: #0f172a; font-weight: 700;">Evaluation Procedure</h4>
-        <ul style="font-size: 13px; color: #475569; padding-left: 18px; line-height: 1.65; margin: 0 0 18px 0;">
-          <li>The <strong>President and Club Committee Members</strong> of TechVerse Club will review your academic discipline, technical interests, and project background.</li>
-          <li>Shortlisted candidates will be notified regarding their role assignments and induction schedule.</li>
-          <li>Upon official role confirmation in the portal, your verified <strong>TechVerse Club Membership Card</strong> will be generated and delivered directly to your email address.</li>
-        </ul>
-
-        <!-- FORMAL SIGN-OFF -->
-        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b; line-height: 1.6;">
-          Sincerely,<br />
-          <strong style="color: #0f172a;">President &amp; Club Committee Members</strong><br />
-          TechVerse Club • School of Engineering &amp; Technology<br />
-          CT University, Ludhiana, Punjab
-        </div>
-      </td>
-    </tr>
+      <!-- FORMAL SIGN-OFF -->
+      <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 13px; color: #475569; line-height: 1.6;">
+        Sincerely,<br/>
+        <strong style="color: #0f172a; font-size: 14px;">President and Committee Members of the Club</strong><br/>
+        TechVerse Club • School of Engineering &amp; Technology<br/>
+        CT University, Ludhiana, Punjab
+      </div>
+    </div>
 
     <!-- FOOTER -->
-    <tr>
-      <td style="background: #f8fafc; padding: 14px 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #64748b;">
-        <p style="margin: 0 0 4px 0;">Official Administrative Communication • TechVerse Club</p>
-        <p style="margin: 0;">Inquiries: <a href="mailto:techverse@ctuniversity.in" style="color: #2563eb; text-decoration: none;">techverse@ctuniversity.in</a></p>
-      </td>
-    </tr>
-  </table>
+    <div style="background: #f8fafc; padding: 14px 28px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8;">
+      Official Communication • TechVerse Club, SOET, CT University • Inquiries: techverse@ctuniversity.in
+    </div>
+  </div>
 </body>
 </html>
   `;
@@ -231,7 +229,7 @@ async function sendScreeningEmail(member) {
     from: `"TechVerse Club • CT University" <${emailUser}>`,
     to: recipientEmail,
     replyTo: emailUser,
-    subject: `Application Received: TechVerse Club Membership Application - ${member.name} (Ref #${member.serialNumber || '1'})`,
+    subject: `TechVerse Club Membership Application Received - Ref #${member.serialNumber || '1'} (${member.name})`,
     html: htmlContent,
     attachments,
   };
@@ -322,8 +320,8 @@ async function sendMembershipCardEmail(member) {
 
   const heroBannerHtml = isPromotion ? `
   <div style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #1e3a8a 100%); padding: 28px 24px; text-align: center; color: #ffffff;">
-    <span style="display: inline-block; background: rgba(250,204,21,0.25); border: 1px solid #facc15; color: #fef08a; font-size: 11px; font-weight: bold; padding: 4px 14px; border-radius: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">🎖️ Official Leadership Promotion • Career Elevation</span>
-    <h1 style="margin: 6px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Congratulations ${escapeHtml(member.name)}, You've Been Promoted!</h1>
+    <span style="display: inline-block; background: rgba(250,204,21,0.25); border: 1px solid #facc15; color: #fef08a; font-size: 11px; font-weight: bold; padding: 4px 14px; border-radius: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Official Leadership Promotion • Career Elevation</span>
+    <h1 style="margin: 6px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Congratulations ${escapeHtml(member.name)}, You Have Been Promoted</h1>
     <p style="margin: 4px 0 0 0; font-size: 13px; color: #e0e7ff; line-height: 1.5;">
       In recognition of your outstanding leadership and contributions to TechVerse, you have officially been elevated to <strong>${escapeHtml(member.designation || 'Club Leader')}</strong> (${escapeHtml(member.roleAssignee || 'President and Committee Members of the Club')}).
     </p>
@@ -331,22 +329,22 @@ async function sendMembershipCardEmail(member) {
   ` : `
   <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); padding: 28px 24px; text-align: center; color: #ffffff;">
     <span style="display: inline-block; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #38bdf8; font-size: 11px; font-weight: bold; padding: 4px 14px; border-radius: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Official Selection Confirmed • Screening Approved</span>
-    <h1 style="margin: 6px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Congratulations ${escapeHtml(member.name)}, You're Selected! 🎉</h1>
-    <p style="margin: 4px 0 0 0; font-size: 13px; color: #cbd5e1;">Your screening is complete. The President and Club Committee Members have confirmed your official designation as <strong>${escapeHtml(member.designation)}</strong> (${escapeHtml(member.roleAssignee || 'Core Team Member')}). Welcome to the TechVerse family!</p>
+    <h1 style="margin: 6px 0; font-size: 24px; font-weight: 800; color: #ffffff;">Congratulations ${escapeHtml(member.name)}, Your Appointment is Confirmed</h1>
+    <p style="margin: 4px 0 0 0; font-size: 13px; color: #cbd5e1;">Your screening is complete. The President and Club Committee Members have confirmed your official designation as <strong>${escapeHtml(member.designation)}</strong> (${escapeHtml(member.roleAssignee || 'Core Team Member')}). Welcome to the TechVerse family.</p>
   </div>
   `;
 
   const letterBodyHtml = isPromotion ? `
   <div style="background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%); border-left: 4px solid #eab308; border-radius: 0 12px 12px 0; padding: 18px; margin: 0 0 24px 0;">
     <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #854d0e; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">
-      🌟 Executive Leadership Citation &amp; Promotion Announcement
+      Executive Leadership Citation &amp; Promotion Announcement
     </h4>
     <p style="margin: 0 0 12px 0; font-size: 13px; color: #713f12; line-height: 1.6;">
       Dear <strong>${escapeHtml(member.name)}</strong>, on behalf of the President and Committee Members of the Club (<strong>TechVerse Club • School of Engineering &amp; Technology, CT University</strong>), we proudly commend your exemplary dedication and technical excellence.
     </p>
     <div style="background: #ffffff; border-radius: 8px; padding: 10px 14px; border: 1px solid #fde047; font-size: 12px; color: #713f12;">
       <span style="color: #64748b;">Previous Designation:</span> <strong style="text-decoration: line-through; color: #64748b;">${escapeHtml(member.previousDesignation || 'Member')}</strong> &nbsp;&nbsp;➔&nbsp;&nbsp; 
-      <span style="color: #b45309; font-weight: bold;">New Elevated Designation:</span> <span style="background: #fef08a; color: #854d0e; font-weight: 800; padding: 2px 8px; border-radius: 4px;">🎖️ ${escapeHtml(member.designation)}</span>
+      <span style="color: #b45309; font-weight: bold;">New Elevated Designation:</span> <span style="background: #fef08a; color: #854d0e; font-weight: 800; padding: 2px 8px; border-radius: 4px;">${escapeHtml(member.designation)}</span>
     </div>
     <p style="margin: 12px 0 0 0; font-size: 12px; color: #854d0e; line-height: 1.5;">
       Your official <strong>TechVerse Leadership &amp; Membership Card</strong> has been generated below as a standalone printable badge. A print-ready, high-resolution PNG file (<code style="color: #854d0e;">${cardFilename}</code>) is also attached to this email for physical lanyard printing.
@@ -355,7 +353,7 @@ async function sendMembershipCardEmail(member) {
   ` : `
   <div style="background: #eff6ff; border-left: 4px solid #2563eb; border-radius: 0 12px 12px 0; padding: 18px; margin: 0 0 24px 0;">
     <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #1e40af; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">
-      🎉 Welcome to TechVerse Club, CT University!
+      Welcome to TechVerse Club, CT University
     </h4>
     <p style="margin: 0 0 10px 0; font-size: 13px; color: #1e3a8a; line-height: 1.6;">
       Dear <strong>${escapeHtml(member.name)}</strong>, the screening committee has approved your application. You have officially been appointed as <strong>${escapeHtml(member.designation || 'Active Member')}</strong> (${escapeHtml(member.roleAssignee || 'Core Team')}).
@@ -384,7 +382,7 @@ async function sendMembershipCardEmail(member) {
       <!-- SEPARATE STANDALONE ID CARD SECTION DIVIDER -->
       <div style="text-align: center; margin: 30px 0 16px 0;">
         <span style="display: inline-block; background: ${isPromotion ? 'rgba(245,158,11,0.12)' : 'rgba(37,99,235,0.1)'}; border: 1.5px solid ${isPromotion ? '#f59e0b' : '#2563eb'}; color: ${isPromotion ? '#92400e' : '#1e40af'}; font-size: 11px; font-weight: 800; padding: 6px 18px; border-radius: 24px; text-transform: uppercase; letter-spacing: 2px;">
-          🪪 OFFICIAL DIGITAL IDENTITY CARD (STANDALONE BADGE)
+          OFFICIAL DIGITAL IDENTITY CARD (STANDALONE BADGE)
         </span>
         <p style="margin: 8px 0 0 0; font-size: 12px; color: #64748b;">
           Standard CR80 / Lanyard Badge Specification • Valid University-Wide
@@ -406,7 +404,7 @@ async function sendMembershipCardEmail(member) {
         <!-- Download Badge Notice -->
         <div style="margin-top: 18px; padding: 14px 16px; background: #111827; border-radius: 14px; border: 1px solid #374151; text-align: center;">
           <div style="font-size: 13px; font-weight: 800; color: #f8fafc; margin-bottom: 4px;">
-            📥 Print-Ready ID Card File Attached (.PNG)
+            Print-Ready ID Card File Attached (.PNG)
           </div>
           <div style="font-size: 11px; color: #94a3b8; line-height: 1.5;">
             The original high-resolution card (<strong style="color: ${isPromotion ? '#fbbf24' : '#38bdf8'};">${cardFilename}</strong>) is attached below.<br/>
@@ -416,7 +414,7 @@ async function sendMembershipCardEmail(member) {
       </div>
 
       <div style="margin-top: 24px; padding: 14px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 11px; color: #64748b; line-height: 1.5; text-align: center;">
-        ℹ️ <strong>University Protocol:</strong> This credential certifies active club membership &amp; leadership in the School of Engineering &amp; Technology, CT University. For inquiries or replacement, email <a href="mailto:techverse@ctuniversity.in" style="color: #2563eb; text-decoration: none;">techverse@ctuniversity.in</a>.
+        <strong>University Protocol:</strong> This credential certifies active club membership &amp; leadership in the School of Engineering &amp; Technology, CT University. For inquiries or replacement, email <a href="mailto:techverse@ctuniversity.in" style="color: #2563eb; text-decoration: none;">techverse@ctuniversity.in</a>.
       </div>
     </div>
 
@@ -432,8 +430,8 @@ async function sendMembershipCardEmail(member) {
   `;
 
   const subjectTitle = isPromotion
-    ? `🎖️ Official Promotion Announced - Congratulations ${member.name} on Becoming ${member.designation || 'Club Leader'}! | TechVerse Club`
-    : `🎉 Official TechVerse Club Membership Card Issued - ${member.name} (${member.designation || 'Active Member'})`;
+    ? `Official Promotion Announced - Congratulations ${member.name} on Becoming ${member.designation || 'Club Leader'} | TechVerse Club`
+    : `Official TechVerse Club Membership Credential Issued - ${member.name} (${member.designation || 'Active Member'})`;
 
   const mailOptions = {
     from: `"TechVerse Club • CT University" <${emailUser}>`,
@@ -858,7 +856,7 @@ async function sendResignationEmail(member, remarks) {
         <table width="640" border="0" cellspacing="0" cellpadding="0" style="max-width: 640px; width: 100%; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 12px 32px rgba(15,23,42,0.08); border: 1px solid #e2e8f0;">
           <tr>
             <td style="background: linear-gradient(135deg, #064e3b 0%, #0f172a 55%, #1e3a8a 100%); padding: 30px 24px; text-align: center; color: #ffffff;">
-              <span style="display: inline-block; background: rgba(52,211,153,0.18); border: 1px solid rgba(52,211,153,0.4); color: #a7f3d0; font-size: 11px; font-weight: 800; padding: 5px 16px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px;">Exemplary Service Recognition • Future Career Best Wishes 🌟</span>
+              <span style="display: inline-block; background: rgba(52,211,153,0.18); border: 1px solid rgba(52,211,153,0.4); color: #a7f3d0; font-size: 11px; font-weight: 800; padding: 5px 16px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px;">Exemplary Service Recognition • Future Career Best Wishes</span>
               <h1 style="margin: 4px 0 8px 0; font-size: 23px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">Thank You for Your Outstanding Service &amp; Dedication</h1>
               <p style="margin: 0; font-size: 13px; color: #cbd5e1;">School of Engineering &amp; Technology • CT University</p>
             </td>
@@ -893,7 +891,7 @@ async function sendResignationEmail(member, remarks) {
               </p>
               <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 5px solid #22c55e; padding: 18px 20px; border-radius: 0 14px 14px 0; margin: 22px 0;">
                 <h4 style="margin: 0 0 6px 0; font-size: 14px; color: #15803d; font-weight: 800;">
-                  🏆 Commendation for Duty Completed with Excellence
+                  Commendation for Duty Completed with Excellence
                 </h4>
                 <p style="margin: 0; color: #166534; font-size: 13.5px; line-height: 1.6;">
                   Thank you sincerely for the passion, creative leadership, and craftsmanship you dedicated to TechVerse Club. You fulfilled your responsibilities with utmost sincerity, inspiring fellow peers and elevating our club events, technical workshops, and initiatives. In honor of your stellar service, your official registry record has been proudly archived as <strong>Relieved with Honors &amp; Full Clearance (Alumnus in Good Standing)</strong>.
@@ -904,7 +902,7 @@ async function sendResignationEmail(member, remarks) {
                 <span style="color: #475569; font-style: italic;">"${escapeHtml(exitRemarks)}"</span>
               </div>
               <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 16px 18px; border-radius: 12px; margin: 20px 0; font-size: 13px; color: #1e40af;">
-                <p style="margin: 0 0 6px 0; font-weight: 800;">🚀 Soaring Ahead Towards New Career Milestones</p>
+                <p style="margin: 0 0 6px 0; font-weight: 800;">Advancing Towards Future Career Milestones</p>
                 <p style="margin: 0; line-height: 1.6;">
                   Moving onward to conquer new professional horizons is a proud milestone. The skills honed, projects delivered, and teamwork fostered during your journey here will serve as strong foundations for your career ahead. You will always remain an esteemed alumnus of the TechVerse family—our doors are permanently open to welcome you back as a guest mentor, speaker, or collaborator.
                 </p>
@@ -939,7 +937,7 @@ async function sendResignationEmail(member, remarks) {
       from: `"TechVerse Club • CT University" <${emailUser}>`,
       to: member.email,
       replyTo: emailUser,
-      subject: `🌟 With Sincere Appreciation & Best Wishes for Your Future Career Growth • TechVerse Club, CT University`,
+      subject: `With Sincere Appreciation & Best Wishes for Your Future Career Growth • TechVerse Club, CT University`,
       html: resignationHtml,
     });
     return true;
@@ -1026,7 +1024,7 @@ async function sendTerminationEmail(member, reason, remarks, fineAmount) {
               </p>
               <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 5px solid #6366f1; padding: 18px 20px; border-radius: 0 14px 14px 0; margin: 22px 0;">
                 <h4 style="margin: 0 0 12px 0; color: #1e1b4b; font-size: 13.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;">
-                  📋 Review Summary &amp; Details
+                  Review Summary &amp; Details
                 </h4>
                 <table width="100%" cellpadding="6" cellspacing="0" style="font-size: 13px; color: #334155;">
                   <tr>
@@ -1049,7 +1047,7 @@ async function sendTerminationEmail(member, reason, remarks, fineAmount) {
                 We genuinely understand that balancing college courses, exam preparations, and various personal responsibilities can be challenging. However, to remain fair to all peers who are actively executing upcoming initiatives, the President and Committee Members of the Club have concluded your official active appointment with TechVerse Club, effective today.
               </p>
               <div style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 16px 18px; border-radius: 12px; margin: 20px 0; font-size: 13px; color: #334155;">
-                <p style="margin: 0 0 6px 0; font-weight: 800; color: #1e293b;">ℹ️ Membership Records &amp; Clearance Information</p>
+                <p style="margin: 0 0 6px 0; font-weight: 800; color: #1e293b;">Membership Records &amp; Clearance Information</p>
                 <p style="margin: 0; line-height: 1.6;">
                   In line with this update, your active club digital ID card and official portal access have been deactivated in the club registry. Should you wish to discuss this update, request clarification, or complete the clearance formalities (₹${fine}), you are warmly welcome to visit the SOET Department Office during academic working hours—our club committee leads will be pleased to assist you.
                 </p>

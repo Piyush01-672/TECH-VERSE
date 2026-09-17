@@ -218,7 +218,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
       ...data,
       consentGiven: true,
       consentTimestamp: new Date().toISOString(),
-      designation: "", // Assigned by President/VP in /admin
+      designation: "", // Assigned by President and Committee Members in /admin
       roleAssignee: "",
     };
 

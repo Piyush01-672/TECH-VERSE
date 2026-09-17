@@ -2026,7 +2026,7 @@ export default function AdminPortal() {
                   </label>
                   <Input
                     id="promote-designation-input"
-                    placeholder="e.g. Vice President, Lead Technical Architect, Event Head..."
+                    placeholder="e.g. Lead Technical Architect, Event Head, Technical Coordinator..."
                     value={promoDesignation}
                     onChange={(e) => setPromoDesignation(e.target.value)}
                     className="bg-white/5 border-white/15 text-white text-sm rounded-xl focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
@@ -2163,7 +2163,7 @@ export default function AdminPortal() {
                   className="mt-0.5 rounded border-amber-400 text-amber-600 focus:ring-amber-500"
                 />
                 <label htmlFor="send-resignation-email-check" className="text-xs text-amber-200 cursor-pointer">
-                  <strong>Dispatch Curated Career-Growth Resignation Email:</strong> Sends a warm commendation &amp; farewell letter on behalf of President &amp; Core Club Committee thanking the member for outstanding duty completion and wishing them exponential career growth.
+                  <strong>Dispatch Curated Career-Growth Resignation Email:</strong> Sends a warm commendation &amp; farewell letter on behalf of President and Committee Members of the Club thanking the member for outstanding duty completion and wishing them exponential career growth.
                 </label>
               </div>
 

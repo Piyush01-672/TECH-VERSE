@@ -46,8 +46,8 @@ function ensureFontFilesSync() {
   const boldCandidates = possibleDirs.map(d => path.join(d, 'Roboto-Bold.ttf'));
   const regCandidates = possibleDirs.map(d => path.join(d, 'Roboto-Regular.ttf'));
 
-  const foundBold = boldCandidates.find(p => fs.existsSync(p));
-  const foundReg = regCandidates.find(p => fs.existsSync(p));
+  const foundBold = boldCandidates.find(p => { try { return fs.existsSync(p); } catch { return false; } });
+  const foundReg = regCandidates.find(p => { try { return fs.existsSync(p); } catch { return false; } });
 
   const fontFiles = [];
   if (foundBold) fontFiles.push(foundBold);
@@ -62,6 +62,36 @@ function ensureFontFilesSync() {
   }
 
   return fontFiles;
+}
+
+function getFontBuffersSync() {
+  const possibleDirs = [
+    path.join(__dirname, '../assets/fonts'),
+    path.join(__dirname, '../../Frontend/api/fonts'),
+    path.join(process.cwd(), 'Backend/assets/fonts'),
+    path.join(process.cwd(), 'Frontend/api/fonts'),
+    path.join(process.cwd(), 'api/fonts'),
+  ];
+  let boldBuf = null;
+  let regBuf = null;
+  for (const dir of possibleDirs) {
+    try {
+      const boldP = path.join(dir, 'Roboto-Bold.ttf');
+      const regP = path.join(dir, 'Roboto-Regular.ttf');
+      if (!boldBuf && fs.existsSync(boldP)) boldBuf = fs.readFileSync(boldP);
+      if (!regBuf && fs.existsSync(regP)) regBuf = fs.readFileSync(regP);
+    } catch (_) {}
+  }
+  if (process.platform === 'win32') {
+    try {
+      if (!boldBuf && fs.existsSync('C:/Windows/Fonts/segoeuib.ttf')) boldBuf = fs.readFileSync('C:/Windows/Fonts/segoeuib.ttf');
+      if (!regBuf && fs.existsSync('C:/Windows/Fonts/segoeui.ttf')) regBuf = fs.readFileSync('C:/Windows/Fonts/segoeui.ttf');
+    } catch (_) {}
+  }
+  const bufs = [];
+  if (boldBuf) bufs.push(boldBuf);
+  if (regBuf) bufs.push(regBuf);
+  return bufs;
 }
 
 function generateIdCardSvg(m, options = {}) {
@@ -241,19 +271,26 @@ function generateIdCardPng(m, options = {}) {
   try {
     const svg = generateIdCardSvg(m, options);
     const fontFiles = ensureFontFilesSync();
+    const fontBuffers = getFontBuffersSync();
     const resvgOpts = {
       fitTo: { mode: 'width', value: 1400 },
       shapeRendering: 2,
       textRendering: 2,
       imageRendering: 0,
     };
+    const fontOpt = {
+      loadSystemFonts: false,
+      defaultFontFamily: 'Roboto',
+      sansSerifFamily: 'Roboto',
+    };
+    if (fontBuffers && fontBuffers.length > 0) {
+      fontOpt.fontBuffers = fontBuffers;
+    }
     if (fontFiles && fontFiles.length > 0) {
-      resvgOpts.font = {
-        fontFiles,
-        loadSystemFonts: false,
-        defaultFontFamily: 'Roboto',
-        sansSerifFamily: 'Roboto',
-      };
+      fontOpt.fontFiles = fontFiles;
+    }
+    if (fontOpt.fontBuffers || fontOpt.fontFiles) {
+      resvgOpts.font = fontOpt;
     }
     const resvg = new Resvg(svg, resvgOpts);
     const pngData = resvg.render();
