@@ -26,9 +26,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import {
   Upload,
   Image as ImageIcon,
@@ -48,6 +54,10 @@ import {
   Mail,
   ShieldAlert,
   AlertTriangle,
+  Calendar as CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  GraduationCap,
 } from "lucide-react";
 
 import UniversityLogo from "@/assets/univeee-logo.png";
@@ -103,6 +113,7 @@ const areasOfInterest = [
   "Cybersecurity & Forensics",
   "Designing (UI/UX, Posters, Branding)",
   "Content Creation & Social Media",
+  "Social Media Reel Expert",
   "Other",
 ];
 
@@ -111,6 +122,8 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [submittedMember, setSubmittedMember] = useState<SubmittedMemberData | null>(null);
+  const [isBatchCalendarOpen, setIsBatchCalendarOpen] = useState(false);
+  const [calendarBaseYear, setCalendarBaseYear] = useState(2020);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const form = useForm<FormData>({
@@ -135,8 +148,8 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
 
   const getBatchOptions = () => {
     if (department === "btech")
-      return ["2021-2025", "2022-2026", "2023-2027", "2024-2028"];
-    if (department === "bca") return ["2022-2025", "2023-2026", "2024-2027"];
+      return ["2021-2025", "2022-2026", "2023-2027", "2024-2028", "2025-2029"];
+    if (department === "bca") return ["2021-2024", "2022-2025", "2023-2026", "2024-2027", "2025-2028"];
     return ["2024-2028"];
   };
 
@@ -407,7 +420,19 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
           /* ✅ REGISTRATION FORM VIEW */
           /* ======================================================================= */
           <>
-            <DialogHeader className="text-center">
+            <DialogHeader className="text-center flex flex-col items-center">
+              {/* TechVerse Logo on Top of Form */}
+              <div className="flex items-center justify-center mb-3">
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-indigo-500 to-cyan-400 rounded-full blur opacity-35 group-hover:opacity-60 transition duration-300"></div>
+                  <img
+                    src={TechverseLogo}
+                    alt="TechVerse Logo"
+                    className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-white shadow-md ring-2 ring-blue-500/20"
+                  />
+                </div>
+              </div>
+
               <div className="mx-auto inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-[11px] font-bold uppercase tracking-wider mb-1">
                 <IdCard className="w-3.5 h-3.5 text-blue-600" />
                 New Member Joining Portal
@@ -503,7 +528,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                   name="regNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Registration Number (Numbers Only)</FormLabel>
+                      <FormLabel>Registration Number</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="e.g. 2024101001"
@@ -577,8 +602,10 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                         <Select
                           onValueChange={(val) => {
                             field.onChange(val);
-                            if (val === "btech") form.setValue("batch", "2024-2028");
-                            if (val === "bca") form.setValue("batch", "2024-2027");
+                            const currentBatch = form.getValues("batch");
+                            const startYr = parseInt(currentBatch?.split("-")[0] || "2024", 10);
+                            const dur = val === "bca" ? 3 : 4;
+                            form.setValue("batch", `${startYr}-${startYr + dur}`);
                           }}
                           value={field.value}
                         >
@@ -599,30 +626,165 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                   <FormField
                     control={form.control}
                     name="batch"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Batch Session</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          disabled={!department}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select batch" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {getBatchOptions().map((batch) => (
-                              <SelectItem key={batch} value={batch}>
-                                {batch}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      const duration = department === "bca" ? 3 : 4;
+                      const years = Array.from({ length: 12 }, (_, i) => calendarBaseYear + i);
+
+                      return (
+                        <FormItem className="flex flex-col justify-end">
+                          <FormLabel>Batch Session (Calendar Year)</FormLabel>
+                          <Popover
+                            open={isBatchCalendarOpen}
+                            onOpenChange={(isOpen) => {
+                              if (isOpen) {
+                                const curStart = parseInt(field.value?.split("-")[0] || "2024", 10);
+                                if (!isNaN(curStart) && (curStart < calendarBaseYear || curStart > calendarBaseYear + 11)) {
+                                  setCalendarBaseYear(Math.floor(curStart / 12) * 12);
+                                }
+                              }
+                              setIsBatchCalendarOpen(isOpen);
+                            }}
+                          >
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  role="combobox"
+                                  aria-expanded={isBatchCalendarOpen}
+                                  disabled={!department}
+                                  className={cn(
+                                    "w-full justify-between h-10 px-3 bg-white font-normal hover:bg-slate-50 border border-slate-200 shadow-sm text-left transition-all",
+                                    !field.value && "text-muted-foreground",
+                                    isBatchCalendarOpen && "ring-2 ring-blue-500/20 border-blue-500"
+                                  )}
+                                >
+                                  <span className="flex items-center gap-2 truncate">
+                                    <CalendarIcon className="h-4 w-4 text-blue-600 shrink-0" />
+                                    {field.value ? (
+                                      <span className="font-semibold text-slate-800">
+                                        Batch {field.value}
+                                      </span>
+                                    ) : (
+                                      <span className="text-slate-400">Select Batch Year</span>
+                                    )}
+                                  </span>
+                                  <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100 shrink-0 ml-1">
+                                    {department === "bca" ? "3-Yr Program" : "4-Yr Program"}
+                                  </span>
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-[330px] p-3.5 bg-white shadow-xl border border-slate-200 rounded-xl z-[100]"
+                              align="start"
+                              sideOffset={5}
+                            >
+                              <div className="space-y-3">
+                                {/* Calendar Header Navigation */}
+                                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setCalendarBaseYear((prev) => prev - 12)}
+                                    className="h-7 w-7 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md"
+                                  >
+                                    <ChevronLeft className="h-4 w-4" />
+                                  </Button>
+                                  <div className="text-center">
+                                    <div className="text-xs font-bold text-slate-800 flex items-center justify-center gap-1.5">
+                                      <CalendarIcon className="h-3.5 w-3.5 text-blue-600" />
+                                      {calendarBaseYear} – {calendarBaseYear + 11}
+                                    </div>
+                                    <div className="text-[10px] text-slate-500 flex items-center justify-center gap-1 mt-0.5">
+                                      <GraduationCap className="h-3 w-3 text-slate-400" />
+                                      {department === "bca" ? "BCA (3-Year Session)" : "B.Tech (4-Year Session)"}
+                                    </div>
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setCalendarBaseYear((prev) => prev + 12)}
+                                    className="h-7 w-7 p-0 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md"
+                                  >
+                                    <ChevronRight className="h-4 w-4" />
+                                  </Button>
+                                </div>
+
+                                {/* Calendar Year Grid */}
+                                <div className="grid grid-cols-3 gap-2">
+                                  {years.map((year) => {
+                                    const sessionStr = `${year}-${year + duration}`;
+                                    const isSelected = field.value === sessionStr;
+                                    const isCurrentYear = new Date().getFullYear() === year;
+
+                                    return (
+                                      <button
+                                        key={year}
+                                        type="button"
+                                        onClick={() => {
+                                          field.onChange(sessionStr);
+                                          setIsBatchCalendarOpen(false);
+                                        }}
+                                        className={cn(
+                                          "flex flex-col items-center justify-center py-2 px-1 rounded-lg text-xs transition-all relative border",
+                                          isSelected
+                                            ? "bg-blue-600 text-white border-blue-600 font-bold shadow-md shadow-blue-500/20"
+                                            : "bg-white hover:bg-blue-50/70 text-slate-700 border-slate-200 hover:border-blue-300"
+                                        )}
+                                      >
+                                        <span className="text-sm font-semibold">{year}</span>
+                                        <span
+                                          className={cn(
+                                            "text-[10px] leading-tight",
+                                            isSelected ? "text-blue-100" : "text-slate-400"
+                                          )}
+                                        >
+                                          → {year + duration}
+                                        </span>
+                                        {isCurrentYear && !isSelected && (
+                                          <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                        )}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+
+                                {/* Quick Select Presets */}
+                                <div className="pt-2 border-t border-slate-100">
+                                  <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                                    Quick Sessions:
+                                  </div>
+                                  <div className="flex flex-wrap gap-1">
+                                    {getBatchOptions().map((batchOption) => (
+                                      <button
+                                        key={batchOption}
+                                        type="button"
+                                        onClick={() => {
+                                          field.onChange(batchOption);
+                                          setIsBatchCalendarOpen(false);
+                                        }}
+                                        className={cn(
+                                          "text-[11px] px-2 py-0.5 rounded border transition-colors",
+                                          field.value === batchOption
+                                            ? "bg-blue-600 text-white border-blue-600 font-semibold"
+                                            : "bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200"
+                                        )}
+                                      >
+                                        {batchOption}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
                   />
                 </div>
 
