@@ -873,18 +873,18 @@ export default function AdminPortal() {
                 TechVerse Club Administration
               </Badge>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black font-space tracking-tight text-white flex items-center gap-3">
-              Admin Portal <ShieldCheck className="w-8 h-8 text-cyan-400" />
+            <h1 className="text-2xl sm:text-4xl font-black font-space tracking-tight text-white flex items-center gap-3">
+              Admin Portal <ShieldCheck className="w-7 h-7 sm:w-8 sm:h-8 text-cyan-400" />
             </h1>
-            <p className="text-slate-400 text-sm mt-1">
-              Assign club roles & designations, manage student enquiries, and track university registrations.
+            <p className="text-slate-400 text-xs sm:text-sm mt-1">
+              Assign club roles &amp; designations, manage student enquiries, and track university registrations.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-mono text-slate-300 text-[11px]">techverse@ctuniversity.in</span>
+              <span className="font-mono text-slate-300 text-[11px] truncate max-w-[170px] sm:max-w-none">techverse@ctuniversity.in</span>
               <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[9px] font-mono">
                 SuperAdmin
               </Badge>
@@ -896,10 +896,10 @@ export default function AdminPortal() {
               size="sm"
               onClick={loadData}
               disabled={loading}
-              className="bg-white/5 hover:bg-white/10 text-slate-200 border-white/10 text-xs font-semibold rounded-xl flex items-center gap-2"
+              className="bg-white/5 hover:bg-white/10 text-slate-200 border-white/10 text-xs font-semibold rounded-xl flex items-center gap-1.5"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-              Refresh Data
+              <span className="hidden xs:inline sm:inline">Refresh</span>
             </Button>
             <Button
               id="logout-admin-btn"
@@ -907,91 +907,91 @@ export default function AdminPortal() {
               variant="outline"
               size="sm"
               onClick={handleLogout}
-              className="bg-red-500/10 hover:bg-red-500/20 text-red-300 border-red-500/30 text-xs font-semibold rounded-xl flex items-center gap-2"
+              className="bg-red-500/10 hover:bg-red-500/20 text-red-300 border-red-500/30 text-xs font-semibold rounded-xl flex items-center gap-1.5"
             >
               <LogOut className="w-3.5 h-3.5" />
-              Log Out
+              <span>Log Out</span>
             </Button>
           </div>
         </div>
 
         {/* METRICS OVERVIEW CARDS */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
           <div 
             onClick={() => setActiveTab("official-members")}
-            className="p-5 rounded-2xl bg-[#0b1126]/80 border border-white/10 shadow-lg backdrop-blur-xl cursor-pointer hover:border-blue-500/40 transition-all group"
+            className="p-3.5 sm:p-5 rounded-2xl bg-[#0b1126]/80 border border-white/10 shadow-lg backdrop-blur-xl cursor-pointer hover:border-blue-500/40 transition-all group"
             title="Click to view all registered members"
           >
-            <div className="flex items-center justify-between text-xs font-mono text-slate-400 mb-2">
-              <span>TOTAL MEMBERS</span>
-              <Users className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
+            <div className="flex items-center justify-between text-[11px] sm:text-xs font-mono text-slate-400 mb-1.5 sm:mb-2">
+              <span className="truncate">TOTAL MEMBERS</span>
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400 group-hover:scale-110 transition-transform shrink-0" />
             </div>
-            <div className="text-3xl font-black font-space text-white">{totalMembers}</div>
-            <span className="text-[11px] text-blue-400 font-medium mt-1 block">Registered in MongoDB</span>
+            <div className="text-2xl sm:text-3xl font-black font-space text-white">{totalMembers}</div>
+            <span className="text-[10px] sm:text-[11px] text-blue-400 font-medium mt-1 block truncate">Registered in MongoDB</span>
           </div>
 
           <div 
             onClick={() => setActiveTab("official-members")}
-            className={`p-5 rounded-2xl bg-[#0b1126]/80 border shadow-lg backdrop-blur-xl cursor-pointer transition-all group ${
+            className={`p-3.5 sm:p-5 rounded-2xl bg-[#0b1126]/80 border shadow-lg backdrop-blur-xl cursor-pointer transition-all group ${
               activeTab === "official-members" ? "border-emerald-500/60 ring-1 ring-emerald-500/40" : "border-white/10 hover:border-emerald-500/40"
             }`}
             title="Click to view Official Club Members"
           >
-            <div className="flex items-center justify-between text-xs font-mono text-slate-400 mb-2">
-              <span>OFFICIAL MEMBERS</span>
-              <UserCheck className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+            <div className="flex items-center justify-between text-[11px] sm:text-xs font-mono text-slate-400 mb-1.5 sm:mb-2">
+              <span className="truncate">OFFICIAL MEMBERS</span>
+              <UserCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 group-hover:scale-110 transition-transform shrink-0" />
             </div>
-            <div className="text-3xl font-black font-space text-emerald-400">{assignedCount}</div>
-            <span className="text-[11px] text-emerald-400/80 mt-1 block">Designation &amp; Card Active</span>
+            <div className="text-2xl sm:text-3xl font-black font-space text-emerald-400">{assignedCount}</div>
+            <span className="text-[10px] sm:text-[11px] text-emerald-400/80 mt-1 block truncate">Designation &amp; Card Active</span>
           </div>
 
           <div 
             onClick={() => setActiveTab("screening")}
-            className={`p-5 rounded-2xl bg-[#0b1126]/80 border shadow-lg backdrop-blur-xl cursor-pointer transition-all group ${
+            className={`p-3.5 sm:p-5 rounded-2xl bg-[#0b1126]/80 border shadow-lg backdrop-blur-xl cursor-pointer transition-all group ${
               activeTab === "screening" ? "border-amber-500/60 ring-1 ring-amber-500/40" : "border-white/10 hover:border-amber-500/40"
             }`}
             title="Click to view Applications Under Screening"
           >
-            <div className="flex items-center justify-between text-xs font-mono text-slate-400 mb-2">
-              <span>UNDER SCREENING</span>
-              <Clock className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+            <div className="flex items-center justify-between text-[11px] sm:text-xs font-mono text-slate-400 mb-1.5 sm:mb-2">
+              <span className="truncate">UNDER SCREENING</span>
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 group-hover:scale-110 transition-transform shrink-0" />
             </div>
-            <div className="text-3xl font-black font-space text-amber-400">{pendingCount}</div>
-            <span className="text-[11px] text-amber-400/80 mt-1 block">Awaiting Role &amp; ID Card</span>
+            <div className="text-2xl sm:text-3xl font-black font-space text-amber-400">{pendingCount}</div>
+            <span className="text-[10px] sm:text-[11px] text-amber-400/80 mt-1 block truncate">Awaiting Role &amp; ID Card</span>
           </div>
 
           <div 
             onClick={() => setActiveTab("queries")}
-            className={`p-5 rounded-2xl bg-[#0b1126]/80 border shadow-lg backdrop-blur-xl cursor-pointer transition-all group ${
+            className={`p-3.5 sm:p-5 rounded-2xl bg-[#0b1126]/80 border shadow-lg backdrop-blur-xl cursor-pointer transition-all group ${
               activeTab === "queries" ? "border-purple-500/60 ring-1 ring-purple-500/40" : "border-white/10 hover:border-purple-500/40"
             }`}
             title="Click to view Student Queries"
           >
-            <div className="flex items-center justify-between text-xs font-mono text-slate-400 mb-2">
-              <span>TOTAL QUERIES</span>
-              <MessageSquare className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
+            <div className="flex items-center justify-between text-[11px] sm:text-xs font-mono text-slate-400 mb-1.5 sm:mb-2">
+              <span className="truncate">TOTAL QUERIES</span>
+              <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-400 group-hover:scale-110 transition-transform shrink-0" />
             </div>
-            <div className="text-3xl font-black font-space text-purple-400">{totalQueries}</div>
-            <span className="text-[11px] text-slate-400 mt-1 block">Enquiries &amp; Messages</span>
+            <div className="text-2xl sm:text-3xl font-black font-space text-purple-400">{totalQueries}</div>
+            <span className="text-[10px] sm:text-[11px] text-slate-400 mt-1 block truncate">Enquiries &amp; Messages</span>
           </div>
         </div>
 
         {/* NAVIGATION TABS */}
-        <div className="flex items-center gap-2 border-b border-white/10 pb-2 overflow-x-auto">
+        <div className="flex items-center gap-2 border-b border-white/10 pb-2 overflow-x-auto no-scrollbar -mx-3 px-3 sm:mx-0 sm:px-0">
           <button
             id="tab-screening-btn"
             type="button"
             onClick={() => setActiveTab("screening")}
-            className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 flex-shrink-0 ${
+            className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 sm:gap-2 flex-shrink-0 ${
               activeTab === "screening"
                 ? "bg-gradient-to-r from-amber-600 to-yellow-600 text-white shadow-lg shadow-amber-500/25"
                 : "bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
             }`}
           >
-            <Clock className="w-4 h-4" />
+            <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>Screening Applications</span>
-            <span className="ml-1 px-2 py-0.5 rounded-full bg-black/40 text-[10px] font-mono text-amber-200">
-              {pendingCount} Pending
+            <span className="ml-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-black/40 text-[10px] font-mono text-amber-200">
+              {pendingCount}
             </span>
           </button>
 
@@ -999,16 +999,16 @@ export default function AdminPortal() {
             id="tab-official-members-btn"
             type="button"
             onClick={() => setActiveTab("official-members")}
-            className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 flex-shrink-0 ${
+            className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 sm:gap-2 flex-shrink-0 ${
               activeTab === "official-members"
                 ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/25"
                 : "bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
             }`}
           >
-            <Sparkles className="w-4 h-4" />
-            <span>Official Club Members</span>
-            <span className="ml-1 px-2 py-0.5 rounded-full bg-black/40 text-[10px] font-mono text-emerald-200">
-              {assignedCount} Members
+            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span>Official Members</span>
+            <span className="ml-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-black/40 text-[10px] font-mono text-emerald-200">
+              {assignedCount}
             </span>
           </button>
 
@@ -1016,15 +1016,15 @@ export default function AdminPortal() {
             id="tab-queries-btn"
             type="button"
             onClick={() => setActiveTab("queries")}
-            className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 flex-shrink-0 ${
+            className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 sm:gap-2 flex-shrink-0 ${
               activeTab === "queries"
                 ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/25"
                 : "bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
             }`}
           >
-            <MessageSquare className="w-4 h-4" />
-            <span>Student Queries &amp; Enquiries</span>
-            <span className="ml-1 px-2 py-0.5 rounded-full bg-black/40 text-[10px] font-mono">
+            <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span>Queries &amp; Enquiries</span>
+            <span className="ml-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-black/40 text-[10px] font-mono">
               {totalQueries}
             </span>
           </button>
@@ -1033,15 +1033,15 @@ export default function AdminPortal() {
             id="tab-arenas-btn"
             type="button"
             onClick={() => setActiveTab("arenas")}
-            className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 flex-shrink-0 ${
+            className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 sm:gap-2 flex-shrink-0 ${
               activeTab === "arenas"
-                ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/25"
+                ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/25"
                 : "bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
             }`}
           >
-            <Trophy className="w-4 h-4" />
+            <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>Engineers' Day Arenas</span>
-            <span className="ml-1 px-2 py-0.5 rounded-full bg-black/40 text-[10px] font-mono">
+            <span className="ml-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-black/40 text-[10px] font-mono">
               {eventStats?.totalRegistrations ?? 13}
             </span>
           </button>
@@ -1071,8 +1071,8 @@ export default function AdminPortal() {
             </div>
 
             {/* Search & Filter Bar */}
-            <div className="p-4 rounded-2xl bg-[#0b1126]/80 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="relative w-full md:w-96">
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-[#0b1126]/80 border border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+              <div className="relative flex-1">
                 <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <Input
                   id="admin-screening-search-input"
@@ -1080,15 +1080,15 @@ export default function AdminPortal() {
                   placeholder="Search applicants by Name, Reg No, or Email..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:border-amber-400"
+                  className="pl-10 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:border-amber-400 w-full"
                 />
               </div>
 
-              <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+              <div className="flex items-center gap-2.5 w-full sm:w-auto">
                 <select
                   value={deptFilter}
                   onChange={(e) => setDeptFilter(e.target.value)}
-                  className="bg-white/5 border border-white/10 text-slate-300 text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-amber-400"
+                  className="bg-white/5 border border-white/10 text-slate-300 text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-amber-400 w-full sm:w-auto"
                 >
                   <option value="all" className="bg-[#0b1126] text-white">All Departments</option>
                   <option value="btech" className="bg-[#0b1126] text-white">B.Tech</option>
@@ -1132,33 +1132,30 @@ export default function AdminPortal() {
                   return (
                     <div
                       key={member._id}
-                      className="p-5 sm:p-6 rounded-2xl bg-[#090e21]/90 border border-amber-500/20 hover:border-amber-500/40 transition-all shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6"
+                      className="p-4 sm:p-6 rounded-2xl bg-[#090e21]/90 border border-amber-500/20 hover:border-amber-500/40 transition-all shadow-xl space-y-4"
                     >
-                      {/* Left: Avatar + Candidate Info */}
-                      <div className="flex items-start gap-4 min-w-[280px]">
+                      {/* Top: Avatar + Candidate Info */}
+                      <div className="flex flex-row items-start gap-3 sm:gap-4">
                         {member.photo ? (
                           <img
                             src={member.photo}
                             alt={member.name}
-                            className="w-16 h-20 rounded-xl object-cover border border-amber-400/40 shadow flex-shrink-0"
+                            className="w-16 h-20 sm:w-20 sm:h-24 rounded-xl object-cover border border-amber-400/40 shadow flex-shrink-0"
                           />
                         ) : (
-                          <div className="w-16 h-20 rounded-xl bg-amber-900/20 border border-amber-500/30 flex items-center justify-center text-amber-300 text-xl font-bold flex-shrink-0">
+                          <div className="w-16 h-20 sm:w-20 sm:h-24 rounded-xl bg-amber-900/20 border border-amber-500/30 flex items-center justify-center text-amber-300 text-xl sm:text-2xl font-bold flex-shrink-0">
                             {member.name.charAt(0).toUpperCase()}
                           </div>
                         )}
 
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <h3 className="text-base sm:text-lg font-bold text-white font-space">
+                        <div className="space-y-1.5 flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="text-base sm:text-lg font-bold text-white font-space truncate">
                               {member.name}
                             </h3>
                             <Badge className="bg-amber-500/10 text-amber-300 border-amber-500/30 text-[10px] font-mono uppercase">
                               ⏳ Under Screening
                             </Badge>
-                          </div>
-
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
                             {member.serialNumber && (
                               <span className="font-mono text-amber-300 font-black bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/30 text-[11px]">
                                 #{member.serialNumber}
@@ -1169,6 +1166,9 @@ export default function AdminPortal() {
                                 {member.memberId}
                               </span>
                             )}
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-slate-400">
                             <span className="font-mono text-cyan-300 font-semibold">{member.regNumber}</span>
                             <span>•</span>
                             <span className="capitalize">{member.department.toUpperCase()} ({member.batch})</span>
@@ -1176,17 +1176,17 @@ export default function AdminPortal() {
                             <span className="text-slate-300">{member.residenceType || "Day Scholar"}</span>
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400 pt-1">
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400 pt-0.5">
                             <span className="flex items-center gap-1">
                               <Phone className="w-3 h-3 text-slate-500" /> {member.contact}
                             </span>
-                            <span className="flex items-center gap-1">
+                            <span className="flex items-center gap-1 break-all">
                               <Mail className="w-3 h-3 text-slate-500" /> {member.email}
                             </span>
                           </div>
 
                           {member.interests && member.interests.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 pt-1.5">
+                            <div className="flex flex-wrap gap-1.5 pt-1">
                               {member.interests.map((interest, idx) => (
                                 <span
                                   key={idx}
@@ -1200,105 +1200,103 @@ export default function AdminPortal() {
                         </div>
                       </div>
 
-                      {/* Middle: Role & Designation Inputs for Admin Assignment */}
-                      <div className="w-full lg:w-auto flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl bg-white/[0.02] border border-amber-500/10">
-                        <div>
-                          <label className="block text-[11px] font-mono uppercase tracking-wider text-amber-300 font-bold mb-1">
-                            Club Designation
-                          </label>
-                          <Input
-                            placeholder="e.g. Technical Lead, Web Dev Head..."
-                            value={draft.designation}
-                            onChange={(e) => handleDraftChange(member._id, "designation", e.target.value)}
-                            className="bg-white/5 border-white/10 text-white text-xs rounded-lg focus:border-amber-400"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-[11px] font-mono uppercase tracking-wider text-blue-300 font-bold mb-1">
-                            Role Assignee
-                          </label>
-                          <Input
-                            placeholder="e.g. Core Team, Associate, Volunteer..."
-                            value={draft.roleAssignee}
-                            onChange={(e) => handleDraftChange(member._id, "roleAssignee", e.target.value)}
-                            className="bg-white/5 border-white/10 text-white text-xs rounded-lg focus:border-blue-400"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Right: Save & Shift Action */}
-                      <div className="flex sm:flex-col items-center gap-2 w-full lg:w-auto justify-end">
-                        <Button
-                          id={`assign-role-btn-${member._id}`}
-                          type="button"
-                          onClick={() => handleSaveRole(member._id)}
-                          disabled={isSaving}
-                          size="sm"
-                          className="w-full sm:w-auto text-white text-xs font-bold rounded-xl px-4 py-2 flex items-center justify-center gap-1.5 shadow-md bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-500/20"
-                          title="Save designation, send official membership card email, and shift to Official Members"
-                        >
-                          {isSaving ? (
-                            <>
-                              <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Issuing Card...
-                            </>
-                          ) : (
-                            <>
-                              <Sparkles className="w-3.5 h-3.5 text-amber-300" /> Assign &amp; Send ID Card 🪪
-                            </>
-                          )}
-                        </Button>
-
-                        {confirmDeleteId === member._id ? (
-                          <div className="flex items-center gap-1.5 w-full sm:w-auto animate-fade-in">
-                            <Button
-                              id={`confirm-delete-btn-${member._id}`}
-                              type="button"
-                              size="sm"
-                              disabled={isDeletingId === member._id}
-                              onClick={() => handleDeleteMember(member._id, member.name)}
-                              className="bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-xl px-3 py-1.5 flex items-center gap-1 shadow-lg shadow-red-500/30"
-                              title="Click again to permanently delete from MongoDB"
-                            >
-                              {isDeletingId === member._id ? (
-                                <>
-                                  <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Deleting...
-                                </>
-                              ) : (
-                                <>
-                                  <Trash2 className="w-3.5 h-3.5" /> Confirm Delete
-                                </>
-                              )}
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              disabled={isDeletingId === member._id}
-                              onClick={() => setConfirmDeleteId(null)}
-                              className="text-slate-400 hover:text-white text-xs py-1.5 px-2"
-                            >
-                              Cancel
-                            </Button>
+                      {/* Bottom: Dedicated Role & Designation Inputs + Action Buttons */}
+                      <div className="pt-3 border-t border-white/10 flex flex-col xl:flex-row items-stretch xl:items-end justify-between gap-4 bg-white/[0.02] p-4 rounded-xl border border-amber-500/15">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1 min-w-0">
+                          <div>
+                            <label className="block text-[11px] font-mono uppercase tracking-wider text-amber-300 font-bold mb-1.5 flex items-center gap-1.5">
+                              <Sparkles className="w-3 h-3 text-amber-400" /> Club Designation
+                            </label>
+                            <Input
+                              placeholder="e.g. Technical Lead, Web Dev Head..."
+                              value={draft.designation}
+                              onChange={(e) => handleDraftChange(member._id, "designation", e.target.value)}
+                              className="bg-black/40 border-white/15 text-white text-xs h-9 rounded-lg focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30"
+                            />
                           </div>
-                        ) : (
-                          <Button
-                            id={`delete-member-btn-${member._id}`}
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setConfirmDeleteId(member._id)}
-                            className="w-full sm:w-auto bg-red-500/10 hover:bg-red-500/20 text-red-300 border-red-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3 transition-colors"
-                            title="Reject and delete this application from MongoDB Atlas"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 text-red-400" />
-                            <span>Reject / Delete</span>
-                          </Button>
-                        )}
 
-                        <span className="text-[10px] font-mono text-slate-500 block text-center">
-                          ID: {member.memberId || "TV-2026"}
-                        </span>
+                          <div>
+                            <label className="block text-[11px] font-mono uppercase tracking-wider text-blue-300 font-bold mb-1.5 flex items-center gap-1.5">
+                              <UserCheck className="w-3 h-3 text-blue-400" /> Role Assignee
+                            </label>
+                            <Input
+                              placeholder="e.g. Core Team, Associate, Volunteer..."
+                              value={draft.roleAssignee}
+                              onChange={(e) => handleDraftChange(member._id, "roleAssignee", e.target.value)}
+                              className="bg-black/40 border-white/15 text-white text-xs h-9 rounded-lg focus:border-blue-400 focus:ring-1 focus:ring-blue-400/30"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+                          <Button
+                            id={`assign-role-btn-${member._id}`}
+                            type="button"
+                            onClick={() => handleSaveRole(member._id)}
+                            disabled={isSaving}
+                            size="sm"
+                            className="w-full sm:w-auto text-white text-xs font-bold rounded-xl px-4 py-2 h-9 flex items-center justify-center gap-1.5 shadow-md bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-500/20 active:scale-[0.98] transition-all"
+                            title="Save designation, send official membership card email, and shift to Official Members"
+                          >
+                            {isSaving ? (
+                              <>
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Issuing Card...
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles className="w-3.5 h-3.5 text-amber-300" /> Assign &amp; Send ID Card 🪪
+                              </>
+                            )}
+                          </Button>
+
+                          {confirmDeleteId === member._id ? (
+                            <div className="flex items-center gap-1.5 w-full sm:w-auto animate-fade-in">
+                              <Button
+                                id={`confirm-delete-btn-${member._id}`}
+                                type="button"
+                                size="sm"
+                                disabled={isDeletingId === member._id}
+                                onClick={() => handleDeleteMember(member._id, member.name)}
+                                className="flex-1 sm:flex-initial bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-xl px-3 py-1.5 h-9 flex items-center justify-center gap-1 shadow-lg shadow-red-500/30"
+                                title="Click again to permanently delete from MongoDB"
+                              >
+                                {isDeletingId === member._id ? (
+                                  <>
+                                    <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Deleting...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Trash2 className="w-3.5 h-3.5" /> Confirm Delete
+                                  </>
+                                )}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                disabled={isDeletingId === member._id}
+                                onClick={() => setConfirmDeleteId(null)}
+                                className="text-slate-400 hover:text-white text-xs py-1.5 px-2 h-9"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button
+                              id={`delete-screening-member-btn-${member._id}`}
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setConfirmDeleteId(member._id)}
+                              className="w-full sm:w-auto bg-red-500/10 hover:bg-red-500/20 text-red-300 border-red-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3 h-9 transition-colors"
+                              title="Delete this candidate application from MongoDB Atlas"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                              <span>Reject / Delete</span>
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -1332,8 +1330,8 @@ export default function AdminPortal() {
             </div>
 
             {/* Search & Filter Bar */}
-            <div className="p-4 rounded-2xl bg-[#0b1126]/80 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="relative w-full md:w-80">
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-[#0b1126]/80 border border-white/10 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 sm:gap-4">
+              <div className="relative flex-1">
                 <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <Input
                   id="admin-official-search-input"
@@ -1341,18 +1339,18 @@ export default function AdminPortal() {
                   placeholder="Search members by Name, Designation, or ID..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:border-emerald-400"
+                  className="pl-10 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:border-emerald-400 w-full"
                 />
               </div>
 
-              <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto">
                 {/* Status Filter Buttons */}
-                <div className="flex items-center p-1 bg-white/5 border border-white/10 rounded-xl">
+                <div className="flex items-center justify-between sm:justify-start p-1 bg-white/5 border border-white/10 rounded-xl overflow-x-auto no-scrollbar">
                   <button
                     id="filter-active-members-btn"
                     type="button"
                     onClick={() => setOfficialStatusFilter("active")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-center whitespace-nowrap ${
                       officialStatusFilter === "active"
                         ? "bg-emerald-600 text-white shadow"
                         : "text-slate-400 hover:text-white"
@@ -1364,7 +1362,7 @@ export default function AdminPortal() {
                     id="filter-resigned-members-btn"
                     type="button"
                     onClick={() => setOfficialStatusFilter("resigned")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-center whitespace-nowrap ${
                       officialStatusFilter === "resigned"
                         ? "bg-amber-600 text-white shadow"
                         : "text-slate-400 hover:text-white"
@@ -1376,7 +1374,7 @@ export default function AdminPortal() {
                     id="filter-terminated-members-btn"
                     type="button"
                     onClick={() => setOfficialStatusFilter("terminated")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-center whitespace-nowrap ${
                       officialStatusFilter === "terminated"
                         ? "bg-red-600 text-white shadow"
                         : "text-slate-400 hover:text-white"
@@ -1388,7 +1386,7 @@ export default function AdminPortal() {
                     id="filter-all-members-btn"
                     type="button"
                     onClick={() => setOfficialStatusFilter("all")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-center whitespace-nowrap ${
                       officialStatusFilter === "all"
                         ? "bg-blue-600 text-white shadow"
                         : "text-slate-400 hover:text-white"
@@ -1401,7 +1399,7 @@ export default function AdminPortal() {
                 <select
                   value={deptFilter}
                   onChange={(e) => setDeptFilter(e.target.value)}
-                  className="bg-white/5 border border-white/10 text-slate-300 text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-emerald-400"
+                  className="bg-white/5 border border-white/10 text-slate-300 text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-emerald-400 w-full sm:w-auto"
                 >
                   <option value="all" className="bg-[#0b1126] text-white">All Departments</option>
                   <option value="btech" className="bg-[#0b1126] text-white">B.Tech</option>
@@ -1446,26 +1444,26 @@ export default function AdminPortal() {
                   return (
                     <div
                       key={member._id}
-                      className="p-5 sm:p-6 rounded-2xl bg-[#090e21]/90 border border-emerald-500/25 hover:border-emerald-500/45 transition-all shadow-xl space-y-4"
+                      className="p-4 sm:p-6 rounded-2xl bg-[#090e21]/90 border border-emerald-500/25 hover:border-emerald-500/45 transition-all shadow-xl space-y-4"
                     >
-                      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-6">
                         {/* Left: Avatar + Details */}
-                        <div className="flex items-start gap-4 min-w-[280px]">
+                        <div className="flex flex-row items-start gap-3.5 sm:gap-4 flex-1 min-w-0">
                           {member.photo ? (
                             <img
                               src={member.photo}
                               alt={member.name}
-                              className="w-16 h-20 rounded-xl object-cover border-2 border-emerald-400/50 shadow-lg flex-shrink-0"
+                              className="w-16 h-20 sm:w-20 sm:h-24 rounded-xl object-cover border-2 border-emerald-400/50 shadow-lg flex-shrink-0"
                             />
                           ) : (
-                            <div className="w-16 h-20 rounded-xl bg-gradient-to-br from-emerald-900/40 to-teal-900/40 border-2 border-emerald-500/40 flex items-center justify-center text-emerald-300 text-xl font-bold flex-shrink-0">
+                            <div className="w-16 h-20 sm:w-20 sm:h-24 rounded-xl bg-gradient-to-br from-emerald-900/40 to-teal-900/40 border-2 border-emerald-500/40 flex items-center justify-center text-emerald-300 text-xl font-bold flex-shrink-0">
                               {member.name.charAt(0).toUpperCase()}
                             </div>
                           )}
 
-                          <div className="space-y-1.5">
+                          <div className="space-y-1.5 flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                              <h3 className="text-base sm:text-lg font-bold text-white font-space">
+                              <h3 className="text-base sm:text-lg font-bold text-white font-space truncate">
                                 {member.name}
                               </h3>
                               {member.status === "Resigned" ? (
@@ -1533,7 +1531,7 @@ export default function AdminPortal() {
                               <span className="flex items-center gap-1">
                                 <Phone className="w-3 h-3 text-slate-500" /> {member.contact}
                               </span>
-                              <span className="flex items-center gap-1">
+                              <span className="flex items-center gap-1 break-all">
                                 <Mail className="w-3 h-3 text-slate-500" /> {member.email}
                               </span>
                             </div>
@@ -1554,7 +1552,7 @@ export default function AdminPortal() {
                         </div>
 
                         {/* Right: Actions */}
-                        <div className="flex sm:flex-col items-center gap-2 w-full lg:w-auto justify-end">
+                        <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end gap-2 w-full lg:w-auto justify-end pt-3 lg:pt-0 border-t border-white/10 lg:border-t-0 shrink-0">
                           {/* Active Member Action Set */}
                           {member.status !== "Resigned" && member.status !== "Terminated" ? (
                             <>
@@ -1564,11 +1562,11 @@ export default function AdminPortal() {
                                 type="button"
                                 size="sm"
                                 onClick={() => openPromotionModal(member)}
-                                className="w-full sm:w-auto bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-black rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3.5 shadow-md shadow-amber-500/25 border border-amber-300/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                className="w-full sm:flex-1 lg:w-48 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-black rounded-xl flex items-center justify-center gap-1.5 py-2 px-3.5 shadow-md shadow-amber-500/25 border border-amber-300/50 transition-all hover:scale-[1.02] active:scale-[0.98]"
                                 title="Promote this member to an elevated designation and dispatch an official leadership promotion email with updated ID card"
                               >
                                 <Crown className="w-3.5 h-3.5 text-slate-950 fill-slate-950" />
-                                <span>Promote / Update Role 🎖️</span>
+                                <span>Promote / Role 🎖️</span>
                               </Button>
 
                               {/* 2. ACCEPT RESIGNATION BUTTON */}
@@ -1578,11 +1576,11 @@ export default function AdminPortal() {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => openResignationModal(member)}
-                                className="w-full sm:w-auto bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3 transition-colors"
+                                className="w-full sm:flex-1 lg:w-48 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-2 px-3 transition-colors"
                                 title="Accept formal resignation from this member and dispatch official confirmation"
                               >
                                 <UserMinus className="w-3.5 h-3.5 text-amber-400" />
-                                <span>Accept Resignation</span>
+                                <span>Resignation</span>
                               </Button>
 
                               {/* 3. TERMINATE BUTTON */}
@@ -1592,7 +1590,7 @@ export default function AdminPortal() {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => openTerminateModal(member)}
-                                className="w-full sm:w-auto bg-red-600/15 hover:bg-red-600/25 text-red-300 border-red-500/40 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3 transition-colors shadow-sm"
+                                className="w-full sm:flex-1 lg:w-48 bg-red-600/15 hover:bg-red-600/25 text-red-300 border-red-500/40 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 py-2 px-3 transition-colors shadow-sm"
                                 title="Disciplinary termination and membership revocation"
                               >
                                 <UserX className="w-3.5 h-3.5 text-red-400" />
@@ -1605,10 +1603,10 @@ export default function AdminPortal() {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => setEditingOfficialId(isEditing ? null : member._id)}
-                                className="w-full sm:w-auto bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3"
+                                className="w-full sm:flex-1 lg:w-48 bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-2 px-3"
                               >
                                 <Edit3 className="w-3.5 h-3.5 text-blue-400" />
-                                <span>{isEditing ? "Close Editor" : "Quick Edit Designation"}</span>
+                                <span>{isEditing ? "Close Editor" : "Quick Edit"}</span>
                               </Button>
                             </>
                           ) : (
@@ -1627,14 +1625,14 @@ export default function AdminPortal() {
 
                           {/* 5. REJECT / DELETE BUTTON */}
                           {confirmDeleteId === member._id ? (
-                            <div className="flex items-center gap-1.5 w-full sm:w-auto animate-fade-in">
+                            <div className="flex items-center gap-1.5 w-full sm:flex-1 lg:w-48 animate-fade-in">
                               <Button
                                 id={`confirm-delete-btn-${member._id}`}
                                 type="button"
                                 size="sm"
                                 disabled={isDeletingId === member._id}
                                 onClick={() => handleDeleteMember(member._id, member.name)}
-                                className="bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-xl px-3 py-1.5 flex items-center gap-1 shadow-lg shadow-red-500/30"
+                                className="flex-1 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-xl px-3 py-2 flex items-center justify-center gap-1 shadow-lg shadow-red-500/30"
                                 title="Permanently delete this member from MongoDB"
                               >
                                 {isDeletingId === member._id ? (
@@ -1653,7 +1651,7 @@ export default function AdminPortal() {
                                 size="sm"
                                 disabled={isDeletingId === member._id}
                                 onClick={() => setConfirmDeleteId(null)}
-                                className="text-slate-400 hover:text-white text-xs py-1.5 px-2"
+                                className="text-slate-400 hover:text-white text-xs py-2 px-2"
                               >
                                 Cancel
                               </Button>
@@ -1665,7 +1663,7 @@ export default function AdminPortal() {
                               variant="outline"
                               size="sm"
                               onClick={() => setConfirmDeleteId(member._id)}
-                              className="w-full sm:w-auto bg-red-500/10 hover:bg-red-500/20 text-red-300 border-red-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-1.5 px-3 transition-colors"
+                              className="w-full sm:flex-1 lg:w-48 bg-red-500/10 hover:bg-red-500/20 text-red-300 border-red-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 py-2 px-3 transition-colors"
                               title="Delete this member record from MongoDB Atlas"
                             >
                               <Trash2 className="w-3.5 h-3.5 text-red-400" />
@@ -1673,7 +1671,7 @@ export default function AdminPortal() {
                             </Button>
                           )}
 
-                          <span className="text-[10px] font-mono text-slate-500 block text-center">
+                          <span className="text-[10px] font-mono text-slate-500 block text-center w-full">
                             ID: {member.memberId || "TV-2026"}
                           </span>
                         </div>
@@ -1957,8 +1955,8 @@ export default function AdminPortal() {
         {/* PROMOTION MODAL: REASSIGN ROLE & DISPATCH CURATED PROMOTION ID CARD */}
         {/* ================================================================= */}
         {promotingMember && (
-          <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
-            <div className="bg-[#090e21] border border-amber-500/40 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6 relative overflow-hidden">
+          <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in">
+            <div className="bg-[#090e21] border border-amber-500/40 rounded-2xl sm:rounded-3xl p-5 sm:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-5 relative my-auto">
               {/* Gold Top Accent Line */}
               <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600" />
 
@@ -2060,19 +2058,19 @@ export default function AdminPortal() {
                 <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-200/90 text-xs flex items-start gap-2.5">
                   <Mail className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
                   <div className="text-[11px] leading-relaxed">
-                    <strong>Automatic Dispatch:</strong> Upon confirmation, a curated <strong>Leadership Promotion Announcement</strong> and an updated <strong>TechVerse Digital ID Card</strong> will be instantly delivered to <code className="text-cyan-300 font-mono">{promotingMember.email}</code>.
+                    <strong>Automatic Dispatch:</strong> Upon confirmation, a curated <strong>Leadership Promotion Announcement</strong> and an updated <strong>TechVerse Digital ID Card</strong> will be instantly delivered to <code className="text-cyan-300 font-mono break-all">{promotingMember.email}</code>.
                   </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 pt-2">
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setPromotingMember(null)}
                   disabled={isPromoting}
-                  className="text-slate-400 hover:text-white text-xs font-semibold rounded-xl"
+                  className="text-slate-400 hover:text-white text-xs font-semibold rounded-xl w-full sm:w-auto"
                 >
                   Cancel
                 </Button>
@@ -2081,7 +2079,7 @@ export default function AdminPortal() {
                   type="button"
                   onClick={handleConfirmPromotion}
                   disabled={isPromoting || !promoDesignation.trim()}
-                  className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-black rounded-xl px-5 py-2.5 shadow-lg shadow-amber-500/25 border border-amber-300/40 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-black rounded-xl px-5 py-2.5 shadow-lg shadow-amber-500/25 border border-amber-300/40 flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
                 >
                   {isPromoting ? (
                     <>
@@ -2102,12 +2100,12 @@ export default function AdminPortal() {
 
         {/* RESIGNATION ACCEPTANCE MODAL */}
         {resigningMember && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-            <div className="relative w-full max-w-lg rounded-3xl bg-[#0b1126] border border-amber-500/30 p-6 sm:p-7 shadow-2xl space-y-5">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
+            <div className="relative w-full max-w-lg rounded-3xl bg-[#0b1126] border border-amber-500/30 p-5 sm:p-7 max-h-[90vh] overflow-y-auto shadow-2xl space-y-4 sm:space-y-5 my-auto">
               <button
                 type="button"
                 onClick={() => setResigningMember(null)}
-                className="absolute top-5 right-5 p-1 text-slate-400 hover:text-white rounded-lg transition-colors"
+                className="absolute top-4 right-4 sm:top-5 sm:right-5 p-1 text-slate-400 hover:text-white rounded-lg transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2128,12 +2126,12 @@ export default function AdminPortal() {
 
               {/* Member Summary */}
               <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-sm">
+                <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-sm flex-shrink-0">
                   {resigningMember.name.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-bold text-white truncate">{resigningMember.name}</h4>
-                  <p className="text-xs text-slate-400 font-mono">
+                  <p className="text-xs text-slate-400 font-mono truncate">
                     {resigningMember.designation} • Reg: {resigningMember.regNumber}
                   </p>
                 </div>
@@ -2168,13 +2166,13 @@ export default function AdminPortal() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-2.5 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 pt-2">
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setResigningMember(null)}
                   disabled={isSubmittingResignation}
-                  className="text-slate-400 hover:text-white text-xs font-semibold rounded-xl"
+                  className="text-slate-400 hover:text-white text-xs font-semibold rounded-xl w-full sm:w-auto"
                 >
                   Cancel
                 </Button>
@@ -2183,7 +2181,7 @@ export default function AdminPortal() {
                   type="button"
                   onClick={handleConfirmResignation}
                   disabled={isSubmittingResignation}
-                  className="bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 text-xs font-bold rounded-xl px-5 py-2.5 shadow-md flex items-center gap-2"
+                  className="bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 text-xs font-bold rounded-xl px-5 py-2.5 shadow-md flex items-center justify-center gap-2 w-full sm:w-auto"
                 >
                   {isSubmittingResignation ? (
                     <>
@@ -2204,12 +2202,12 @@ export default function AdminPortal() {
 
         {/* DISCIPLINARY TERMINATION MODAL */}
         {terminatingMember && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fade-in">
-            <div className="relative w-full max-w-lg rounded-3xl bg-[#0e0a14] border-2 border-red-500/50 p-6 sm:p-7 shadow-2xl space-y-5">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-sm animate-fade-in overflow-y-auto">
+            <div className="relative w-full max-w-lg rounded-3xl bg-[#0e0a14] border-2 border-red-500/50 p-5 sm:p-7 max-h-[90vh] overflow-y-auto shadow-2xl space-y-4 sm:space-y-5 my-auto">
               <button
                 type="button"
                 onClick={() => setTerminatingMember(null)}
-                className="absolute top-5 right-5 p-1 text-slate-400 hover:text-white rounded-lg transition-colors"
+                className="absolute top-4 right-4 sm:top-5 sm:right-5 p-1 text-slate-400 hover:text-white rounded-lg transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2230,12 +2228,12 @@ export default function AdminPortal() {
 
               {/* Member Summary */}
               <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-red-600/30 text-red-200 flex items-center justify-center font-bold text-sm">
+                <div className="w-10 h-10 rounded-lg bg-red-600/30 text-red-200 flex items-center justify-center font-bold text-sm flex-shrink-0">
                   {terminatingMember.name.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-bold text-white truncate">{terminatingMember.name}</h4>
-                  <p className="text-xs text-slate-400 font-mono">
+                  <p className="text-xs text-slate-400 font-mono truncate">
                     {terminatingMember.designation} • Reg: {terminatingMember.regNumber}
                   </p>
                 </div>
@@ -2280,7 +2278,7 @@ export default function AdminPortal() {
               </div>
 
               {/* Fine Amount & Remarks */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-mono uppercase tracking-wider text-red-300 font-bold mb-1">
                     Administrative Clearance Fine (₹)
@@ -2318,18 +2316,18 @@ export default function AdminPortal() {
                   className="mt-0.5 rounded border-red-400 text-red-600 focus:ring-red-500"
                 />
                 <label htmlFor="send-termination-email-check" className="text-xs text-red-200 cursor-pointer">
-                  <strong>Dispatch Curated Soft-Toned Notice Email:</strong> Sends a polite, respectful message to <code className="text-red-300 font-mono">{terminatingMember.email}</code> gently explaining the status update, referencing clearance formalities (₹{fineAmount || 1000}), and wishing them well academically.
+                  <strong>Dispatch Curated Soft-Toned Notice Email:</strong> Sends a polite, respectful message to <code className="text-red-300 font-mono break-all">{terminatingMember.email}</code> gently explaining the status update, referencing clearance formalities (₹{fineAmount || 1000}), and wishing them well academically.
                 </label>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-2.5 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 pt-2">
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setTerminatingMember(null)}
                   disabled={isSubmittingTermination}
-                  className="text-slate-400 hover:text-white text-xs font-semibold rounded-xl"
+                  className="text-slate-400 hover:text-white text-xs font-semibold rounded-xl w-full sm:w-auto"
                 >
                   Cancel
                 </Button>
@@ -2338,7 +2336,7 @@ export default function AdminPortal() {
                   type="button"
                   onClick={handleConfirmTermination}
                   disabled={isSubmittingTermination}
-                  className="bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 text-white text-xs font-bold rounded-xl px-5 py-2.5 shadow-lg shadow-red-600/30 flex items-center gap-2"
+                  className="bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 text-white text-xs font-bold rounded-xl px-5 py-2.5 shadow-lg shadow-red-600/30 flex items-center justify-center gap-2 w-full sm:w-auto"
                 >
                   {isSubmittingTermination ? (
                     <>
