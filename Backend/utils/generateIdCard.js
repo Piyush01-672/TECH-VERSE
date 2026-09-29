@@ -127,6 +127,14 @@ function generateIdCardSvg(m, options = {}) {
     (m.department === 'mtech' ? 'M.Tech (SOET)' : String(m.department || 'B.Tech').toUpperCase())))
   );
   const batch = escapeXml(m.batch || '2024-2028');
+  const specialization = escapeXml(
+    m.specialization || m.branch || (
+      m.department === 'btech' ? 'Computer Science & Engg.' :
+      (m.department === 'bca' ? 'Computer Applications' :
+      (m.department === 'mca' ? 'Computer Applications & Dev' :
+      (m.department === 'mtech' ? 'Advanced Engineering' : 'Engineering & Technology')))
+    )
+  );
   const designation = escapeXml((m.designation || (isPromotion ? 'Club Leader' : 'Active Member')).toUpperCase());
   const roleAssignee = escapeXml(m.roleAssignee || (isPromotion ? 'President and Committee Members of the Club' : 'Core Team Member'));
   const residence = escapeXml(m.residenceType || 'Day Scholar');
@@ -143,6 +151,7 @@ function generateIdCardSvg(m, options = {}) {
   const desigFontSize = designation.length > 25 ? 18 : 21;
   const roleFontSize = roleAssignee.length > 35 ? 11 : 12;
   const nameFontSize = name.length > 20 ? 19 : 23;
+  const specFontSize = specialization.length > 24 ? 10.5 : (specialization.length > 18 ? 11.5 : 12.5);
 
   let photoElement = '';
   if (photoBase64) {
@@ -240,61 +249,75 @@ function generateIdCardSvg(m, options = {}) {
     ${photoElement}
 
     <!-- RIGHT SIDE MEMBER DETAILS -->
-    <g transform="translate(272, 322)">
+    <g transform="translate(272, 320)">
       <!-- FULL NAME -->
-      <text x="0" y="16" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1.5">FULL NAME</text>
-      <text x="0" y="44" font-family="${fontFam}" font-size="${nameFontSize}" font-weight="900" fill="#0f172a">${name}</text>
-      <line x1="0" y1="56" x2="386" y2="56" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="0" y="14" font-family="${fontFam}" font-size="9.5" font-weight="800" fill="#64748b" letter-spacing="1.5">FULL NAME</text>
+      <text x="0" y="38" font-family="${fontFam}" font-size="${nameFontSize}" font-weight="900" fill="#0f172a">${name}</text>
+      <line x1="0" y1="48" x2="386" y2="48" stroke="#e2e8f0" stroke-width="1.5"/>
 
-      <!-- REGISTRATION NO. -->
-      <text x="0" y="78" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">REGISTRATION NO.</text>
-      <text x="0" y="101" font-family="${fontFam}" font-size="18" font-weight="900" fill="#1e40af">${regNumber}</text>
+      <!-- ROW 1: REGISTRATION NO. & CONTACT NUMBER (Registration No. in standard contact-like styling) -->
+      <g transform="translate(0, 58)">
+        <text x="0" y="12" font-family="${fontFam}" font-size="9" font-weight="800" fill="#64748b" letter-spacing="1">REGISTRATION NO.</text>
+        <text x="0" y="30" font-family="${fontFam}" font-size="13" font-weight="700" fill="#1e293b">${regNumber}</text>
 
-      <!-- DEPARTMENT & BATCH -->
-      <text x="0" y="128" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">DEPARTMENT &amp; BATCH</text>
-      <text x="0" y="148" font-family="${fontFam}" font-size="14" font-weight="700" fill="#1e293b">${department} • ${batch}</text>
+        <text x="190" y="12" font-family="${fontFam}" font-size="9" font-weight="800" fill="#64748b" letter-spacing="1">CONTACT NUMBER</text>
+        <text x="190" y="30" font-family="${fontFam}" font-size="13" font-weight="700" fill="#1e293b">${contact}</text>
+      </g>
 
-      <!-- RESIDENCE & CONTACT -->
-      <text x="0" y="180" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">RESIDENCE TYPE</text>
-      <text x="0" y="200" font-family="${fontFam}" font-size="13" font-weight="700" fill="#334155">${residence}</text>
+      <!-- ROW 2: DEPARTMENT & BATCH & BRANCH / SPECIALIZATION -->
+      <g transform="translate(0, 102)">
+        <text x="0" y="12" font-family="${fontFam}" font-size="9" font-weight="800" fill="#64748b" letter-spacing="1">DEPARTMENT &amp; BATCH</text>
+        <text x="0" y="30" font-family="${fontFam}" font-size="12.5" font-weight="700" fill="#1e293b">${department} • ${batch}</text>
 
-      <text x="190" y="180" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">CONTACT NUMBER</text>
-      <text x="190" y="200" font-family="${fontFam}" font-size="13" font-weight="700" fill="#334155">${contact}</text>
+        <text x="190" y="12" font-family="${fontFam}" font-size="9" font-weight="800" fill="#64748b" letter-spacing="1">BRANCH / SPECIALIZATION</text>
+        <text x="190" y="30" font-family="${fontFam}" font-size="${specFontSize}" font-weight="700" fill="#1e293b">${specialization}</text>
+      </g>
+
+      <!-- ROW 3: RESIDENCE TYPE & CAMPUS AFFILIATION -->
+      <g transform="translate(0, 146)">
+        <text x="0" y="12" font-family="${fontFam}" font-size="9" font-weight="800" fill="#64748b" letter-spacing="1">RESIDENCE TYPE</text>
+        <text x="0" y="30" font-family="${fontFam}" font-size="13" font-weight="700" fill="#1e293b">${residence}</text>
+
+        <text x="190" y="12" font-family="${fontFam}" font-size="9" font-weight="800" fill="#64748b" letter-spacing="1">CAMPUS AFFILIATION</text>
+        <text x="190" y="30" font-family="${fontFam}" font-size="12.5" font-weight="700" fill="#1e293b">CT University • SOET</text>
+      </g>
 
       <!-- OFFICIAL VERIFIED BADGE -->
-      <g transform="translate(0, 222)">
+      <g transform="translate(0, 196)">
         <rect x="0" y="0" width="386" height="34" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
         <circle cx="18" cy="17" r="9" fill="${isPromotion ? '#fef3c7' : '#eff6ff'}" stroke="${borderColor}" stroke-width="1.5"/>
         <text x="18" y="21" font-family="${fontFam}" font-size="11" font-weight="900" fill="${borderColor}" text-anchor="middle">✓</text>
-        <text x="36" y="21" font-family="${fontFam}" font-size="10" font-weight="800" fill="#0f172a" letter-spacing="0.5">AUTHENTICATED CREDENTIAL • SOET TECHVERSE</text>
+        <text x="36" y="21" font-family="${fontFam}" font-size="9.5" font-weight="800" fill="#0f172a" letter-spacing="0.5">AUTHENTICATED CREDENTIAL • SOET TECHVERSE</text>
       </g>
     </g>
 
     <!-- SIGNATORY & VALIDATION ROW -->
-    <g transform="translate(42, 606)">
+    <g transform="translate(42, 596)">
       <line x1="0" y1="0" x2="616" y2="0" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="6,4"/>
       
-      <g transform="translate(8, 16)">
-        <text x="0" y="16" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">MEMBERSHIP VALIDATION</text>
-        <text x="0" y="34" font-family="${fontFam}" font-size="12" font-weight="800" fill="#059669">Officially Enrolled • Active Status</text>
-        <text x="0" y="48" font-family="${fontFam}" font-size="10" font-weight="600" fill="#94a3b8">Authorized for Symposia, Hackathons &amp; Activities</text>
+      <g transform="translate(4, 12)">
+        <text x="0" y="14" font-family="${fontFam}" font-size="9.5" font-weight="800" fill="#64748b" letter-spacing="1">MEMBERSHIP VALIDATION</text>
+        <text x="0" y="32" font-family="${fontFam}" font-size="12" font-weight="800" fill="#059669">Officially Enrolled • Active Status</text>
+        <text x="0" y="48" font-family="${fontFam}" font-size="10.5" font-weight="800" fill="#1e3a8a">Issued by President &amp; Committee Members of TechVerse</text>
+        <text x="0" y="63" font-family="${fontFam}" font-size="9" font-weight="600" fill="#64748b">Authorized for University Symposia, Hackathons &amp; Activities</text>
       </g>
 
-      <g transform="translate(436, 10)">
-        <text x="85" y="26" font-family="${fontFam}" font-style="italic" font-weight="900" font-size="21" fill="#1e3a8a" text-anchor="middle">TechVerse CTU</text>
-        <line x1="0" y1="36" x2="170" y2="36" stroke="#0f172a" stroke-width="1.5"/>
-        <text x="85" y="49" font-family="${fontFam}" font-size="9" font-weight="800" fill="#475569" text-anchor="middle" letter-spacing="0.8">AUTHORIZED SIGNATORY</text>
+      <g transform="translate(436, 12)">
+        <text x="85" y="24" font-family="${fontFam}" font-style="italic" font-weight="900" font-size="21" fill="#1e3a8a" text-anchor="middle">TechVerse CTU</text>
+        <line x1="0" y1="34" x2="170" y2="34" stroke="#0f172a" stroke-width="1.5"/>
+        <text x="85" y="47" font-family="${fontFam}" font-size="9" font-weight="800" fill="#475569" text-anchor="middle" letter-spacing="0.8">AUTHORIZED SIGNATORY</text>
+        <text x="85" y="60" font-family="${fontFam}" font-size="8.5" font-weight="700" fill="#94a3b8" text-anchor="middle">CT UNIVERSITY • SOET</text>
       </g>
     </g>
 
     <!-- ELEGANT BOTTOM FOOTER -->
-    <rect x="0" y="690" width="700" height="190" fill="#0f172a"/>
-    <line x1="0" y1="690" x2="700" y2="690" stroke="${borderColor}" stroke-width="3"/>
+    <rect x="0" y="686" width="700" height="194" fill="#0f172a"/>
+    <line x1="0" y1="686" x2="700" y2="686" stroke="${borderColor}" stroke-width="3"/>
 
-    <text x="350" y="730" font-family="${fontFam}" font-size="12" font-weight="800" fill="#f8fafc" text-anchor="middle" letter-spacing="1.5">TECHVERSE CLUB • SCHOOL OF ENGINEERING &amp; TECHNOLOGY</text>
-    <text x="350" y="752" font-family="${fontFam}" font-size="11" fill="#94a3b8" text-anchor="middle">CT University, Ferozepur Road, Ludhiana, Punjab - 142024</text>
-    <text x="350" y="774" font-family="${fontFam}" font-size="10" fill="#64748b" text-anchor="middle">Inquiries: techverse@ctuniversity.in • https://techversectu.vercel.app</text>
-    <text x="350" y="802" font-family="${fontFam}" font-size="9.5" font-weight="800" fill="${borderColor}" text-anchor="middle" letter-spacing="1.5">OFFICIAL UNIVERSITY STUDENT ORGANIZATION CREDENTIAL • VALID ON-CAMPUS</text>
+    <text x="350" y="726" font-family="${fontFam}" font-size="12" font-weight="800" fill="#f8fafc" text-anchor="middle" letter-spacing="1.5">TECHVERSE CLUB • SCHOOL OF ENGINEERING &amp; TECHNOLOGY</text>
+    <text x="350" y="748" font-family="${fontFam}" font-size="11" fill="#94a3b8" text-anchor="middle">CT University, Ferozepur Road, Ludhiana, Punjab - 142024</text>
+    <text x="350" y="770" font-family="${fontFam}" font-size="10.5" font-weight="700" fill="#38bdf8" text-anchor="middle">Inquiries: techverse@ctuniversity.in • https://techverse.ctuniversity.in</text>
+    <text x="350" y="800" font-family="${fontFam}" font-size="9.5" font-weight="800" fill="${borderColor}" text-anchor="middle" letter-spacing="1.5">OFFICIAL UNIVERSITY STUDENT ORGANIZATION CREDENTIAL • VALID ON-CAMPUS</text>
   </g>
 </svg>
   `;
