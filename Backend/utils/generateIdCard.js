@@ -127,45 +127,41 @@ function generateIdCardSvg(m, options = {}) {
     (m.department === 'mtech' ? 'M.Tech (SOET)' : String(m.department || 'B.Tech').toUpperCase())))
   );
   const batch = escapeXml(m.batch || '2024-2028');
-  const designation = escapeXml(m.designation || (isPromotion ? 'Club Leader' : 'Active Member'));
+  const designation = escapeXml((m.designation || (isPromotion ? 'Club Leader' : 'Active Member')).toUpperCase());
   const roleAssignee = escapeXml(m.roleAssignee || (isPromotion ? 'President and Committee Members of the Club' : 'Core Team Member'));
   const residence = escapeXml(m.residenceType || 'Day Scholar');
   const contact = escapeXml(m.contact || 'N/A');
 
-  const borderColor = isPromotion ? '#f59e0b' : '#3b82f6';
+  const borderColor = isPromotion ? '#f59e0b' : '#2563eb';
   const accentGradientStart = isPromotion ? '#1e1b4b' : '#0f172a';
   const accentGradientMid = isPromotion ? '#312e81' : '#1e3a8a';
   const accentGradientEnd = isPromotion ? '#1e3a8a' : '#0284c7';
   const badgeTitle = isPromotion ? 'EXECUTIVE LEADERSHIP CREDENTIAL' : 'OFFICIAL CLUB IDENTITY CARD';
   const fontFam = "Roboto, 'Segoe UI', Arial, sans-serif";
 
+  // Dynamic font sizing for long values
+  const desigFontSize = designation.length > 25 ? 18 : 21;
+  const roleFontSize = roleAssignee.length > 35 ? 11 : 12;
+  const nameFontSize = name.length > 20 ? 19 : 23;
+
   let photoElement = '';
   if (photoBase64) {
-    photoElement = `<image href="${photoBase64}" x="50" y="240" width="200" height="280" preserveAspectRatio="xMidYMid slice" clip-path="url(#photoClip)"/>`;
+    photoElement = `<image href="${photoBase64}" x="42" y="320" width="206" height="260" preserveAspectRatio="xMidYMid slice" clip-path="url(#photoClip)"/>`;
   } else {
     const initial = escapeXml(rawName.charAt(0) || 'M');
     photoElement = `
-      <rect x="50" y="240" width="200" height="280" rx="20" fill="#1e293b" stroke="${borderColor}" stroke-width="2"/>
-      <circle cx="150" cy="370" r="70" fill="${isPromotion ? '#312e81' : '#1e3a8a'}" opacity="0.6"/>
-      <text x="150" y="402" font-family="${fontFam}" font-size="85" font-weight="900" fill="${borderColor}" text-anchor="middle">${initial}</text>
+      <rect x="42" y="320" width="206" height="260" rx="18" fill="#1e293b" stroke="${borderColor}" stroke-width="2"/>
+      <circle cx="145" cy="440" r="64" fill="${isPromotion ? '#312e81' : '#1e3a8a'}" opacity="0.6"/>
+      <text x="145" y="470" font-family="${fontFam}" font-size="80" font-weight="900" fill="${borderColor}" text-anchor="middle">${initial}</text>
     `;
   }
 
-  let barcodeLines = '';
-  const seedString = `${m.regNumber || '2024'}TECHVERSE`;
-  for (let i = 0; i < 58; i++) {
-    const x = 70 + i * 9.6;
-    const charCode = seedString.charCodeAt(i % seedString.length);
-    const w = (i % 4 === 0 || charCode % 3 === 0) ? 4.5 : (i % 2 === 0 ? 2.5 : 1.5);
-    barcodeLines += `<rect x="${x.toFixed(1)}" y="18" width="${w}" height="42" fill="#0f172a" />`;
-  }
-
   return `
-<svg width="700" height="1060" viewBox="0 0 700 1060" xmlns="http://www.w3.org/2000/svg">
+<svg width="700" height="880" viewBox="0 0 700 880" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="65%" stop-color="#f8fafc" />
+      <stop offset="70%" stop-color="#f8fafc" />
       <stop offset="100%" stop-color="#f1f5f9" />
     </linearGradient>
     <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -178,111 +174,127 @@ function generateIdCardSvg(m, options = {}) {
       <stop offset="50%" stop-color="#fef08a" />
       <stop offset="100%" stop-color="#d97706" />
     </linearGradient>
+    <linearGradient id="desigGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="${isPromotion ? '#fef3c7' : '#f0fdf4'}" />
+      <stop offset="100%" stop-color="${isPromotion ? '#fde68a' : '#dcfce7'}" />
+    </linearGradient>
     <clipPath id="cardClip">
-      <rect x="0" y="0" width="700" height="1060" rx="36" />
+      <rect x="0" y="0" width="700" height="880" rx="36" />
     </clipPath>
     <clipPath id="photoClip">
-      <rect x="50" y="240" width="200" height="280" rx="20" />
+      <rect x="42" y="320" width="206" height="260" rx="18" />
     </clipPath>
     <clipPath id="techverseClip">
-      <circle cx="350" cy="98" r="36" />
+      <circle cx="350" cy="92" r="36" />
     </clipPath>
   </defs>
 
   <g clip-path="url(#cardClip)">
-    <rect x="0" y="0" width="700" height="1060" fill="url(#cardBg)"/>
-    <rect x="3" y="3" width="694" height="1054" rx="33" fill="none" stroke="${borderColor}" stroke-width="6"/>
-    <rect x="8" y="8" width="684" height="1044" rx="28" fill="none" stroke="${isPromotion ? '#fde047' : '#93c5fd'}" stroke-width="1.5" opacity="0.7"/>
-    <rect x="305" y="14" width="90" height="14" rx="7" fill="#0f172a"/>
-    <rect x="306" y="15" width="88" height="12" rx="6" fill="#1e293b"/>
+    <!-- Base Background -->
+    <rect x="0" y="0" width="700" height="880" fill="url(#cardBg)"/>
+    
+    <!-- Outer Premium Border -->
+    <rect x="3" y="3" width="694" height="874" rx="33" fill="none" stroke="${borderColor}" stroke-width="5"/>
+    <rect x="7" y="7" width="686" height="866" rx="29" fill="none" stroke="${isPromotion ? '#fde047' : '#93c5fd'}" stroke-width="1.5" opacity="0.6"/>
 
-    <rect x="0" y="38" width="700" height="152" fill="url(#headerGrad)"/>
-    <line x1="0" y1="190" x2="700" y2="190" stroke="url(#goldRibbon)" stroke-width="4"/>
+    <!-- Lanyard Hole Slot Graphical Indicator -->
+    <rect x="305" y="12" width="90" height="12" rx="6" fill="#0f172a"/>
+    <rect x="306" y="13" width="88" height="10" rx="5" fill="#1e293b"/>
 
-    <g transform="translate(45, 52)">
-      ${univLogoBase64 ? `<image href="${univLogoBase64}" x="0" y="0" width="105" height="65" preserveAspectRatio="xMidYMid meet"/>` : ''}
+    <!-- HEADER BLOCK -->
+    <rect x="0" y="32" width="700" height="145" fill="url(#headerGrad)"/>
+    <line x1="0" y1="177" x2="700" y2="177" stroke="url(#goldRibbon)" stroke-width="3"/>
+
+    <!-- University Logo -->
+    <g transform="translate(42, 45)">
+      ${univLogoBase64 ? `<image href="${univLogoBase64}" x="0" y="0" width="100" height="62" preserveAspectRatio="xMidYMid meet"/>` : ''}
     </g>
-    <circle cx="350" cy="98" r="39" fill="#ffffff" stroke="${borderColor}" stroke-width="3"/>
-    ${techverseLogoBase64 ? `<image href="${techverseLogoBase64}" x="313" y="61" width="74" height="74" preserveAspectRatio="xMidYMid slice" clip-path="url(#techverseClip)"/>` : ''}
-    <g transform="translate(550, 52)">
-      ${soetLogoBase64 ? `<image href="${soetLogoBase64}" x="0" y="0" width="105" height="65" preserveAspectRatio="xMidYMid meet"/>` : ''}
+
+    <!-- Center TechVerse Emblem -->
+    <circle cx="350" cy="92" r="38" fill="#ffffff" stroke="${borderColor}" stroke-width="3"/>
+    ${techverseLogoBase64 ? `<image href="${techverseLogoBase64}" x="314" y="56" width="72" height="72" preserveAspectRatio="xMidYMid slice" clip-path="url(#techverseClip)"/>` : ''}
+
+    <!-- SOET Logo -->
+    <g transform="translate(558, 45)">
+      ${soetLogoBase64 ? `<image href="${soetLogoBase64}" x="0" y="0" width="100" height="62" preserveAspectRatio="xMidYMid meet"/>` : ''}
     </g>
 
-    <text x="350" y="156" font-family="${fontFam}" font-size="20" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="3">CT UNIVERSITY</text>
-    <text x="350" y="176" font-family="${fontFam}" font-size="11" font-weight="800" fill="#cbd5e1" text-anchor="middle" letter-spacing="2">SCHOOL OF ENGINEERING &amp; TECHNOLOGY • TECHVERSE CLUB</text>
+    <!-- Header Titles -->
+    <text x="350" y="148" font-family="${fontFam}" font-size="18" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="3.5">CT UNIVERSITY</text>
+    <text x="350" y="166" font-family="${fontFam}" font-size="10.5" font-weight="700" fill="#cbd5e1" text-anchor="middle" letter-spacing="1.5">SCHOOL OF ENGINEERING &amp; TECHNOLOGY • TECHVERSE CLUB</text>
 
-    <rect x="40" y="202" width="620" height="28" rx="8" fill="${isPromotion ? '#fef3c7' : '#eff6ff'}" stroke="${borderColor}" stroke-width="1.5"/>
-    <text x="350" y="221" font-family="${fontFam}" font-size="11" font-weight="900" fill="${isPromotion ? '#92400e' : '#1e40af'}" text-anchor="middle" letter-spacing="2">${badgeTitle}</text>
+    <!-- TOP CREDENTIAL BADGE PILL -->
+    <rect x="42" y="190" width="616" height="26" rx="8" fill="${isPromotion ? '#fef3c7' : '#eff6ff'}" stroke="${borderColor}" stroke-width="1.2"/>
+    <text x="350" y="208" font-family="${fontFam}" font-size="11" font-weight="900" fill="${isPromotion ? '#92400e' : '#1e40af'}" text-anchor="middle" letter-spacing="2">${badgeTitle}</text>
+
+    <!-- PRIMARY HERO SECTION: DESIGNATION (BIGGER TEXT FIRST) & ROLE -->
+    <g transform="translate(42, 226)">
+      <rect x="0" y="0" width="616" height="76" rx="14" fill="url(#desigGrad)" stroke="${borderColor}" stroke-width="2"/>
+      <text x="308" y="22" font-family="${fontFam}" font-size="10" font-weight="800" fill="${isPromotion ? '#b45309' : '#0369a1'}" text-anchor="middle" letter-spacing="2">OFFICIAL CLUB DESIGNATION</text>
+      <text x="308" y="47" font-family="${fontFam}" font-size="${desigFontSize}" font-weight="900" fill="${isPromotion ? '#78350f' : '#15803d'}" text-anchor="middle" letter-spacing="1">${designation}</text>
+      <text x="308" y="65" font-family="${fontFam}" font-size="${roleFontSize}" font-weight="700" fill="#334155" text-anchor="middle">Role: ${roleAssignee}</text>
+    </g>
 
     <!-- PHOTO BOX -->
-    <rect x="48" y="238" width="204" height="284" rx="22" fill="none" stroke="${borderColor}" stroke-width="4"/>
+    <rect x="40" y="318" width="210" height="264" rx="20" fill="none" stroke="${borderColor}" stroke-width="3"/>
     ${photoElement}
 
-    <!-- Security Chip / Official Authenticity Seal Under Photo -->
-    <g transform="translate(48, 542)">
-      <rect x="0" y="0" width="204" height="66" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
-      <circle cx="28" cy="33" r="16" fill="${isPromotion ? '#fef3c7' : '#eff6ff'}" stroke="${borderColor}" stroke-width="2"/>
-      <polygon points="28,24 30.5,30 37,30.5 32,34.5 34,41 28.5,37 23,41 25,34.5 20,30.5 26.5,30" fill="${borderColor}"/>
-      <text x="56" y="28" font-family="${fontFam}" font-size="10" font-weight="900" fill="#0f172a" letter-spacing="1">AUTHENTIC CREDENTIAL</text>
-      <text x="56" y="45" font-family="${fontFam}" font-size="9" font-weight="700" fill="#64748b">CT UNIVERSITY • SOET</text>
-    </g>
-
     <!-- RIGHT SIDE MEMBER DETAILS -->
-    <g transform="translate(280, 238)">
-      <text x="0" y="18" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1.5">FULL NAME</text>
-      <text x="0" y="46" font-family="${fontFam}" font-size="23" font-weight="900" fill="#0f172a">${name}</text>
-      <line x1="0" y1="58" x2="375" y2="58" stroke="#e2e8f0" stroke-width="1.5"/>
+    <g transform="translate(272, 322)">
+      <!-- FULL NAME -->
+      <text x="0" y="16" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1.5">FULL NAME</text>
+      <text x="0" y="44" font-family="${fontFam}" font-size="${nameFontSize}" font-weight="900" fill="#0f172a">${name}</text>
+      <line x1="0" y1="56" x2="386" y2="56" stroke="#e2e8f0" stroke-width="1.5"/>
 
-      <text x="0" y="80" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">REGISTRATION NO.</text>
-      <text x="0" y="103" font-family="${fontFam}" font-size="18" font-weight="900" fill="#1e40af">${regNumber}</text>
+      <!-- REGISTRATION NO. -->
+      <text x="0" y="78" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">REGISTRATION NO.</text>
+      <text x="0" y="101" font-family="${fontFam}" font-size="18" font-weight="900" fill="#1e40af">${regNumber}</text>
 
-      <text x="0" y="130" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">DEPARTMENT &amp; BATCH</text>
-      <text x="0" y="150" font-family="${fontFam}" font-size="14" font-weight="700" fill="#1e293b">${department} • ${batch}</text>
+      <!-- DEPARTMENT & BATCH -->
+      <text x="0" y="128" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">DEPARTMENT &amp; BATCH</text>
+      <text x="0" y="148" font-family="${fontFam}" font-size="14" font-weight="700" fill="#1e293b">${department} • ${batch}</text>
 
-      <text x="0" y="180" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">OFFICIAL CLUB DESIGNATION</text>
-      <rect x="0" y="188" width="375" height="34" rx="8" fill="${isPromotion ? '#fef3c7' : '#f0fdf4'}" stroke="${borderColor}" stroke-width="2"/>
-      <text x="14" y="211" font-family="${fontFam}" font-size="14" font-weight="900" fill="${isPromotion ? '#92400e' : '#166534'}">${isPromotion ? 'PROMOTED • ' : ''}${designation}</text>
+      <!-- RESIDENCE & CONTACT -->
+      <text x="0" y="180" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">RESIDENCE TYPE</text>
+      <text x="0" y="200" font-family="${fontFam}" font-size="13" font-weight="700" fill="#334155">${residence}</text>
 
-      <text x="0" y="246" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">ROLE ASSIGNEE / DIVISION</text>
-      <rect x="0" y="254" width="375" height="28" rx="6" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
-      <text x="14" y="273" font-family="${fontFam}" font-size="12" font-weight="800" fill="#1e40af">${roleAssignee}</text>
+      <text x="190" y="180" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">CONTACT NUMBER</text>
+      <text x="190" y="200" font-family="${fontFam}" font-size="13" font-weight="700" fill="#334155">${contact}</text>
 
-      <text x="0" y="304" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">RESIDENCE TYPE</text>
-      <text x="0" y="322" font-family="${fontFam}" font-size="13" font-weight="700" fill="#334155">${residence}</text>
-
-      <text x="190" y="304" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">CONTACT NUMBER</text>
-      <text x="190" y="322" font-family="${fontFam}" font-size="13" font-weight="700" fill="#334155">${contact}</text>
-    </g>
-
-    <line x1="45" y1="630" x2="655" y2="630" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,4"/>
-
-    <g transform="translate(48, 646)">
-      <rect x="0" y="0" width="375" height="64" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
-      <text x="16" y="22" font-family="${fontFam}" font-size="10" font-weight="900" fill="#0f172a" letter-spacing="1">VERIFIED UNIVERSITY CREDENTIAL</text>
-      <text x="16" y="38" font-family="${fontFam}" font-size="9" fill="#64748b">Recognized for University Symposiums, Hackathons &amp; Events</text>
-      <text x="16" y="52" font-family="${fontFam}" font-size="9" font-weight="700" fill="#059669">Log Validated • Academic Session ${batch}</text>
-
-      <g transform="translate(415, -2)">
-        <text x="95" y="40" font-family="${fontFam}" font-style="italic" font-weight="900" font-size="22" fill="#1e3a8a" text-anchor="middle">TechVerse CTU</text>
-        <line x1="0" y1="48" x2="190" y2="48" stroke="#0f172a" stroke-width="1.5"/>
-        <text x="95" y="62" font-family="${fontFam}" font-size="9" font-weight="800" fill="#475569" text-anchor="middle" letter-spacing="0.5">AUTHORIZED SIGNATORY</text>
+      <!-- OFFICIAL VERIFIED BADGE -->
+      <g transform="translate(0, 222)">
+        <rect x="0" y="0" width="386" height="34" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+        <circle cx="18" cy="17" r="9" fill="${isPromotion ? '#fef3c7' : '#eff6ff'}" stroke="${borderColor}" stroke-width="1.5"/>
+        <text x="18" y="21" font-family="${fontFam}" font-size="11" font-weight="900" fill="${borderColor}" text-anchor="middle">✓</text>
+        <text x="36" y="21" font-family="${fontFam}" font-size="10" font-weight="800" fill="#0f172a" letter-spacing="0.5">AUTHENTICATED CREDENTIAL • SOET TECHVERSE</text>
       </g>
     </g>
 
-    <!-- CLEAN BARCODE SECTION -->
-    <g transform="translate(45, 730)">
-      <rect x="0" y="0" width="610" height="92" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
-      ${barcodeLines}
-      <text x="305" y="78" font-family="${fontFam}" font-size="12" font-weight="800" fill="#0f172a" text-anchor="middle" letter-spacing="4">* REG-${regNumber} • TECHVERSE • CT UNIVERSITY *</text>
+    <!-- SIGNATORY & VALIDATION ROW -->
+    <g transform="translate(42, 606)">
+      <line x1="0" y1="0" x2="616" y2="0" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="6,4"/>
+      
+      <g transform="translate(8, 16)">
+        <text x="0" y="16" font-family="${fontFam}" font-size="10" font-weight="800" fill="#64748b" letter-spacing="1">MEMBERSHIP VALIDATION</text>
+        <text x="0" y="34" font-family="${fontFam}" font-size="12" font-weight="800" fill="#059669">Officially Enrolled • Active Status</text>
+        <text x="0" y="48" font-family="${fontFam}" font-size="10" font-weight="600" fill="#94a3b8">Authorized for Symposia, Hackathons &amp; Activities</text>
+      </g>
+
+      <g transform="translate(436, 10)">
+        <text x="85" y="26" font-family="${fontFam}" font-style="italic" font-weight="900" font-size="21" fill="#1e3a8a" text-anchor="middle">TechVerse CTU</text>
+        <line x1="0" y1="36" x2="170" y2="36" stroke="#0f172a" stroke-width="1.5"/>
+        <text x="85" y="49" font-family="${fontFam}" font-size="9" font-weight="800" fill="#475569" text-anchor="middle" letter-spacing="0.8">AUTHORIZED SIGNATORY</text>
+      </g>
     </g>
 
-    <rect x="0" y="850" width="700" height="210" fill="#0f172a"/>
-    <line x1="0" y1="850" x2="700" y2="850" stroke="${borderColor}" stroke-width="3"/>
+    <!-- ELEGANT BOTTOM FOOTER -->
+    <rect x="0" y="690" width="700" height="190" fill="#0f172a"/>
+    <line x1="0" y1="690" x2="700" y2="690" stroke="${borderColor}" stroke-width="3"/>
 
-    <text x="350" y="885" font-family="${fontFam}" font-size="12" font-weight="800" fill="#f8fafc" text-anchor="middle" letter-spacing="1.5">TECHVERSE CLUB • SCHOOL OF ENGINEERING &amp; TECHNOLOGY</text>
-    <text x="350" y="906" font-family="${fontFam}" font-size="11" fill="#94a3b8" text-anchor="middle">CT University, Ferozepur Road, Ludhiana, Punjab - 142024</text>
-    <text x="350" y="927" font-family="${fontFam}" font-size="10" fill="#64748b" text-anchor="middle">Inquiries: techverse@ctuniversity.in • https://techversectu.vercel.app</text>
-    <text x="350" y="952" font-family="${fontFam}" font-size="9" font-weight="700" fill="${borderColor}" text-anchor="middle" letter-spacing="1">PROPERTY OF TECHVERSE CLUB • IF FOUND, PLEASE RETURN TO SOET OFFICE</text>
+    <text x="350" y="730" font-family="${fontFam}" font-size="12" font-weight="800" fill="#f8fafc" text-anchor="middle" letter-spacing="1.5">TECHVERSE CLUB • SCHOOL OF ENGINEERING &amp; TECHNOLOGY</text>
+    <text x="350" y="752" font-family="${fontFam}" font-size="11" fill="#94a3b8" text-anchor="middle">CT University, Ferozepur Road, Ludhiana, Punjab - 142024</text>
+    <text x="350" y="774" font-family="${fontFam}" font-size="10" fill="#64748b" text-anchor="middle">Inquiries: techverse@ctuniversity.in • https://techversectu.vercel.app</text>
+    <text x="350" y="802" font-family="${fontFam}" font-size="9.5" font-weight="800" fill="${borderColor}" text-anchor="middle" letter-spacing="1.5">OFFICIAL UNIVERSITY STUDENT ORGANIZATION CREDENTIAL • VALID ON-CAMPUS</text>
   </g>
 </svg>
   `;
