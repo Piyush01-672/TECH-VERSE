@@ -54,12 +54,27 @@ function ensureFontFilesSync() {
   if (foundBold) fontFiles.push(foundBold);
   if (foundReg) fontFiles.push(foundReg);
 
-  if (fontFiles.length >= 2) return fontFiles;
+  if (fontFiles.length < 2) {
+    try {
+      const tmpDir = os.tmpdir();
+      const tmpReg = path.join(tmpDir, 'techverse-Roboto-Regular.ttf');
+      const tmpBold = path.join(tmpDir, 'techverse-Roboto-Bold.ttf');
+      if (defaultFontBuffers && defaultFontBuffers[0] && (!fs.existsSync(tmpReg) || fs.statSync(tmpReg).size === 0)) {
+        fs.writeFileSync(tmpReg, defaultFontBuffers[0]);
+      }
+      if (defaultFontBuffers && defaultFontBuffers[1] && (!fs.existsSync(tmpBold) || fs.statSync(tmpBold).size === 0)) {
+        fs.writeFileSync(tmpBold, defaultFontBuffers[1]);
+      }
+      if (fs.existsSync(tmpReg) && !fontFiles.includes(tmpReg)) fontFiles.push(tmpReg);
+      if (fs.existsSync(tmpBold) && !fontFiles.includes(tmpBold)) fontFiles.push(tmpBold);
+    } catch (e) {
+      console.warn('Could not write font buffers to tmpdir:', e.message);
+    }
+  }
 
-  if (process.platform === 'win32') {
+  if (process.platform === 'win32' && fontFiles.length < 2) {
     if (fs.existsSync('C:/Windows/Fonts/segoeuib.ttf')) fontFiles.push('C:/Windows/Fonts/segoeuib.ttf');
     if (fs.existsSync('C:/Windows/Fonts/segoeui.ttf')) fontFiles.push('C:/Windows/Fonts/segoeui.ttf');
-    if (fontFiles.length >= 2) return fontFiles;
   }
 
   return fontFiles;
@@ -276,16 +291,17 @@ function generateIdCardSvg(m, options = {}) {
 function generateIdCardPng(m, options = {}) {
   try {
     const svg = generateIdCardSvg(m, options);
+    const fontFiles = ensureFontFilesSync();
     const resvgOpts = {
       fitTo: { mode: 'width', value: 1400 },
       shapeRendering: 2,
       textRendering: 2,
       imageRendering: 0,
       font: {
-        loadSystemFonts: false,
+        loadSystemFonts: true,
+        fontFiles: fontFiles.length > 0 ? fontFiles : undefined,
         defaultFontFamily: 'Roboto',
         sansSerifFamily: 'Roboto',
-        fontBuffers: defaultFontBuffers,
       },
     };
     const resvg = new Resvg(svg, resvgOpts);
