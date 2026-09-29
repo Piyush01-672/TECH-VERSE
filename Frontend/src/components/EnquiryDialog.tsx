@@ -74,9 +74,10 @@ const formSchema = z.object({
     .string()
     .regex(/^\d{10}$/, { message: "Enter a valid 10-digit contact number" }),
   email: z.string().email({ message: "Enter a valid email address" }),
-  department: z.enum(["btech", "bca"], {
+  department: z.enum(["btech", "bca", "mca", "mtech"], {
     required_error: "Please select a department",
   }),
+  specialization: z.string().optional(),
   batch: z.string().min(1, { message: "Please select a batch" }),
   residenceType: z.enum(["Hosteller", "Day Scholar"], {
     required_error: "Please select if you are a Hosteller or Day Scholar",
@@ -94,6 +95,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 interface SubmittedMemberData extends FormData {
+  specialization?: string;
   designation?: string;
   roleAssignee?: string;
   memberId?: string;
@@ -135,6 +137,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
       email: "",
       department: "btech",
       batch: "2024-2028",
+      specialization: "",
       residenceType: "Hosteller",
       photo: "",
       interests: ["Coding & App/Web Development"],
@@ -146,11 +149,50 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
   const department = form.watch("department");
   const interests = form.watch("interests");
 
+  const getDepartmentDuration = (dept?: string) => {
+    if (dept === "mca" || dept === "mtech") return 2;
+    if (dept === "bca") return 3;
+    return 4; // btech default
+  };
+
+  const getDepartmentLabel = (dept?: string) => {
+    switch (dept) {
+      case "mca":
+        return "MCA (2-Year Session)";
+      case "mtech":
+        return "M.Tech (2-Year Session)";
+      case "bca":
+        return "BCA (3-Year Session)";
+      default:
+        return "B.Tech (4-Year Session)";
+    }
+  };
+
+  const getProgramBadge = (dept?: string) => {
+    if (dept === "mca" || dept === "mtech") return "2-Yr Program";
+    if (dept === "bca") return "3-Yr Program";
+    return "4-Yr Program";
+  };
+
+  const getDepartmentDisplayName = (dept?: string) => {
+    switch (dept) {
+      case "mtech":
+        return "M.Tech";
+      case "mca":
+        return "MCA";
+      case "bca":
+        return "BCA";
+      default:
+        return "B.Tech";
+    }
+  };
+
   const getBatchOptions = () => {
-    if (department === "btech")
-      return ["2021-2025", "2022-2026", "2023-2027", "2024-2028", "2025-2029"];
-    if (department === "bca") return ["2021-2024", "2022-2025", "2023-2026", "2024-2027", "2025-2028"];
-    return ["2024-2028"];
+    if (department === "mca" || department === "mtech")
+      return ["2022-2024", "2023-2025", "2024-2026", "2025-2027", "2026-2028"];
+    if (department === "bca")
+      return ["2021-2024", "2022-2025", "2023-2026", "2024-2027", "2025-2028"];
+    return ["2021-2025", "2022-2026", "2023-2027", "2024-2028", "2025-2029"];
   };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -213,12 +255,12 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
-    if (interests.includes("Other") && data.otherInterest) {
-      data.interests = [
-        ...interests.filter((i) => i !== "Other"),
-        data.otherInterest,
-      ];
-    }
+    const selectedInterest = data.interests?.[0] || "Coding & App/Web Development";
+    const finalInterests = (selectedInterest === "Other" && data.otherInterest?.trim())
+      ? [data.otherInterest.trim()]
+      : [selectedInterest];
+
+    data.interests = finalInterests;
 
     const tempMemberId = `TV-${new Date().getFullYear()}-0000`;
     const issuedAt = new Date().toLocaleDateString("en-IN", {
@@ -354,8 +396,10 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                   <span className="font-bold text-slate-800 font-mono">{submittedMember.regNumber}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Program & Batch</span>
-                  <span className="font-bold text-slate-800 uppercase">{submittedMember.department} ({submittedMember.batch})</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Program &amp; Batch</span>
+                  <span className="font-bold text-slate-800">
+                    {getDepartmentDisplayName(submittedMember.department)} ({submittedMember.batch})
+                  </span>
                 </div>
                 <div>
                   <span className="text-[10px] uppercase font-bold text-slate-400 block">Residence Status</span>
@@ -365,6 +409,12 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                   <span className="text-[10px] uppercase font-bold text-slate-400 block">Contact</span>
                   <span className="font-semibold text-slate-700">{submittedMember.contact}</span>
                 </div>
+                {submittedMember.specialization && (
+                  <div className="col-span-2 bg-blue-50/70 p-2 rounded-lg border border-blue-100">
+                    <span className="text-[10px] uppercase font-bold text-blue-600 block">Specialization / Branch</span>
+                    <span className="font-bold text-slate-800 text-xs">{submittedMember.specialization}</span>
+                  </div>
+                )}
               </div>
 
               {/* NEXT STEPS CALLOUT */}
@@ -604,7 +654,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                             field.onChange(val);
                             const currentBatch = form.getValues("batch");
                             const startYr = parseInt(currentBatch?.split("-")[0] || "2024", 10);
-                            const dur = val === "bca" ? 3 : 4;
+                            const dur = getDepartmentDuration(val);
                             form.setValue("batch", `${startYr}-${startYr + dur}`);
                           }}
                           value={field.value}
@@ -617,6 +667,8 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                           <SelectContent>
                             <SelectItem value="btech">B.Tech</SelectItem>
                             <SelectItem value="bca">BCA</SelectItem>
+                            <SelectItem value="mca">MCA</SelectItem>
+                            <SelectItem value="mtech">M.Tech</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -627,7 +679,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                     control={form.control}
                     name="batch"
                     render={({ field }) => {
-                      const duration = department === "bca" ? 3 : 4;
+                      const duration = getDepartmentDuration(department);
                       const years = Array.from({ length: 12 }, (_, i) => calendarBaseYear + i);
 
                       return (
@@ -670,7 +722,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                                     )}
                                   </span>
                                   <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100 shrink-0 ml-1">
-                                    {department === "bca" ? "3-Yr Program" : "4-Yr Program"}
+                                    {getProgramBadge(department)}
                                   </span>
                                 </Button>
                               </FormControl>
@@ -699,7 +751,7 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                                     </div>
                                     <div className="text-[10px] text-slate-500 flex items-center justify-center gap-1 mt-0.5">
                                       <GraduationCap className="h-3 w-3 text-slate-400" />
-                                      {department === "bca" ? "BCA (3-Year Session)" : "B.Tech (4-Year Session)"}
+                                      {getDepartmentLabel(department)}
                                     </div>
                                   </div>
                                   <Button
@@ -788,6 +840,27 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                   />
                 </div>
 
+                {/* Specialization / Branch (No dropdown, user types) */}
+                <FormField
+                  control={form.control}
+                  name="specialization"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center justify-between">
+                        <span>Field of Specialization / Branch</span>
+                        <span className="text-[11px] text-slate-400 font-normal">Free text (no dropdown)</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g. AI & Machine Learning, Data Science, Cyber Security, Cloud, Full Stack..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 {/* Residential Status (Hosteller / Day Scholar) */}
                 <FormField
                   control={form.control}
@@ -822,71 +895,91 @@ export function EnquiryDialog({ open, onOpenChange }: EnquiryDialogProps) {
                   )}
                 />
 
-                {/* Interests */}
+                {/* Areas of Interest - SINGLE OPTION SELECTION */}
                 <FormField
                   control={form.control}
                   name="interests"
-                  render={() => (
-                    <FormItem>
-                      <div className="mb-2">
-                        <FormLabel className="text-base font-semibold text-gray-800">
-                          Areas of Interest
-                        </FormLabel>
-                        <FormMessage />
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {areasOfInterest.map((interest) => (
+                  render={({ field }) => {
+                    const selectedInterest = field.value?.[0] || "";
+
+                    return (
+                      <FormItem>
+                        <div className="mb-2">
+                          <div className="flex items-center justify-between">
+                            <FormLabel className="text-base font-semibold text-gray-800">
+                              Area of Interest
+                            </FormLabel>
+                            <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+                              Choose 1 Option
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            Select your single primary domain of focus in TechVerse Club.
+                          </p>
+                          <FormMessage />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          {areasOfInterest.map((interest) => {
+                            const isSelected = selectedInterest === interest;
+
+                            return (
+                              <div
+                                key={interest}
+                                onClick={() => {
+                                  field.onChange([interest]);
+                                  setShowOther(interest === "Other");
+                                  if (interest !== "Other") {
+                                    form.setValue("otherInterest", "");
+                                  }
+                                }}
+                                className={cn(
+                                  "flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all select-none",
+                                  isSelected
+                                    ? "bg-blue-50/90 border-blue-500 shadow-sm ring-1 ring-blue-500/30 text-blue-900 font-medium"
+                                    : "bg-white hover:bg-slate-50/80 border-slate-200 text-slate-700"
+                                )}
+                              >
+                                {/* Radio Circle Indicator */}
+                                <div
+                                  className={cn(
+                                    "w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-all",
+                                    isSelected
+                                      ? "border-blue-600 bg-blue-600"
+                                      : "border-slate-300 bg-white"
+                                  )}
+                                >
+                                  {isSelected && (
+                                    <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                                  )}
+                                </div>
+                                <span className="text-sm font-medium leading-tight">{interest}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {showOther && (
                           <FormField
-                            key={interest}
                             control={form.control}
-                            name="interests"
-                            render={({ field }) => (
-                              <FormItem className="flex items-center space-x-2">
+                            name="otherInterest"
+                            render={({ field: otherField }) => (
+                              <FormItem className="mt-3">
+                                <FormLabel>Specify Other Area of Interest</FormLabel>
                                 <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(interest)}
-                                    onCheckedChange={(checked) => {
-                                      if (interest === "Other")
-                                        setShowOther(Boolean(checked));
-                                      return checked
-                                        ? field.onChange([...field.value, interest])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (value) => value !== interest
-                                            )
-                                          );
-                                    }}
+                                  <Input
+                                    placeholder="Type your custom interest or specialization..."
+                                    {...otherField}
                                   />
                                 </FormControl>
-                                <FormLabel className="font-normal text-sm cursor-pointer text-gray-700">
-                                  {interest}
-                                </FormLabel>
+                                <FormMessage />
                               </FormItem>
                             )}
                           />
-                        ))}
-                      </div>
-
-                      {showOther && (
-                        <FormField
-                          control={form.control}
-                          name="otherInterest"
-                          render={({ field }) => (
-                            <FormItem className="mt-3">
-                              <FormLabel>Specify Other Interest</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="Your custom interest"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      )}
-                    </FormItem>
-                  )}
+                        )}
+                      </FormItem>
+                    );
+                  }}
                 />
 
                 {/* ======================================================================= */}

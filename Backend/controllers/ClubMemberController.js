@@ -96,7 +96,13 @@ async function sendScreeningEmail(member) {
 
   const departmentDisplay = member.department === 'btech'
     ? 'B.Tech (School of Engineering & Technology)'
-    : (member.department === 'bca' ? 'BCA (School of Engineering & Technology)' : String(member.department).toUpperCase());
+    : (member.department === 'bca'
+       ? 'BCA (School of Engineering & Technology)'
+       : (member.department === 'mca'
+          ? 'MCA (School of Engineering & Technology)'
+          : (member.department === 'mtech'
+             ? 'M.Tech (School of Engineering & Technology)'
+             : String(member.department || '').toUpperCase())));
   const interestsList = Array.isArray(member.interests) ? member.interests.join(', ') : (member.interests || 'Technology & Innovation');
 
   // Prepare attachments for the 3 logos
@@ -295,7 +301,13 @@ async function sendMembershipCardEmail(member) {
 
   const departmentDisplay = member.department === 'btech'
     ? 'B.Tech (School of Engineering & Technology)'
-    : (member.department === 'bca' ? 'BCA (School of Engineering & Technology)' : String(member.department).toUpperCase());
+    : (member.department === 'bca'
+       ? 'BCA (School of Engineering & Technology)'
+       : (member.department === 'mca'
+          ? 'MCA (School of Engineering & Technology)'
+          : (member.department === 'mtech'
+             ? 'M.Tech (School of Engineering & Technology)'
+             : String(member.department || '').toUpperCase())));
   const interestsList = Array.isArray(member.interests) ? member.interests.join(', ') : (member.interests || 'Technology & Innovation');
 
   const isPromotion = Boolean(member.isPromotion);

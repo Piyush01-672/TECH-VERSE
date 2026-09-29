@@ -8,6 +8,7 @@ const ClubMemberSchema = new mongoose.Schema({
   contact: { type: String, required: true },
   email: { type: String, required: true },
   department: { type: String, required: true },
+  specialization: { type: String, default: '' },
   batch: { type: String, required: true },
   residenceType: { type: String, enum: ['Hosteller', 'Day Scholar'], default: 'Day Scholar' },
   photo: { type: String, default: '' },

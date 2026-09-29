@@ -142,7 +142,12 @@ function generateIdCardSvg(m, options = {}) {
   const rawName = (m.name || 'Club Member').toUpperCase();
   const name = escapeXml(rawName);
   const regNumber = escapeXml(m.regNumber || 'N/A');
-  const department = escapeXml(m.department === 'btech' ? 'B.Tech (SOET)' : (m.department === 'bca' ? 'BCA (SOET)' : String(m.department || 'B.Tech').toUpperCase()));
+  const department = escapeXml(
+    m.department === 'btech' ? 'B.Tech (SOET)' :
+    (m.department === 'bca' ? 'BCA (SOET)' :
+    (m.department === 'mca' ? 'MCA (SOET)' :
+    (m.department === 'mtech' ? 'M.Tech (SOET)' : String(m.department || 'B.Tech').toUpperCase())))
+  );
   const batch = escapeXml(m.batch || '2024-2028');
   const designation = escapeXml(m.designation || (isPromotion ? 'Club Leader' : 'Active Member'));
   const roleAssignee = escapeXml(m.roleAssignee || (isPromotion ? 'President and Committee Members of the Club' : 'Core Team Member'));
@@ -369,7 +374,13 @@ export default async function handler(req, res) {
       const m = member || {};
       const departmentDisplay = m.department === 'btech'
         ? 'B.Tech (School of Engineering & Technology)'
-        : (m.department === 'bca' ? 'BCA (School of Engineering & Technology)' : String(m.department || '').toUpperCase());
+        : (m.department === 'bca'
+           ? 'BCA (School of Engineering & Technology)'
+           : (m.department === 'mca'
+              ? 'MCA (School of Engineering & Technology)'
+              : (m.department === 'mtech'
+                 ? 'M.Tech (School of Engineering & Technology)'
+                 : String(m.department || '').toUpperCase())));
       const interestsList = Array.isArray(m.interests) ? m.interests.join(', ') : (m.interests || 'Technology & Innovation');
 
       const submittedDate = m.createdAt ? new Date(m.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });

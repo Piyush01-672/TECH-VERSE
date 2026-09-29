@@ -105,7 +105,12 @@ function generateIdCardSvg(m, options = {}) {
   const rawName = (m.name || 'Club Member').toUpperCase();
   const name = escapeXml(rawName);
   const regNumber = escapeXml(m.regNumber || 'N/A');
-  const department = escapeXml(m.department === 'btech' ? 'B.Tech (SOET)' : (m.department === 'bca' ? 'BCA (SOET)' : String(m.department || 'B.Tech').toUpperCase()));
+  const department = escapeXml(
+    m.department === 'btech' ? 'B.Tech (SOET)' :
+    (m.department === 'bca' ? 'BCA (SOET)' :
+    (m.department === 'mca' ? 'MCA (SOET)' :
+    (m.department === 'mtech' ? 'M.Tech (SOET)' : String(m.department || 'B.Tech').toUpperCase())))
+  );
   const batch = escapeXml(m.batch || '2024-2028');
   const designation = escapeXml(m.designation || (isPromotion ? 'Club Leader' : 'Active Member'));
   const roleAssignee = escapeXml(m.roleAssignee || (isPromotion ? 'President and Committee Members of the Club' : 'Core Team Member'));

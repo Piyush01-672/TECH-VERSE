@@ -70,6 +70,7 @@ export interface ClubMemberItem {
   contact: string;
   email: string;
   department: string;
+  specialization?: string;
   batch: string;
   residenceType?: string;
   photo?: string;
@@ -1093,6 +1094,8 @@ export default function AdminPortal() {
                   <option value="all" className="bg-[#0b1126] text-white">All Departments</option>
                   <option value="btech" className="bg-[#0b1126] text-white">B.Tech</option>
                   <option value="bca" className="bg-[#0b1126] text-white">BCA</option>
+                  <option value="mca" className="bg-[#0b1126] text-white">MCA</option>
+                  <option value="mtech" className="bg-[#0b1126] text-white">M.Tech</option>
                 </select>
               </div>
             </div>
@@ -1171,7 +1174,17 @@ export default function AdminPortal() {
                           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-slate-400">
                             <span className="font-mono text-cyan-300 font-semibold">{member.regNumber}</span>
                             <span>•</span>
-                            <span className="capitalize">{member.department.toUpperCase()} ({member.batch})</span>
+                            <span className="capitalize">
+                              {member.department === "mtech" ? "M.Tech" : member.department === "btech" ? "B.Tech" : member.department.toUpperCase()} ({member.batch})
+                            </span>
+                            {member.specialization && (
+                              <>
+                                <span>•</span>
+                                <span className="text-amber-300 font-mono text-[11px] bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/20">
+                                  🎯 {member.specialization}
+                                </span>
+                              </>
+                            )}
                             <span>•</span>
                             <span className="text-slate-300">{member.residenceType || "Day Scholar"}</span>
                           </div>
@@ -1404,6 +1417,8 @@ export default function AdminPortal() {
                   <option value="all" className="bg-[#0b1126] text-white">All Departments</option>
                   <option value="btech" className="bg-[#0b1126] text-white">B.Tech</option>
                   <option value="bca" className="bg-[#0b1126] text-white">BCA</option>
+                  <option value="mca" className="bg-[#0b1126] text-white">MCA</option>
+                  <option value="mtech" className="bg-[#0b1126] text-white">M.Tech</option>
                 </select>
               </div>
             </div>
@@ -1522,7 +1537,17 @@ export default function AdminPortal() {
                               )}
                               <span className="font-mono text-cyan-300 font-semibold">{member.regNumber}</span>
                               <span>•</span>
-                              <span className="capitalize">{member.department.toUpperCase()} ({member.batch})</span>
+                              <span className="capitalize">
+                                {member.department === "mtech" ? "M.Tech" : member.department === "btech" ? "B.Tech" : member.department.toUpperCase()} ({member.batch})
+                              </span>
+                              {member.specialization && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-emerald-300 font-mono text-[11px] bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                                    🎯 {member.specialization}
+                                  </span>
+                                </>
+                              )}
                               <span>•</span>
                               <span className="text-slate-300">{member.residenceType || "Day Scholar"}</span>
                             </div>
